@@ -5,8 +5,13 @@ https://www.halekoa.com/dining-drinks/barefoot-bar-menu-qr
 mask == 010
 
 so in my original_map.txt i made 1==black
-if this is correct
-mask == ((i*j)%3+i+j)%2=0 according to QR_Format_Information.svg
+i dont know if this is correct,
+just look at QR_Format_Information.svg
+apparently the mask is white-black-white so
+mask == ((i*j)%3+i+j)%2=0
 
-if that is wrong and 1 is really white,
-mask == (i + j)%2 = 0 according to QR_Format_Information.svg
+whatever the truth is 0=black or 0=white
+we should see the 2nd and 3rd codeword end up the same
+because of
+h t t p s 
+i think
