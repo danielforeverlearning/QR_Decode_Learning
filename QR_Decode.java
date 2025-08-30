@@ -28,6 +28,8 @@ public class QR_Decode  {
 	//  Wikipedia diagram mask5: ((i*j)%3+i+j)%2 == 0
 	//  Wikipedia diagram mask6: (i/2 + j/3)%2   == 0
 	//  Wikipedia diagram mask7: (i*j)%2+(i*j)%3 == 0
+	//
+	//  Wikipedia masks same as QR_Format_Information.svg
 	
 	
 	
@@ -38,9 +40,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = (ii*jj)%2+(ii*jj)%3;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -60,9 +62,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = (ii/2 + jj/3)%2;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -104,9 +106,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = ((ii*jj)%3+ii*jj)%2;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -126,9 +128,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = ii%2;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -148,9 +150,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = (ii+jj)%2;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -170,9 +172,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = (ii+jj)%3;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -191,9 +193,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = jj % 3;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -273,19 +275,73 @@ public class QR_Decode  {
 			ex.printStackTrace();
 			return false;
 		}
-	}
+	}//Do_Mask
+	
+	
+	public static boolean Change_OriginalMap_Black0(String input_filename, String output_filename) {
+		try {
+			FileWriter myWriter = new FileWriter(output_filename);		
+			File inputFile = new File(input_filename);
+			Scanner inputReader = new Scanner(inputFile);
+			boolean inputNextLine = inputReader.hasNextLine();
+			while (inputNextLine) {
+				String inputData = inputReader.nextLine();
+				int inputLen = inputData.length();
+				
+				for (int ii=0; ii < inputLen; ii++) {
+					char inputChar = inputData.charAt(ii);
+					
+					if (inputChar == 'A')
+						myWriter.write('A');
+					else if (inputChar == 'X')
+						myWriter.write('X');
+					else if (inputChar == 'Z')
+						myWriter.write('Z');
+					else if (inputChar == '0')
+						myWriter.write('1');
+					else if (inputChar == '1')
+						myWriter.write('0');
+					else {
+						System.out.println("Change_OriginalMap_Black0: Unsupported character found in the input file, FORCING QUIT!");
+						return false;							
+					}
+				}
+				
+			    myWriter.write('\n');
+			    inputNextLine = inputReader.hasNextLine();
+			}
+			
+			inputReader.close();
+			myWriter.close();
+			
+			System.out.println("Change_OriginalMap_Black0: Success");
+			return true;
+		}
+		catch (Exception ex) {
+			System.out.println("Change_OriginalMap_Black0: An exception occurred!");
+			ex.printStackTrace();
+			return false;
+		}
+	}//Change_OriginalMap_Black0
+	
+	
 		
 	public static void main(String s[]) {
 		//20221025_104402.jpg original image
 		//original_map.txt created by eyeball-and-hand, no code yet
 		//original_map_2.txt created by eyeball-and-hand, no code yet
+		
+		//Change_OriginalMap_Black0("original_map_2.txt", "original_map_3_black0.txt");
+		
+		//using original_map_3_black0.txt
 		Write_Wikipedia_Mask_5();
-		boolean success = Do_Mask("original_map_2.txt", "mask_5.txt", "after_mask5.txt");
+		boolean success = Do_Mask("original_map_3_black0.txt", "mask_5.txt", "after_mask5.txt");
 		
 		//After using javascript debugger in chromewebbrowser of good working code
 		RowColumnMap mymap = new RowColumnMap(41,41);
 		mymap.Load("after_mask5.txt");
 		mymap.GetCodewordsFromMap();
+		
     }//main
 }//class
 

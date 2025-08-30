@@ -17,3 +17,5 @@ mask == white black white
 
 (2) Ok transform original_map_2.txt to original_map_3_black0.txt
     and then try again with mask ((i*j)%3+i+j)%2 == 0
+	ok ..... this did not work you gotta watch whole video to learn
+	and you also got to understand "version" you did not go that far in video.
