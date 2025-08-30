@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class RowColumnMap {
 	enum DIRECTION {
-		GO_DIAGONAL;
-		GO_LEFT;
-		GO_HANDLE_1_Z;
+		GO_DIAGONAL,
+		GO_LEFT,
+		GO_HANDLE_1_Z
 	}
 	private int row_count;
 	private int col_count;
@@ -60,21 +60,21 @@ public class RowColumnMap {
 		char[] temp = { '0', '1', '2', '3', '4', '5', '6', '7' };
 		boolean goingup = true;
 		int Z_count = 0;
-		int Z_save_bitcount;
+		int Z_save_bitcount = 0;
 		DIRECTION mydir;
 		
 		while (true) {
 			
 			//usual case
 			if ((bitcount % 2) == 0) //even bit
-				mydir = GO_LEFT;
+				mydir = DIRECTION.GO_LEFT;
 			else //odd bit
-				mydir = GO_DIAGONAL;
+				mydir = DIRECTION.GO_DIAGONAL;
 			
 			if (map[xx][yy] != 'Z') {
 				if (Z_count > 0) {
 					if (Z_count == 1) {
-						mydir = GO_HANDLE_1_Z; //force go vertical save
+						mydir = DIRECTION.GO_HANDLE_1_Z; //force go vertical save
 					}
 					Z_count = 0;
 					bitcount = Z_save_bitcount;
@@ -90,11 +90,11 @@ public class RowColumnMap {
 					Z_count++;
 			}
 			
-			if (mydir == GO_LEFT) {
+			if (mydir == DIRECTION.GO_LEFT) {
 				//it is always the case xx >= 1 no need for code check
 				xx--;
 			}
-			else if (mydir == GO_DIAGONAL) {
+			else if (mydir == DIRECTION.GO_DIAGONAL) {
 				if (goingup) {
 					if (yy == 0 || map[xx + 1][yy - 1] == 'A') {
 						goingup = false;
@@ -122,7 +122,7 @@ public class RowColumnMap {
 					}
 				}
 			}
-			else if (mydir == GO_HANDLE_1_Z) {
+			else if (mydir == DIRECTION.GO_HANDLE_1_Z) {
 				if (goingup) {
 					if (map[xx + 1][yy - 1] == 'Z')
 						yy--; //go vertical
