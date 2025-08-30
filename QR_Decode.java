@@ -28,7 +28,7 @@ public class QR_Decode  {
 	//  Wikipedia diagram mask5: ((i*j)%3+i+j)%2 == 0
 	//  Wikipedia diagram mask6: (i/2 + j/3)%2   == 0
 	//  Wikipedia diagram mask7: (i*j)%2+(i*j)%3 == 0
-	//  Ok tried what wikipedia said was mask5 and mask0
+	
 	
 	
 	public static void Write_Wikipedia_Mask_7() {
