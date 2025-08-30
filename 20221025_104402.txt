@@ -2,3 +2,11 @@ https://www.halekoa.com/dining-drinks/barefoot-bar-menu-qr
 
 https://www.halekoa.com/dining-drinks/barefoot-bar-menu-qr
 
+mask == 010
+
+so in my original_map.txt i made 1==black
+if this is correct
+mask == ((i*j)%3+i+j)%2=0 according to QR_Format_Information.svg
+
+if that is wrong and 1 is really white,
+mask == (i + j)%2 = 0 according to QR_Format_Information.svg
