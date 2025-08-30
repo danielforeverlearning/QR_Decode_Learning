@@ -82,9 +82,9 @@ public class QR_Decode  {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = ((ii*jj)%3+ii+jj)%2;
 					if (answer == 0)
-						myWriter.write("1");
+						myWriter.write("i"); //i means invert the color
 					else
-						myWriter.write("0");
+						myWriter.write("d"); //d means do not invert the color
 				}
 				myWriter.write('\n');
 			}
@@ -232,9 +232,9 @@ public class QR_Decode  {
 					char inputChar = inputData.charAt(ii);
 					char maskChar = maskData.charAt(ii);
 					
-					if (maskChar == '0')
+					if (maskChar == 'd') //d means do NOT invert color
 						myWriter.write(inputChar);
-					else if (maskChar == '1') {
+					else if (maskChar == 'i') { //i means invert color
 						if (inputChar == 'A')
 							myWriter.write('A');
 						else if (inputChar == 'X')
