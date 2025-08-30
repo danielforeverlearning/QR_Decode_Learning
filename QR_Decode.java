@@ -78,15 +78,17 @@ public class QR_Decode  {
 
 
     public static void Write_Wikipedia_Mask_5() {
+		//i means invert the color
+		//d means do not invert the color
 		try {
 			FileWriter myWriter = new FileWriter("mask_5.txt");
 			for (int ii=0; ii <= 40; ii++) {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = ((ii*jj)%3+ii+jj)%2;
 					if (answer == 0)
-						myWriter.write("i"); //i means invert the color
+						myWriter.write("i");
 					else
-						myWriter.write("d"); //d means do not invert the color
+						myWriter.write("d");
 				}
 				myWriter.write('\n');
 			}
@@ -333,9 +335,10 @@ public class QR_Decode  {
 		
 		//Change_OriginalMap_Black0("original_map_2.txt", "original_map_3_black0.txt");
 		
-		//using original_map_3_black0.txt
 		Write_Wikipedia_Mask_5();
-		boolean success = Do_Mask("original_map_3_black0.txt", "mask_5.txt", "after_mask5.txt");
+		
+		//boolean success = Do_Mask("original_map_3_black0.txt", "mask_5.txt", "after_mask5.txt");
+		boolean success = Do_Mask("original_map_2.txt", "mask_5.txt", "after_mask5.txt");
 		
 		//After using javascript debugger in chromewebbrowser of good working code
 		RowColumnMap mymap = new RowColumnMap(41,41);
