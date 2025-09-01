@@ -51,7 +51,9 @@ public class RowColumnMap {
 		}
 	}
 	
-	public void GetCodewordsFromMap() {
+	public void GetCodewordsFromMap(int NumBlocksGrp1, int NumDataCodewordsEachBlockGrp1, int NumBlocksGrp2, int NumDataCodewordsEachBlockGrp2)
+	{
+		int totalCodewords = (NumBlocksGrp1 * NumDataCodewordsEachBlockGrp1) + (NumBlocksGrp2 * NumDataCodewordsEachBlockGrp2);
 		mybyte    = new ArrayList<String>();
 		codewords = new ArrayList<Integer>();
 		int xx = col_count - 1;
@@ -188,10 +190,14 @@ public class RowColumnMap {
 					System.out.println(tempstr + " = " + tempint);
 					mybyte.add(tempstr);
 					codewords.add(tempint);
-				}
-			}
-		}
+					
+					if (codewords.size() == totalCodewords)
+						break;
+					
+				}//Z_count==0
+			}//bitcount==8
+		}//while
 		
 		System.out.println("GetCodewordsFromMap: DONE");
-	}
+	}//GetCodewordsFromMap
 }//RowColumnMap

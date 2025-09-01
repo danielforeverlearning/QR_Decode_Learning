@@ -479,7 +479,13 @@ public class QR_Decode  {
 		//original_map.txt created by eyeball-and-hand, no code yet
 		//original_map_2.txt created by eyeball-and-hand, no code yet
 		
+		//Do not need this, but just save the code
 		//Change_OriginalMap_Black0("original_map_2.txt", "original_map_3_black0.txt");
+		
+		//These codewords we got from stepping thru online javascript code
+		//https://webqr.com/
+		//Decode_Correct_Sequential_Codewords("./bin/20221025_104402_codewords.txt", "");
+		
 		
 		Write_Wikipedia_Mask_5();
 		boolean success = Do_Mask("./bin/original_map_2.txt", "./bin/mask_5.txt", "./bin/after_mask5.txt");
@@ -488,11 +494,20 @@ public class QR_Decode  {
 			System.out.println("ERROR");
 			return;
 		}
-		Decode_Correct_Sequential_Codewords("./bin/20221025_104402_codewords.txt", "");
 		
+		//see interleaving.jpg or 
+		//https://www.thonky.com/qr-code-tutorial/error-correction-table
+		//
+		//20221025_104402.jpg
+		//
+		//Version and EC Level                                = 6-H
+		//Number of Blocks in Group1                          = 4
+		//Number of Data Codewords in Each of Group1's Blocks = 15
+		//Number of Blocks in Group2                          = 0
+		//Number of Data Codewords in Each of Group2's Blocks = 0
 		RowColumnMap mymap = new RowColumnMap(41,41);
 		mymap.Load("./bin/after_mask5.txt");
-		mymap.GetCodewordsFromMap();
+		mymap.GetCodewordsFromMap(4,15,0,0);
 		
 		System.out.println("DONE");
     }//main
