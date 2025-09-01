@@ -39,28 +39,9 @@ mask == white black white
 	uploading folder 
 	jsqrcode-master
 	
-(4) ok i think it is original_map_2.txt and mask5.txt
-0100 0011  = (4bits) indicator (byte) , (8bits) length (49)
-0001
-
-then you have to remember the D-words MAYBE interleaved not sequential
-
-     0110 1110    110 n
-	 0110 1111    111 o
-	 0110 1010    106 j
-	 0110 1100    108 l
-	 0110 0111    103 g
-	 0010 1111     47 /
-	 0111 1000    120 x
-	 0111 0101    117 u
-	 0110 1101    109 m
-	 0110 0100    100 d
-	 0010 0100     36 $
-	 0111 1011    123 {
-	 0110 0100    100 d
-	 0111 1101    125 }
-	
-(5) there are dynamic vs static qrcodes, dynamic is a short-url that redirects
+	or just step thru https://webqr.com/
+		
+(4) there are dynamic vs static qrcodes, dynamic is a short-url that redirects
 so in this example it is a redirect.
 this example is version6 41x41
 but it has colorful-brand-logo in middle with CTA (call to action)
@@ -73,6 +54,11 @@ again have to learn error-correction and colors CTA if you really
 want to get the short-url for this one.
 to learn error-correction start with simpler qrcodes.
 
+(5) 2025aug31 ok it is original_map_2.txt and mask5.txt after getting D bytes in correct sequential order, look at
+    The-structure-for-QR-code-of-version-6-with-error-correction-level-medium-figure-is.png
+	Made 20221025_104402_codewords.txt from debugger stepping thru https://webqr.com/
+	Wrote function Decode_Correct_Sequential_Codewords
+	so it is a static QR code NOT a dynamic QR code.
 
 	
 	
