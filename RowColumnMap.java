@@ -61,21 +61,32 @@ public class RowColumnMap {
 		boolean goingup = true;
 		int Z_count = 0;
 		int Z_save_bitcount = 0;
+		
+		boolean reverse = false;
 		DIRECTION mydir;
 		
 		while (true) {
 			
 			//usual case
-			if ((bitcount % 2) == 0) //even bit
-				mydir = DIRECTION.GO_LEFT;
-			else //odd bit
-				mydir = DIRECTION.GO_DIAGONAL;
+			if (reverse == false)
+			{
+				if ((bitcount % 2) == 0) //even bit
+					mydir = DIRECTION.GO_LEFT;
+				else //odd bit
+					mydir = DIRECTION.GO_DIAGONAL;
+			}
+			else
+			{
+				if ((bitcount % 2) == 0) //even bit
+					mydir = DIRECTION.GO_DIAGONAL;
+				else //odd bit
+					mydir = DIRECTION.GO_LEFT;
+			}
 			
 			if (map[xx][yy] != 'Z') {
 				if (Z_count > 0) {
-					if (Z_count == 1) {
+					if (Z_count == 1)
 						mydir = DIRECTION.GO_HANDLE_1_Z; //force go vertical save
-					}
 					Z_count = 0;
 					bitcount = Z_save_bitcount;
 				}
@@ -129,6 +140,8 @@ public class RowColumnMap {
 					else { //go diagonal
 						yy--;
 						xx++;
+						
+						reverse = true;
 					}
 				}
 				else { //going down
@@ -175,11 +188,6 @@ public class RowColumnMap {
 					System.out.println(tempstr + " = " + tempint);
 					mybyte.add(tempstr);
 					codewords.add(tempint);
-					
-					if (codewords.size() == 31) {
-						int dummy=0;
-						dummy++;
-					}
 				}
 			}
 		}
