@@ -58,6 +58,7 @@ mask == white black white
 	Made 20221025_104402_codewords.txt from debugger stepping thru https://webqr.com/
 	Wrote function Decode_Correct_Sequential_Codewords
 	so it is a static QR code NOT a dynamic QR code.
+	https://www.thonky.com/qr-code-tutorial/error-correction-table
 
 	
 	
