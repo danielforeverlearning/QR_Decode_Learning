@@ -81,7 +81,7 @@ public class RowColumnMap {
 				}
 				temp[bitcount] = map[xx][yy];
 			}
-			else {
+			else { //map[xx][yy] == 'Z'
 				if (Z_count == 0) {
 					Z_count = 1;
 					Z_save_bitcount = bitcount;
@@ -175,6 +175,11 @@ public class RowColumnMap {
 					System.out.println(tempstr + " = " + tempint);
 					mybyte.add(tempstr);
 					codewords.add(tempint);
+					
+					if (codewords.size() == 31) {
+						int dummy=0;
+						dummy++;
+					}
 				}
 			}
 		}

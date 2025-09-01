@@ -94,7 +94,7 @@ public class QR_Decode  {
 		//i means invert the color
 		//d means do not invert the color
 		try {
-			FileWriter myWriter = new FileWriter("mask_5.txt");
+			FileWriter myWriter = new FileWriter("./bin/mask_5.txt");
 			for (int ii=0; ii <= 40; ii++) {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = ((ii*jj)%3+ii+jj)%2;
@@ -482,16 +482,18 @@ public class QR_Decode  {
 		//Change_OriginalMap_Black0("original_map_2.txt", "original_map_3_black0.txt");
 		
 		Write_Wikipedia_Mask_5();
-		boolean success = Do_Mask("original_map_2.txt", "mask_5.txt", "after_mask5.txt");
+		boolean success = Do_Mask("./bin/original_map_2.txt", "./bin/mask_5.txt", "./bin/after_mask5.txt");
+		if (!success)
+		{
+			System.out.println("ERROR");
+			return;
+		}
+		Decode_Correct_Sequential_Codewords("./bin/20221025_104402_codewords.txt", "");
 		
-		Decode_Correct_Sequential_Codewords("20221025_104402_codewords.txt", "");
-		
-		/*****
-		//After using javascript debugger in chromewebbrowser of good working code
 		RowColumnMap mymap = new RowColumnMap(41,41);
-		mymap.Load("after_mask5.txt");
+		mymap.Load("./bin/after_mask5.txt");
 		mymap.GetCodewordsFromMap();
-		*****/
+		
 		System.out.println("DONE");
     }//main
 }//class
