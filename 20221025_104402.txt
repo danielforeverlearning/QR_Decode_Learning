@@ -41,20 +41,19 @@ mask == white black white
 	
 	or just step thru https://webqr.com/
 		
-(4) there are dynamic vs static qrcodes, dynamic is a short-url that redirects
-so in this example it is a redirect.
-this example is version6 41x41
-but it has colorful-brand-logo in middle with CTA (call to action)
-you will have to learn error-correction and qrcode generation/encoding first
-for now since you are learning its best to stick with simpler
-black and white only qrcodes say version 6 or less
-before learning more complex qrcodes.
-this 1 too difficult to begin with.
-again have to learn error-correction and colors CTA if you really
-want to get the short-url for this one.
-to learn error-correction start with simpler qrcodes.
-
-(5) 2025aug31 ok it is original_map_2.txt and mask5.txt after getting D bytes in correct sequential order, look at
+(4) there are dynamic vs static qrcodes, 
+    dynamic is a short-url that redirects,
+	static is the url string no redirect.
+    this example is version6 41x41
+    but it has colorful-brand-logo in middle with CTA (call to action)
+    you will have to learn error-correction and qrcode generation/encoding first
+    for now since you are learning its best to stick with simpler
+    black and white only qrcodes say version 6 or less
+    before learning more complex qrcodes,
+    again have to learn error-correction and colors CTA.
+	
+(5) 2025sept1 ok it is original_map_2.txt and mask5.txt 
+	after getting D bytes in correct sequential order, look at
     The-structure-for-QR-code-of-version-6-with-error-correction-level-medium-figure-is.png
 	Made 20221025_104402_codewords.txt from debugger stepping thru https://webqr.com/
 	Wrote function Decode_Correct_Sequential_Codewords
