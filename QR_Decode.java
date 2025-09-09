@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class QR_Decode  { 
@@ -508,6 +509,23 @@ public class QR_Decode  {
 		RowColumnMap mymap = new RowColumnMap(41,41);
 		mymap.Load("./bin/after_mask5.txt");
 		mymap.GetCodewordsFromMap(4,15,0,0);
+		
+		
+		//"HELLO WORLD", 1-M ALPHANUMERIC, 16 data-codewords, 10 error-correction-codewords 
+		String[] msg_polynomial = { "00100000", "01011011", "00001011", "01111000", 
+				                    "11010001", "01110010", "11011100", "01001101", 
+				                    "01000011", "01000000", "11101100", "00010001",
+				                    "11101100", "00010001", "11101100", "00010001"  };
+		ArrayList<Integer> msg_poly_coeffs = new ArrayList<Integer>();
+		
+		System.out.println();
+		for (int ii=0; ii < msg_polynomial.length; ii++)
+		{
+		     int temp = ConvertBinaryByteStringToPositiveInteger(msg_polynomial[ii]);
+		     msg_poly_coeffs.add(temp);
+		     System.out.print(" " + temp);
+		}
+		System.out.println();
 		
 		System.out.println("DONE");
     }//main
