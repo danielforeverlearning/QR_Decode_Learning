@@ -753,7 +753,7 @@ class ErrorCorrectionCodewordsGeneration
 		
 		
 		
-		for (int nn=2; nn <= 3; nn++)
+		for (int nn=2; nn <= 15; nn++)
 		{
 			if (nn==2)
 			{
@@ -802,6 +802,8 @@ class ErrorCorrectionCodewordsGeneration
 					//GF256 multiply
 					int x_exp              = temp1_x_exp + temp2_x_exp;
 					int alpha_exp          = temp1_alpha_exp + temp2_alpha_exp;
+					if (alpha_exp >= 256)
+						alpha_exp %= 255;
 					int alphadecimal       = Table_Exponent_Of_Alpha_To_Integer[alpha_exp];
 					
 					if (x_exp == highest_x_exp)
@@ -820,8 +822,8 @@ class ErrorCorrectionCodewordsGeneration
 			{
 				int alpha_exp = Table_Integer_To_Exponent_Of_Alpha[answer_alphadecimal.get(ii)];
 				answer_alpha_exp.add(alpha_exp);
-				big_gen_poly_alpha_exp.add(answer_alpha_exp);
 			}
+			big_gen_poly_alpha_exp.add(answer_alpha_exp);
 			
 			System.out.println();
 			System.out.println("nn==" + nn + " answer_alphadecimal = ");
