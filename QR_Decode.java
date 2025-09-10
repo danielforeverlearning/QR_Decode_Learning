@@ -526,7 +526,12 @@ public class QR_Decode  {
 		     System.out.print(" " + temp);
 		}
 		System.out.println();
+		System.out.println();
 		
+		ErrorCorrectionCodewordsGeneration ecc = new ErrorCorrectionCodewordsGeneration(msg_poly_coeffs, 10);
+		ecc.Make_GeneratorPolynomial_Table();
+
+		System.out.println();
 		System.out.println("DONE");
     }//main
 }//class

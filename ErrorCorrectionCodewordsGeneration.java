@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Stack;
+
 /****************************************************************************
 
 "HELLO WORLD"
@@ -584,10 +587,32 @@ LOOP 7 of 16
 
 class ErrorCorrectionCodewordsGeneration
 {
+	private ArrayList<Integer> msg_poly_coeffs_decimal;
+	private ArrayList<Integer> gen_poly_coeffs_decimal;
 	
-	public ErrorCorrectionCodewordsGeneration()
+	private int countErrorCorrectionCodewords;
+	
+	private void InitializeGeneratorPolynomial()
 	{
-		
+		gen_poly_coeffs_decimal = new ArrayList<Integer>();
+		if (countErrorCorrectionCodewords == 10)
+		{
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[0]);
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[251]);
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[67]);
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[46]);
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[61]);
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[118]);
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[70]);
+			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[64]);
+		}
+	}
+	
+	public ErrorCorrectionCodewordsGeneration(ArrayList<Integer> myintarray, int myint)
+	{
+		msg_poly_coeffs_decimal = myintarray;
+		countErrorCorrectionCodewords = myint;
+		InitializeGeneratorPolynomial();
 	}
 	
 	
@@ -669,4 +694,144 @@ class ErrorCorrectionCodewordsGeneration
 				 System.out.print(table2[ii] + ", ");
 		}	
 	}//Make_GF256_Tables
+	
+	public void Make_GeneratorPolynomial_Table()
+	{
+		/***********************************************************************************************
+		The Generator Polynomial
+		
+		(x - ɑ^0) ... (x - ɑ^n-1)
+		where n is the number of error correction codewords that must be generated (see the error correction table). 
+		As mentioned in the previous section, ɑ (alpha) is equal to 2.
+		
+		First, get the generator polynomial. Since this is a 1-M code, 
+		the error correction table says to create 10 error correction codewords.
+		Therefore, use the following generator polynomial:
+		x^10 + ɑ^251x^9 + ɑ^67x^8 + ɑ^46x^7 + ɑ^61x^6 + ɑ^118x^5 + ɑ^70x^4 + ɑ^64x^3 + ɑ^94x^2 + ɑ^32x + ɑ^45
+
+		(Use generator polynomial tool if you want to)
+		https://www.thonky.com/qr-code-tutorial/generator-polynomial-tool?degree=10  :
+		ɑ^0x10 + ɑ^251x9 + ɑ^67x8 + ɑ^46x7 + ɑ^61x6 + ɑ^118x5 + ɑ^70x4 + ɑ^64x3 + ɑ^94x2 + ɑ^32x + ɑ^45
+		***********************************************************************************************/
+		
+		ArrayList<ArrayList<Integer>> big_gen_poly_alpha_exp = new ArrayList<ArrayList<Integer>>();
+		//minimum amount of error-correction-codewords == 2
+		//maximum amount of error-correction-codewords == 30
+		big_gen_poly_alpha_exp.add(null); //0 error_correction_codewords
+		big_gen_poly_alpha_exp.add(null); //1 error_correction_codewords
+		
+		
+		
+		
+		
+		
+
+		//term1 will be the big term that keeps getting bigger
+		ArrayList<Integer> term1_alpha_exp = new ArrayList<Integer>();
+		ArrayList<Integer> term1_x_exp = new ArrayList<Integer>();
+		
+			
+		//in GF256 world - is same as + in multiplication
+		//(x - a^0).....(x - a^(n-1))
+		//
+		//(x - a^0)(x - a^1)
+		//(a^0x^1 + a^0x^0)(a^0x^1 + a^1x^0)
+		//term2 will be (x-a^(n-1)) it will always be total size 4
+		int[] term2_alpha_exp = { 0, 1 };
+		int[] term2_x_exp     = { 1, 0 };
+		
+		ArrayList<Integer> answer_alphadecimal = new ArrayList<Integer>();
+		
+		//answer will have 1 more than highest-term-count
+		//since we start with (x + 1)(x + a^1) for n==2
+		//that means there will be 3 terms
+		//with highest x exponent of 2 as in x^2
+		answer_alphadecimal.add(0);
+		answer_alphadecimal.add(0);
+		answer_alphadecimal.add(0);
+		int highest_x_exp = 2;
+		
+		
+		
+		for (int nn=2; nn <= 3; nn++)
+		{
+			if (nn==2)
+			{
+			     term1_alpha_exp.add(0);
+			     term1_x_exp.add(1);
+			     term1_alpha_exp.add(0);
+			     term1_x_exp.add(0);
+			}
+			else
+			{
+			     term1_alpha_exp.clear();
+		         term1_x_exp.clear();
+		         answer_alphadecimal.clear();
+		         
+		         //(x - a^0).....(x - a^(n-2))
+		         ArrayList<Integer> gen_poly = big_gen_poly_alpha_exp.get(nn-1);   
+		         for (int ii=0; ii < gen_poly.size(); ii++)
+		         {
+		        	 term1_alpha_exp.add(gen_poly.get(ii));
+		        	 term1_x_exp.add(gen_poly.size() - ii - 1);
+		        	 answer_alphadecimal.add(0);
+		         }
+		         answer_alphadecimal.add(0);
+		         
+		         //term2 will be (a^0x^1 - a^(n-1)x^0) it will always be total size 4
+				 term2_alpha_exp[0] = 0;
+				 term2_x_exp[0]     = 1;
+				 term2_alpha_exp[1] = nn - 1;
+				 term2_x_exp[1]     = 0;
+					
+				 highest_x_exp = nn;
+			}
+	
+			
+			//  x^(n-1) + ........ * (x - a^(n-1))
+			int term1_length = term1_alpha_exp.size();
+			for (int term1_ii=0; term1_ii < term1_length; term1_ii++)
+			{
+				int temp1_alpha_exp        = term1_alpha_exp.get(term1_ii);
+				int temp1_x_exp            = term1_x_exp.get(term1_ii);
+				for (int term2_ii=0; term2_ii < 2; term2_ii++)
+				{
+					int temp2_alpha_exp    = term2_alpha_exp[term2_ii];
+					int temp2_x_exp        = term2_x_exp[term2_ii];
+				
+					//GF256 multiply
+					int x_exp              = temp1_x_exp + temp2_x_exp;
+					int alpha_exp          = temp1_alpha_exp + temp2_alpha_exp;
+					int alphadecimal       = Table_Exponent_Of_Alpha_To_Integer[alpha_exp];
+					
+					if (x_exp == highest_x_exp)
+						answer_alphadecimal.set(0, alphadecimal);
+					else
+					{   int index = highest_x_exp - x_exp;
+					    int temp = answer_alphadecimal.get(index);
+					    temp ^= alphadecimal;
+					    answer_alphadecimal.set(index, temp);
+					}
+				}//term2_ii
+			}//term1_ii
+			
+			ArrayList<Integer> answer_alpha_exp = new ArrayList<Integer>();
+			for (int ii=0; ii < answer_alphadecimal.size(); ii++)
+			{
+				int alpha_exp = Table_Integer_To_Exponent_Of_Alpha[answer_alphadecimal.get(ii)];
+				answer_alpha_exp.add(alpha_exp);
+				big_gen_poly_alpha_exp.add(answer_alpha_exp);
+			}
+			
+			System.out.println();
+			System.out.println("nn==" + nn + " answer_alphadecimal = ");
+			for (int ii=0; ii < answer_alphadecimal.size(); ii++)
+				System.out.print(answer_alphadecimal.get(ii) + "  ");
+			
+			System.out.println();
+			System.out.println("nn==" + nn + " answer_alpha_exp = ");
+			for (int ii=0; ii < answer_alpha_exp.size(); ii++)
+				System.out.print(answer_alpha_exp.get(ii) + "  ");
+	     }//for nn
+	}//Make_GeneratorPolynomial_Table
 }//class
