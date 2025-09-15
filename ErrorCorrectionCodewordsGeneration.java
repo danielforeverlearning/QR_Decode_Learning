@@ -587,33 +587,119 @@ LOOP 7 of 16
 
 class ErrorCorrectionCodewordsGeneration
 {
-	private ArrayList<Integer> msg_poly_coeffs_decimal;
-	private ArrayList<Integer> gen_poly_coeffs_decimal;
-	
 	private int countErrorCorrectionCodewords;
+	private ArrayList<Integer> OriginalGenPolyAlphaExp;
 	
-	private void InitializeGeneratorPolynomial()
-	{
-		gen_poly_coeffs_decimal = new ArrayList<Integer>();
-		if (countErrorCorrectionCodewords == 10)
-		{
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[0]);
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[251]);
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[67]);
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[46]);
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[61]);
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[118]);
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[70]);
-			gen_poly_coeffs_decimal.add(Table_Exponent_Of_Alpha_To_Integer[64]);
-		}
-	}
+	private ArrayList<Integer> msg_poly_decimal;
+	private ArrayList<Integer> msg_poly_alphaexp;
 	
+	private ArrayList<Integer> gen_poly_alphaexp;
+	private ArrayList<Integer> gen_poly_decimal;
+	
+	private ArrayList<Integer> result_decimal;
+
 	public ErrorCorrectionCodewordsGeneration(ArrayList<Integer> myintarray, int myint)
 	{
-		msg_poly_coeffs_decimal = myintarray;
 		countErrorCorrectionCodewords = myint;
-		InitializeGeneratorPolynomial();
-	}
+		
+		msg_poly_alphaexp = new ArrayList<Integer>();
+		gen_poly_alphaexp = new ArrayList<Integer>();
+		gen_poly_decimal  = new ArrayList<Integer>();
+		result_decimal  = new ArrayList<Integer>();
+		
+		msg_poly_decimal = new ArrayList<Integer>();
+		for (int ii=0; ii < myintarray.size(); ii++)
+			msg_poly_decimal.add(myintarray.get(ii));
+		
+		for (int ii=0; ii < countErrorCorrectionCodewords; ii++)
+			msg_poly_decimal.add(0);
+		
+		OriginalGenPolyAlphaExp = new ArrayList<Integer>();
+		for (int ii=0; ii < Table_Generator_Polynomial_AlphaExp[countErrorCorrectionCodewords].length; ii++)
+			OriginalGenPolyAlphaExp.add(Table_Generator_Polynomial_AlphaExp[countErrorCorrectionCodewords][ii]);
+		
+		//division loop
+		int loop_count = myintarray.size();
+		for (int ii=1; ii <= loop_count; ii++)
+		{
+		     Create_MsgPolyAlphaExp();
+		     MultiplyGenPolyAlphaExpByLeadTermMsgPolyAlphaExp();
+		     Create_GenPolyDecimal();
+		     Pad_GenPolyDecimal();
+		     XOR_Decimal();
+	         Result_To_MsgPolyDecimal();
+	         
+		     //DebugPrintArray("msg_poly_decimal", msg_poly_decimal);
+		     //DebugPrintArray("msg_poly_alphaexp", msg_poly_alphaexp);
+		     //DebugPrintArray("gen_poly_alphaexp", gen_poly_alphaexp);
+		     //DebugPrintArray("gen_poly_decimal", gen_poly_decimal);
+		     DebugPrintArray("result_decimal", result_decimal);
+		}
+	}//constructor
+	
+    private void Result_To_MsgPolyDecimal()
+    {
+    	msg_poly_decimal.clear();
+    	for (int ii=0; ii < result_decimal.size(); ii++)
+    		msg_poly_decimal.add(result_decimal.get(ii));
+    }//Result_To_MsgPolyDecimal
+
+	
+	private void XOR_Decimal()
+	{
+		result_decimal.clear();
+		for (int ii=1; ii < msg_poly_decimal.size(); ii++)
+		{
+			int temp = msg_poly_decimal.get(ii) ^ gen_poly_decimal.get(ii);
+			result_decimal.add(temp);
+		}
+	}//XOR_Decimal
+	
+	private void Pad_GenPolyDecimal()
+	{
+		int count = msg_poly_decimal.size() - gen_poly_decimal.size();
+		for (int ii=0; ii < count; ii++)
+			gen_poly_decimal.add(0);
+	}//Pad_GenPolyDecimal
+	
+	private void MultiplyGenPolyAlphaExpByLeadTermMsgPolyAlphaExp()
+	{
+		int leadterm = msg_poly_alphaexp.get(0);
+		gen_poly_alphaexp.clear();
+		for (int ii=0; ii < OriginalGenPolyAlphaExp.size(); ii++)
+		{
+			int temp = OriginalGenPolyAlphaExp.get(ii);
+			temp += leadterm;
+			if (temp >= 256)
+				temp %= 255;
+			
+			gen_poly_alphaexp.add(temp);
+		}
+		
+	}//MultiplyGenPolyAlphaExpByLeadTermMsgPolyAlphaExp
+	
+	private void Create_MsgPolyAlphaExp()
+	{
+		msg_poly_alphaexp.clear();
+		for (int ii=0; ii < msg_poly_decimal.size(); ii++)
+			msg_poly_alphaexp.add(Table_Integer_To_Exponent_Of_Alpha[msg_poly_decimal.get(ii)]);
+	}//Create_MsgPolyAlphaExp
+	
+	private void Create_GenPolyDecimal()
+	{
+		gen_poly_decimal.clear();
+		for (int ii=0; ii < gen_poly_alphaexp.size(); ii++)
+			gen_poly_decimal.add(Table_Exponent_Of_Alpha_To_Integer[gen_poly_alphaexp.get(ii)]);
+	}//Create_GenPolyDecimal
+	
+	private void DebugPrintArray(String name, ArrayList<Integer> array)
+	{
+		System.out.println();
+		System.out.print(name + " = ");
+		for (int ii=0; ii < array.size(); ii++)
+			System.out.print(array.get(ii) + "  ");
+		System.out.println();
+	}//DebugPrintArray
 	
 	
 	/************************************************************************************************
@@ -656,6 +742,40 @@ class ErrorCorrectionCodewordsGeneration
 	                                             203, 89, 95, 176, 156, 169, 160, 81, 11, 245, 22, 235, 122, 117, 44, 215,
 	                                              79, 174, 213, 233, 230, 231, 173, 232, 116, 214, 244, 234, 168, 80, 88, 175   };
 	
+	private int[][] Table_Generator_Polynomial_AlphaExp = { 
+			null,
+			null,
+	        { 0, 25, 1 }, 
+	        { 0, 198, 199, 3 }, 
+	        { 0, 75, 249, 78, 6 }, 
+	        { 0, 113, 164, 166, 119, 10 }, 
+	        { 0, 166, 0, 134, 5, 176, 15 }, 
+	        { 0, 87, 229, 146, 149, 238, 102, 21 }, 
+	        { 0, 175, 238, 208, 249, 215, 252, 196, 28 }, 
+	        { 0, 95, 246, 137, 231, 235, 149, 11, 123, 36 }, 
+	        { 0, 251, 67, 46, 61, 118, 70, 64, 94, 32, 45 }, 
+	        { 0, 220, 192, 91, 194, 172, 177, 209, 116, 227, 10, 55 }, 
+	        { 0, 102, 43, 98, 121, 187, 113, 198, 143, 131, 87, 157, 66 }, 
+	        { 0, 74, 152, 176, 100, 86, 100, 106, 104, 130, 218, 206, 140, 78 }, 
+	        { 0, 199, 249, 155, 48, 190, 124, 218, 137, 216, 87, 207, 59, 22, 91 }, 
+	        { 0, 8, 183, 61, 91, 202, 37, 51, 58, 58, 237, 140, 124, 5, 99, 105 }, 
+	        { 0, 120, 104, 107, 109, 102, 161, 76, 3, 91, 191, 147, 169, 182, 194, 225, 120 }, 
+	        { 0, 43, 139, 206, 78, 43, 239, 123, 206, 214, 147, 24, 99, 150, 39, 243, 163, 136 }, 
+	        { 0, 215, 234, 158, 94, 184, 97, 118, 170, 79, 187, 152, 148, 252, 179, 5, 98, 96, 153 }, 
+	        { 0, 67, 3, 105, 153, 52, 90, 83, 17, 150, 159, 44, 128, 153, 133, 252, 222, 138, 220, 171 }, 
+	        { 0, 17, 60, 79, 50, 61, 163, 26, 187, 202, 180, 221, 225, 83, 239, 156, 164, 212, 212, 188, 190 }, 
+	        { 0, 240, 233, 104, 247, 181, 140, 67, 98, 85, 200, 210, 115, 148, 137, 230, 36, 122, 254, 148, 175, 210 }, 
+	        { 0, 210, 171, 247, 242, 93, 230, 14, 109, 221, 53, 200, 74, 8, 172, 98, 80, 219, 134, 160, 105, 165, 231 }, 
+	        { 0, 171, 102, 146, 91, 49, 103, 65, 17, 193, 150, 14, 25, 183, 248, 94, 164, 224, 192, 1, 78, 56, 147, 253 }, 
+	        { 0, 229, 121, 135, 48, 211, 117, 251, 126, 159, 180, 169, 152, 192, 226, 228, 218, 111, 0, 117, 232, 87, 96, 227, 21 }, 
+	        { 0, 231, 181, 156, 39, 170, 26, 12, 59, 15, 148, 201, 54, 66, 237, 208, 99, 167, 144, 182, 95, 243, 129, 178, 252, 45 }, 
+	        { 0, 173, 125, 158, 2, 103, 182, 118, 17, 145, 201, 111, 28, 165, 53, 161, 21, 245, 142, 13, 102, 48, 227, 153, 145, 218, 70 }, 
+	        { 0, 79, 228, 8, 165, 227, 21, 180, 29, 9, 237, 70, 99, 45, 58, 138, 135, 73, 126, 172, 94, 216, 193, 157, 26, 17, 149, 96 }, 
+	        { 0, 168, 223, 200, 104, 224, 234, 108, 180, 110, 190, 195, 147, 205, 27, 232, 201, 21, 43, 245, 87, 42, 195, 212, 119, 242, 37, 9, 123 }, 
+	        { 0, 156, 45, 183, 29, 151, 219, 54, 96, 249, 24, 136, 5, 241, 175, 189, 28, 75, 234, 150, 148, 23, 9, 202, 162, 68, 250, 140, 24, 151 }, 
+	        { 0, 41, 173, 145, 152, 216, 31, 179, 182, 50, 48, 110, 86, 239, 96, 222, 125, 42, 173, 226, 193, 224, 130, 156, 37, 251, 216, 238, 40, 192, 180 } 
+	};	
+	
 	
 	private void Make_GF256_Tables()
 	{
@@ -695,7 +815,7 @@ class ErrorCorrectionCodewordsGeneration
 		}	
 	}//Make_GF256_Tables
 	
-	public void Make_GeneratorPolynomial_Table()
+	private void Make_GeneratorPolynomial_Table()
 	{
 		/***********************************************************************************************
 		The Generator Polynomial
@@ -753,7 +873,7 @@ class ErrorCorrectionCodewordsGeneration
 		
 		
 		
-		for (int nn=2; nn <= 15; nn++)
+		for (int nn=2; nn <= 30; nn++)
 		{
 			if (nn==2)
 			{
@@ -824,16 +944,21 @@ class ErrorCorrectionCodewordsGeneration
 				answer_alpha_exp.add(alpha_exp);
 			}
 			big_gen_poly_alpha_exp.add(answer_alpha_exp);
-			
-			System.out.println();
-			System.out.println("nn==" + nn + " answer_alphadecimal = ");
-			for (int ii=0; ii < answer_alphadecimal.size(); ii++)
-				System.out.print(answer_alphadecimal.get(ii) + "  ");
-			
-			System.out.println();
-			System.out.println("nn==" + nn + " answer_alpha_exp = ");
-			for (int ii=0; ii < answer_alpha_exp.size(); ii++)
-				System.out.print(answer_alpha_exp.get(ii) + "  ");
 	     }//for nn
+		
+		 /*****
+		 for (int ii=0; ii < big_gen_poly_alpha_exp.size(); ii++)
+		 {
+			 ArrayList<Integer> temp = big_gen_poly_alpha_exp.get(ii);
+			 if (temp == null)
+				 System.out.println("null");
+			 else
+			 {
+				 for (int xx=0; xx < temp.size(); xx++)
+					 System.out.print(temp.get(xx) + ", ");
+				 System.out.println();
+			 }
+		 }
+		 *****/
 	}//Make_GeneratorPolynomial_Table
 }//class
