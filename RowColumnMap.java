@@ -21,10 +21,41 @@ public class RowColumnMap {
 		
 		//top left is 0,0
 		
-		map = new char[num_columns][num_rows];
+		map       = new char[num_columns][num_rows];
+		mybyte    = new ArrayList<String>();
+		codewords = new ArrayList<Integer>();
+		
 		row_count = num_rows;
 		col_count = num_columns;
-	}
+	}//constructor
+	
+	public ArrayList<String> Get_mybyte()
+	{
+		return mybyte;
+	}//Get_mybyte
+	
+	public ArrayList<Integer> Get_codewords()
+	{
+		return codewords;
+	}//Get_codewords
+	
+	public void DebugPrint_mybyte()
+	{
+		System.out.println();
+		System.out.print("mybyte = ");
+		for (int ii=0; ii < mybyte.size(); ii++)
+			System.out.print(mybyte.get(ii) + " ");
+		System.out.println();
+	}//DebugPrint_mybyte
+	
+	public void DebugPrint_codewords()
+	{
+		System.out.println();
+		System.out.print("codewords = ");
+		for (int ii=0; ii < codewords.size(); ii++)
+			System.out.print(codewords.get(ii) + " ");
+		System.out.println();
+	}//DebugPrint_codewords
 	
 	public boolean Load(String input_filename) {
 		
@@ -49,13 +80,15 @@ public class RowColumnMap {
 			ex.printStackTrace();
 			return false;
 		}
-	}
+	}//Load
 	
-	public void GetCodewordsFromMap(int NumBlocksGrp1, int NumDataCodewordsEachBlockGrp1, int NumBlocksGrp2, int NumDataCodewordsEachBlockGrp2)
+	public void FindCodewordsFromMap(int NumBlocksGrp1, int NumDataCodewordsEachBlockGrp1, int NumBlocksGrp2, int NumDataCodewordsEachBlockGrp2)
 	{
 		int totalCodewords = (NumBlocksGrp1 * NumDataCodewordsEachBlockGrp1) + (NumBlocksGrp2 * NumDataCodewordsEachBlockGrp2);
-		mybyte    = new ArrayList<String>();
-		codewords = new ArrayList<Integer>();
+		
+		mybyte.clear();
+		codewords.clear();
+		
 		int xx = col_count - 1;
 		int yy = row_count - 1;
 		int bitcount = 0;
@@ -199,5 +232,5 @@ public class RowColumnMap {
 		}//while
 		
 		System.out.println("GetCodewordsFromMap: DONE");
-	}//GetCodewordsFromMap
+	}//FindCodewordsFromMap
 }//RowColumnMap
