@@ -605,7 +605,7 @@ class ErrorCorrectionCodewordsGeneration
 		msg_poly_alphaexp = new ArrayList<Integer>();
 		gen_poly_alphaexp = new ArrayList<Integer>();
 		gen_poly_decimal  = new ArrayList<Integer>();
-		result_decimal  = new ArrayList<Integer>();
+		result_decimal    = new ArrayList<Integer>();
 		
 		msg_poly_decimal = new ArrayList<Integer>();
 		for (int ii=0; ii < myintarray.size(); ii++)
@@ -615,7 +615,7 @@ class ErrorCorrectionCodewordsGeneration
 			msg_poly_decimal.add(0);
 		
 		OriginalGenPolyAlphaExp = new ArrayList<Integer>();
-		for (int ii=0; ii < Table_Generator_Polynomial_AlphaExp[countErrorCorrectionCodewords].length; ii++)
+ 		for (int ii=0; ii < Table_Generator_Polynomial_AlphaExp[countErrorCorrectionCodewords].length; ii++)
 			OriginalGenPolyAlphaExp.add(Table_Generator_Polynomial_AlphaExp[countErrorCorrectionCodewords][ii]);
 		
 		//division loop
@@ -629,13 +629,18 @@ class ErrorCorrectionCodewordsGeneration
 		     XOR_Decimal();
 	         Result_To_MsgPolyDecimal();
 	         
-		     //DebugPrintArray("msg_poly_decimal", msg_poly_decimal);
+		     //DebugPrintArray("msg_poly_decimal",  msg_poly_decimal);
 		     //DebugPrintArray("msg_poly_alphaexp", msg_poly_alphaexp);
 		     //DebugPrintArray("gen_poly_alphaexp", gen_poly_alphaexp);
-		     //DebugPrintArray("gen_poly_decimal", gen_poly_decimal);
-		     DebugPrintArray("result_decimal", result_decimal);
+		     //DebugPrintArray("gen_poly_decimal",  gen_poly_decimal);
+		     //DebugPrintArray("result_decimal",    result_decimal);
 		}
 	}//constructor
+	
+	public ArrayList<Integer> Get_ECC_Decimal()
+	{
+		return result_decimal;
+	}//Get_ECC_Decimal
 	
     private void Result_To_MsgPolyDecimal()
     {

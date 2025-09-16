@@ -34,15 +34,15 @@ public class RowColumnMap {
 		return mybyte;
 	}//Get_mybyte
 	
-	public ArrayList<Integer> Get_codewords()
+	public ArrayList<Integer> Get_datacodewords()
 	{
 		return codewords;
-	}//Get_codewords
+	}//Get_datacodewords
 	
 	public void DebugPrint_mybyte()
 	{
 		System.out.println();
-		System.out.print("mybyte = ");
+		System.out.print("length=" + mybyte.size() + " mybyte= ");
 		for (int ii=0; ii < mybyte.size(); ii++)
 			System.out.print(mybyte.get(ii) + " ");
 		System.out.println();
@@ -51,7 +51,7 @@ public class RowColumnMap {
 	public void DebugPrint_codewords()
 	{
 		System.out.println();
-		System.out.print("codewords = ");
+		System.out.print("length=" + codewords.size() + " codewords= ");
 		for (int ii=0; ii < codewords.size(); ii++)
 			System.out.print(codewords.get(ii) + " ");
 		System.out.println();
