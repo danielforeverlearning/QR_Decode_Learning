@@ -32,19 +32,6 @@ public class QR_Decode  {
 	//
 	//  Wikipedia masks same as QR_Format_Information.svg
 	
-	enum ENCODING_INDICATOR {
-		NUMERIC,                          //0001 (10bits per 3 digits) 
-		ALPHANUMERIC,                     //0010 (11bits per 2 characters)
-		BYTE,                             //0100 ( 8bits per character)
-		KANJI,                            //1000 (13bits per character)
-		STRUCTURED_APPEND,                //0011 (used to split a message across multiple QR symbols)
-		EXTENDED_CHANNEL_INTERPRETATION,  //0111 (select alternate character set or encoding)
-		FNC1_1ST_POSITION,                //0101
-		FNC1_2ND_POSITION,                //1001
-		END_OF_MESSAGE,                   //0000 (terminator)
-		UNKNOWN
-	}
-	
 	
 	
 	public static void Write_Wikipedia_Mask_7() {
@@ -294,18 +281,6 @@ public class QR_Decode  {
 	}//Do_Mask
 	
 	
-	public static int ConvertBinaryByteStringToPositiveInteger(String binaryByteString) {
-		int[] two_pow = {128, 64, 32, 16, 8, 4, 2, 1};
-		int answer = 0;
-		for (int ii=0; ii <= 7; ii++) {
-			char mychar = binaryByteString.charAt(ii);
-			if (mychar == '1')
-				answer += two_pow[ii];
-		}
-        return answer;		
-	}//ConvertBinaryByteStringToPositiveInteger
-	
-	
 	public static boolean Change_OriginalMap_Black0(String input_filename, String output_filename) {
 		try {
 			FileWriter myWriter = new FileWriter(output_filename);		
@@ -352,128 +327,6 @@ public class QR_Decode  {
 		}
 	}//Change_OriginalMap_Black0
 	
-	public static boolean Decode_Correct_Sequential_Codewords(String input_filename, String output_filename) {
-		try {
-			
-			//FileWriter myWriter = new FileWriter(output_filename);		
-			File inputFile        = new File(input_filename);
-			Scanner inputReader   = new Scanner(inputFile);
-			
-			boolean getIndicator  = true;
-			int length            = 0;
-			ENCODING_INDICATOR encoding = ENCODING_INDICATOR.UNKNOWN;
-			
-			String startOfByte    = "";
-			
-			while (true) {
-				
-				if (getIndicator) {
-					
-					String padded8str = "00000000";
-				    String inputData  = inputReader.nextLine();
-				    int number = Integer.parseInt(inputData);
-					//System.out.println("number=" + number);
-                    String binaryString = Integer.toBinaryString(number);
-					//System.out.println("binaryString=" + binaryString);
-				    if (binaryString.length() == 8)
-						padded8str = binaryString;
-					else
-						padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-                    //System.out.println("padded8str=" + padded8str);
-					
-					if (padded8str.startsWith("0001"))
-						encoding = ENCODING_INDICATOR.NUMERIC;
-					else if (padded8str.startsWith("0010"))
-						encoding = ENCODING_INDICATOR.ALPHANUMERIC;
-					else if (padded8str.startsWith("0100"))
-						encoding = ENCODING_INDICATOR.BYTE;
-					else if (padded8str.startsWith("1000"))
-						encoding = ENCODING_INDICATOR.KANJI;
-					else if (padded8str.startsWith("0011"))
-						encoding = ENCODING_INDICATOR.STRUCTURED_APPEND;
-					else if (padded8str.startsWith("0111"))
-						encoding = ENCODING_INDICATOR.EXTENDED_CHANNEL_INTERPRETATION;
-					else if (padded8str.startsWith("0101"))
-						encoding = ENCODING_INDICATOR.FNC1_1ST_POSITION;
-					else if (padded8str.startsWith("1001"))
-						encoding = ENCODING_INDICATOR.FNC1_2ND_POSITION;
-					else if (padded8str.startsWith("0000"))
-						encoding = ENCODING_INDICATOR.END_OF_MESSAGE;
-					else
-						encoding = ENCODING_INDICATOR.UNKNOWN;
-					
-				    System.out.println("INDICATOR=" + padded8str.substring(0,4) + " , " + encoding);
-					if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.END_OF_MESSAGE)) {
-					    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.END_OF_MESSAGE, exiting.....");
-                        break;						
-					}
-					
-					//get length
-					String startOfLength = padded8str.substring(4,8);
-				    inputData = inputReader.nextLine();
-					System.out.println("inputData=" + inputData);
-					number = Integer.parseInt(inputData);
-					System.out.println("number=" + number);
-					binaryString = Integer.toBinaryString(number);
-				    if (binaryString.length() == 8)
-						padded8str = binaryString;
-					else
-						padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-					System.out.println("padded8str=" + padded8str);
-					binaryString = startOfLength + padded8str.substring(0,4);
-					System.out.println("binaryString=" + binaryString);
-					length = ConvertBinaryByteStringToPositiveInteger(binaryString);
-					System.out.println("length=" + length);
-					
-					startOfByte = padded8str.substring(4,8);
-					
-					System.out.println("startOfByte=" + startOfByte);
-					
-					getIndicator = false;
-				} 
-				else {
-				    if (length > 0) {
-						String padded8str = "00000000";
-				        String inputData  = inputReader.nextLine();
-				        int number = Integer.parseInt(inputData);
-					    //System.out.println("number=" + number);
-                        String binaryString = Integer.toBinaryString(number);
-					    //System.out.println("binaryString=" + binaryString);
-				        if (binaryString.length() == 8)
-						    padded8str = binaryString;
-					    else
-						    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-						//System.out.println("padded8str=" + padded8str);
-						
-						String mybyte = startOfByte + padded8str.substring(0,4);
-						int ascii_decimal_int = ConvertBinaryByteStringToPositiveInteger(mybyte);
-						char character = (char) ascii_decimal_int;
-						
-						System.out.println(" ascii_decimal_int=" + ascii_decimal_int + " = " + character);
-						
-						startOfByte = padded8str.substring(4,8);
-						length--;
-					}
-					else {
-						getIndicator = true;
-						break;
-					}
-				}
-			}//while
-			
-			inputReader.close();
-			//myWriter.close();
-			
-			return true;
-		}
-		catch (Exception ex) {
-			System.out.println("Decode_Correct_Sequential_Codewords: An exception occurred!");
-			ex.printStackTrace();
-			return false;
-		}
-	}//Decode_Correct_Sequential_Codewords
-	
-	
 		
 	public static void main(String s[]) {
 		//20221025_104402.jpg original image
@@ -485,7 +338,8 @@ public class QR_Decode  {
 		
 		//These codewords we got from stepping thru online javascript code
 		//https://webqr.com/
-		//Decode_Correct_Sequential_Codewords("./bin/20221025_104402_codewords.txt", "");
+		//DataCodewordsDecoder dec = new DataCodewordsDecoder();
+		//dec.Decode_Correct_Sequential_Codewords("./bin/20221025_104402_codewords.txt");
 		
 		
 		Write_Wikipedia_Mask_5();
@@ -519,6 +373,7 @@ public class QR_Decode  {
 		ArrayList<Integer> deinterleaved_datacodewords_16_thru_30 = new ArrayList<Integer>();
 		ArrayList<Integer> deinterleaved_datacodewords_31_thru_45 = new ArrayList<Integer>();
 		ArrayList<Integer> deinterleaved_datacodewords_46_thru_60 = new ArrayList<Integer>();
+
 		for (int ii=0; ii < datacodewords.size(); ii += 4)
 		{
 			deinterleaved_datacodewords_01_thru_15.add(datacodewords.get(ii));
@@ -526,6 +381,14 @@ public class QR_Decode  {
 			deinterleaved_datacodewords_31_thru_45.add(datacodewords.get(ii+2));
 			deinterleaved_datacodewords_46_thru_60.add(datacodewords.get(ii+3));
 		}
+		
+		/*****
+		DataCodewordsDecoder dec = new DataCodewordsDecoder();
+		dec.Decode_Correct_Sequential_Codewords(deinterleaved_datacodewords_01_thru_15,
+				                                deinterleaved_datacodewords_16_thru_30,
+				                                deinterleaved_datacodewords_31_thru_45,
+				                                deinterleaved_datacodewords_46_thru_60);
+		*****/
 		
 		ErrorCorrectionCodewordsGeneration ecc1 = new ErrorCorrectionCodewordsGeneration(deinterleaved_datacodewords_01_thru_15, ecc_per_block_6H);
 		ErrorCorrectionCodewordsGeneration ecc2 = new ErrorCorrectionCodewordsGeneration(deinterleaved_datacodewords_16_thru_30, ecc_per_block_6H);
@@ -537,7 +400,16 @@ public class QR_Decode  {
 		ArrayList<Integer> ecc_block3 = ecc3.Get_ECC_Decimal();
 		ArrayList<Integer> ecc_block4 = ecc4.Get_ECC_Decimal();
 		
-
+		ArrayList<Integer> barefootbar = new ArrayList<Integer>();
+		barefootbar.addAll(datacodewords);
+		barefootbar.addAll(ecc_block1);
+		barefootbar.addAll(ecc_block2);
+		barefootbar.addAll(ecc_block3);
+		barefootbar.addAll(ecc_block4);
+		RowColumnMapWriter mapwriter = new RowColumnMapWriter("./bin/after_mask5.txt", 41, 41);
+		mapwriter.FillMap(barefootbar);
+		mapwriter.DumpMap("cow.txt");
+		
 		/*******************************************
 		//"HELLO WORLD", 1-M ALPHANUMERIC, 16 data-codewords, 10 error-correction-codewords 
 		String[] msg_polynomial = { "00100000", "01011011", "00001011", "01111000", 

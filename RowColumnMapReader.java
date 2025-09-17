@@ -57,6 +57,7 @@ public class RowColumnMapReader {
 		System.out.println();
 	}//DebugPrint_codewords
 	
+	
 	public boolean Load(String input_filename) {
 		
 		try {
@@ -81,6 +82,7 @@ public class RowColumnMapReader {
 			return false;
 		}
 	}//Load
+	
 	
 	public void FindCodewordsFromMap(int NumBlocksGrp1, int NumDataCodewordsEachBlockGrp1, int NumBlocksGrp2, int NumDataCodewordsEachBlockGrp2)
 	{
