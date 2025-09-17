@@ -509,7 +509,7 @@ public class QR_Decode  {
 		int ecc_per_block_6H = 28;
 		int dc_per_block_6H  = 15;
 		int num_of_blocks_6H = 4;
-		RowColumnMap mymap = new RowColumnMap(41,41);
+		RowColumnMapReader mymap = new RowColumnMapReader(41,41);
 		mymap.Load("./bin/after_mask5.txt");
 		mymap.FindCodewordsFromMap(num_of_blocks_6H, dc_per_block_6H,0,0);
 		//mymap.DebugPrint_mybyte();
