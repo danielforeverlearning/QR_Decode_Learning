@@ -32,7 +32,10 @@ public class RowColumnMapWriter {
 				String inputData = inputReader.nextLine();
 				for (int xx=0; xx < col_count; xx++) {
 					char inputChar = inputData.charAt(xx);
-					if (inputChar=='A' || inputChar=='Z')  //A==alignment, Z==timing
+					if (inputChar=='A' || 
+						inputChar=='Z' || 
+						inputChar=='T' ||
+						inputChar=='U')
 						map[xx][yy] = inputChar;
 					else //X==brand, 0, 1
 						map[xx][yy] = 'E'; //E==empty
@@ -67,7 +70,7 @@ public class RowColumnMapWriter {
 	}//DumpMap
 	
 
-	public void FillMap(ArrayList<Integer> all_codewords)
+	public void FillMap(ArrayList<Integer> all_codewords) throws Exception
 	{
 		
 		int xx = col_count - 1;
@@ -76,6 +79,7 @@ public class RowColumnMapWriter {
 
 		boolean goingup = true;
 		int Z_count = 0;
+		int U_count = 0;
 		
 		boolean reverse = false;
 		DIRECTION mydir;
@@ -95,24 +99,69 @@ public class RowColumnMapWriter {
 			//usual case
 			if (reverse == false)
 			{
-				if ((bitcount % 2) == 0) //even bit
-					mydir = DIRECTION.GO_LEFT;
-				else //odd bit
-					mydir = DIRECTION.GO_DIAGONAL;
+				if (Z_count == 0 && U_count == 0)
+				{
+					if ((bitcount % 2) == 0) //even bit
+						mydir = DIRECTION.GO_LEFT;
+					else //odd bit
+						mydir = DIRECTION.GO_DIAGONAL;
+				}
+				else if (Z_count >= 1)
+				{
+					if ((Z_count % 2) == 0)
+						mydir = DIRECTION.GO_LEFT;
+					else
+						mydir = DIRECTION.GO_DIAGONAL;
+				}
+				else if (U_count >= 1)
+				{
+					if (U_count == 1) //saw 1 U now on 2nd U
+						mydir = DIRECTION.GO_DIAGONAL;
+					else
+						mydir = DIRECTION.GO_LEFT;
+				}
+				else
+					throw new Exception("reverse==false unhandled char found");
 			}
 			else
 			{
-				if ((bitcount % 2) == 0) //even bit
-					mydir = DIRECTION.GO_DIAGONAL;
-				else //odd bit
-					mydir = DIRECTION.GO_LEFT;
+				if (Z_count == 0 && U_count == 0)
+				{
+					if ((bitcount % 2) == 0) //even bit
+						mydir = DIRECTION.GO_DIAGONAL;
+					else //odd bit
+						mydir = DIRECTION.GO_LEFT;
+				}
+				else if (Z_count >= 1)
+				{
+					if ((Z_count % 2) == 0)
+						mydir = DIRECTION.GO_DIAGONAL;
+					else
+						mydir = DIRECTION.GO_LEFT;
+				}
+				else if (U_count >= 1)
+				{
+					if (U_count == 1) //saw 1 U now on 2nd U
+						mydir = DIRECTION.GO_DIAGONAL;
+					else
+						mydir = DIRECTION.GO_LEFT;
+				}
+				else
+					throw new Exception("reverse==true unhandled char found");
 			}
 			
-			if (map[xx][yy] != 'Z') { //can only be 'E' because check for 'A' is below
+			if (map[xx][yy] == 'E') {
 				if (Z_count > 0) {
 					if (Z_count == 1)
 						mydir = DIRECTION.GO_HANDLE_1_Z; //force go vertical save
 					Z_count = 0;
+				}
+				else if (U_count > 0) {
+					//U_count should be 2
+					if (U_count == 2)
+						U_count = 0;
+					else
+						throw new Exception("U_count is not 2");
 				}
 				map[xx][yy] = padded8str.charAt(bitcount);
 				bitcount++;
@@ -127,8 +176,15 @@ public class RowColumnMapWriter {
 						padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
 				}//bitcount==8
 			}
-			else //map[xx][yy] == 'Z'
+			else if (map[xx][yy] == 'Z')
 				Z_count++;
+			else if (map[xx][yy] == 'U')
+				U_count++;
+			else {
+				char temp = map[xx][yy];
+				throw new Exception("unknown char in map");
+			}
+
 			
 			if (mydir == DIRECTION.GO_LEFT) {
 				//it is always the case xx >= 1 no need for code check

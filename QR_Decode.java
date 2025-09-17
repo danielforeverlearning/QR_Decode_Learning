@@ -406,8 +406,13 @@ public class QR_Decode  {
 		barefootbar.addAll(ecc_block2);
 		barefootbar.addAll(ecc_block3);
 		barefootbar.addAll(ecc_block4);
-		RowColumnMapWriter mapwriter = new RowColumnMapWriter("./bin/after_mask5.txt", 41, 41);
-		mapwriter.FillMap(barefootbar);
+		RowColumnMapWriter mapwriter = new RowColumnMapWriter("./bin/ver6-blank.txt", 41, 41);
+		try {
+		     mapwriter.FillMap(barefootbar);
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		mapwriter.DumpMap("cow.txt");
 		
 		/*******************************************
