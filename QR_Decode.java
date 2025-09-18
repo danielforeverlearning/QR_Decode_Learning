@@ -328,7 +328,7 @@ public class QR_Decode  {
 	}//Change_OriginalMap_Black0
 	
 		
-	public static void main(String s[]) {
+	public static void main(String s[]) throws Exception {
 		//20221025_104402.jpg original image
 		//original_map.txt created by eyeball-and-hand, no code yet
 		//original_map_2.txt created by eyeball-and-hand, no code yet
@@ -368,18 +368,18 @@ public class QR_Decode  {
 		mymap.FindCodewordsFromMap(num_of_blocks_6H, dc_per_block_6H,0,0);
 		//mymap.DebugPrint_mybyte();
 		//mymap.DebugPrint_codewords();
-		ArrayList<Integer> datacodewords = mymap.Get_datacodewords();
+		ArrayList<Integer> interleaved_datacodewords = mymap.Get_datacodewords();
 		ArrayList<Integer> deinterleaved_datacodewords_01_thru_15 = new ArrayList<Integer>();
 		ArrayList<Integer> deinterleaved_datacodewords_16_thru_30 = new ArrayList<Integer>();
 		ArrayList<Integer> deinterleaved_datacodewords_31_thru_45 = new ArrayList<Integer>();
 		ArrayList<Integer> deinterleaved_datacodewords_46_thru_60 = new ArrayList<Integer>();
 
-		for (int ii=0; ii < datacodewords.size(); ii += 4)
+		for (int ii=0; ii < interleaved_datacodewords.size(); ii += 4)
 		{
-			deinterleaved_datacodewords_01_thru_15.add(datacodewords.get(ii));
-			deinterleaved_datacodewords_16_thru_30.add(datacodewords.get(ii+1));
-			deinterleaved_datacodewords_31_thru_45.add(datacodewords.get(ii+2));
-			deinterleaved_datacodewords_46_thru_60.add(datacodewords.get(ii+3));
+			deinterleaved_datacodewords_01_thru_15.add(interleaved_datacodewords.get(ii));
+			deinterleaved_datacodewords_16_thru_30.add(interleaved_datacodewords.get(ii+1));
+			deinterleaved_datacodewords_31_thru_45.add(interleaved_datacodewords.get(ii+2));
+			deinterleaved_datacodewords_46_thru_60.add(interleaved_datacodewords.get(ii+3));
 		}
 		
 		/*****
@@ -400,20 +400,33 @@ public class QR_Decode  {
 		ArrayList<Integer> ecc_block3 = ecc3.Get_ECC_Decimal();
 		ArrayList<Integer> ecc_block4 = ecc4.Get_ECC_Decimal();
 		
-		ArrayList<Integer> barefootbar = new ArrayList<Integer>();
-		barefootbar.addAll(datacodewords);
-		barefootbar.addAll(ecc_block1);
-		barefootbar.addAll(ecc_block2);
-		barefootbar.addAll(ecc_block3);
-		barefootbar.addAll(ecc_block4);
-		RowColumnMapWriter mapwriter = new RowColumnMapWriter("./bin/ver6-blank.txt", 41, 41);
-		try {
-		     mapwriter.FillMap(barefootbar);
+		ArrayList<Integer> interleaved_ecc = new ArrayList<Integer>();
+		for (int ii=0; ii < ecc_block1.size(); ii++)
+		{
+			interleaved_ecc.add(ecc_block1.get(ii));
+			interleaved_ecc.add(ecc_block2.get(ii));
+			interleaved_ecc.add(ecc_block3.get(ii));
+			interleaved_ecc.add(ecc_block4.get(ii));
 		}
-		catch (Exception ex) {
-			ex.printStackTrace();
+		int ecc_total_size = ecc_block1.size() + ecc_block2.size() + ecc_block3.size() + ecc_block4.size();
+		if (ecc_total_size == interleaved_ecc.size())
+		{
+			ArrayList<Integer> barefootbar = new ArrayList<Integer>();
+			barefootbar.addAll(interleaved_datacodewords);
+			barefootbar.addAll(interleaved_ecc);
+			RowColumnMapWriter mapwriter = new RowColumnMapWriter("./bin/ver6-blank.txt", 41, 41);
+			try {
+				mapwriter.FillMap(barefootbar);
+			}
+			catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
+			mapwriter.DumpMap("cow.txt");
 		}
-		mapwriter.DumpMap("cow.txt");
+		else
+			throw new Exception("ecc_total_size != interleaved_ecc.size, NOT FILLING MAP!!!!!");
+		
 		
 		/*******************************************
 		//"HELLO WORLD", 1-M ALPHANUMERIC, 16 data-codewords, 10 error-correction-codewords 

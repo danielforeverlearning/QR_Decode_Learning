@@ -94,7 +94,7 @@ public class RowColumnMapWriter {
          
 		
 		//while (ii < all_codewords.size())
-		while (ii < 60)
+		while (ii < 69)
 		{
 			//usual case
 			if (reverse == false)
