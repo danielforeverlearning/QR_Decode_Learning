@@ -92,9 +92,8 @@ public class RowColumnMapWriter {
 		else
 			padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
          
-		
-		//while (ii < all_codewords.size())
-		while (ii < 69)
+		System.out.println(all_codewords.size());
+		while (ii < all_codewords.size())
 		{
 			//usual case
 			if (reverse == false)
@@ -168,6 +167,8 @@ public class RowColumnMapWriter {
 				if (bitcount == 8) {
 					bitcount = 0;
 					ii++;
+					if (ii >= all_codewords.size())
+						return;
 					binaryString = Integer.toBinaryString(all_codewords.get(ii));
 					padded8str   = "00000000";
 					if (binaryString.length() == 8)
@@ -180,10 +181,46 @@ public class RowColumnMapWriter {
 				Z_count++;
 			else if (map[xx][yy] == 'U')
 				U_count++;
-			else {
+			else if (map[xx][yy] == 'A' && xx <= 8) {
+				//going up on the last few ec-codewords
+				//last bit of this codeword is above the bottom-left-'A's
 				char temp = map[xx][yy];
-				throw new Exception("unknown char in map");
-			}
+				while (temp == 'A') {
+					yy--;
+					temp = map[xx][yy];
+				}
+				map[xx][yy] = padded8str.charAt(bitcount);
+				bitcount++;
+				if (bitcount == 8) {
+					bitcount = 0;
+					ii++;
+					binaryString = Integer.toBinaryString(all_codewords.get(ii));
+					padded8str   = "00000000";
+					if (binaryString.length() == 8)
+						padded8str = binaryString;
+					else
+						padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+				}//bitcount==8
+				mydir = DIRECTION.GO_LEFT;
+			}//going up on the last few ec-codewords
+			
+			else if (map[xx][yy] == 'T' && xx <= 8) {
+				//almost done 
+				xx--;
+				map[xx][yy] = padded8str.charAt(bitcount);
+				bitcount++;
+				if (bitcount == 8) {
+					bitcount = 0;
+					ii++;
+					binaryString = Integer.toBinaryString(all_codewords.get(ii));
+					padded8str   = "00000000";
+					if (binaryString.length() == 8)
+						padded8str = binaryString;
+					else
+						padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+				}//bitcount==8
+				mydir = DIRECTION.GO_LEFT;
+			}//almost done
 
 			
 			if (mydir == DIRECTION.GO_LEFT) {
