@@ -242,6 +242,12 @@ public class QR_Decode  {
 					else if (maskChar == 'i') { //i means invert color
 						if (inputChar == 'A')
 							myWriter.write('A');
+						else if (inputChar == 'E')
+							myWriter.write('T');
+						else if (inputChar == 'T')
+							myWriter.write('T');
+						else if (inputChar == 'U')
+							myWriter.write('U');
 						else if (inputChar == 'X')
 							myWriter.write('X');
 						else if (inputChar == 'Z')
@@ -252,6 +258,7 @@ public class QR_Decode  {
 							myWriter.write('0');
 						else {
 							System.out.println("Do_Mask: Unsupported character found in the input file, FORCING QUIT!");
+							System.out.println("Do_Mask: inputChar=" + inputChar);
 							return false;							
 						}
 					}
@@ -421,8 +428,13 @@ public class QR_Decode  {
 			catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			
 			mapwriter.DumpMap("cow.txt");
+			boolean theend = Do_Mask("cow.txt", "./bin/mask_5.txt", "final.txt");
+			if (!theend)
+			{
+				System.out.println("ERROR");
+				return;
+			}
 		}
 		else
 			throw new Exception("ecc_total_size != interleaved_ecc.size, NOT FILLING MAP!!!!!");
