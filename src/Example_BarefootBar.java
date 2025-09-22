@@ -23,7 +23,7 @@ public class Example_BarefootBar {
 		
 		Masking mask = new Masking();
 		mask.Write_Wikipedia_Mask_5();
-		boolean success = mask.Do_Mask("./bin/Example_BarefootBar/original_map_2.txt", "./bin/mask_5.txt", "./bin/Example_BarefootBar/after_mask5.txt");
+		boolean success = mask.Do_Mask("./Example_BarefootBar/original_map_2.txt", "./bin/mask_5.txt", "./Example_BarefootBar/after_mask5.txt");
 		if (!success)
 		{
 			System.out.println("ERROR");
@@ -44,7 +44,7 @@ public class Example_BarefootBar {
 		int dc_per_block_6H  = 15;
 		int num_of_blocks_6H = 4;
 		RowColumnMapReader mymap = new RowColumnMapReader(41,41);
-		mymap.Load("./bin/Example_BarefootBar/after_mask5.txt");
+		mymap.Load("./Example_BarefootBar/after_mask5.txt");
 		mymap.FindDataCodewordsFromMap(num_of_blocks_6H, dc_per_block_6H,0,0);
 		//mymap.DebugPrint_mybyte();
 		//mymap.DebugPrint_codewords();
@@ -95,15 +95,15 @@ public class Example_BarefootBar {
 			ArrayList<Integer> barefootbar = new ArrayList<Integer>();
 			barefootbar.addAll(interleaved_datacodewords);
 			barefootbar.addAll(interleaved_ecc);
-			RowColumnMapWriter mapwriter = new RowColumnMapWriter("./bin/Example_BarefootBar/ver6-blank.txt", 41, 41);
+			RowColumnMapWriter mapwriter = new RowColumnMapWriter("./Example_BarefootBar/ver6-blank.txt", 41, 41);
 			try {
 				mapwriter.FillMap(barefootbar);
 			}
 			catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			mapwriter.DumpMap("./bin/Example_BarefootBar/cow.txt");
-			boolean theend = mask.Do_Mask("./bin/Example_BarefootBar/cow.txt", "./bin/Example_BarefootBar/mask_5.txt", "./bin/Example_BarefootBar/final.txt");
+			mapwriter.DumpMap("./Example_BarefootBar/cow.txt");
+			boolean theend = mask.Do_Mask("./Example_BarefootBar/cow.txt", "./bin/mask_5.txt", "./Example_BarefootBar/final.txt");
 			if (!theend)
 			{
 				System.out.println("ERROR");

@@ -58,8 +58,11 @@ public class QR_Decode  {
 		
 	public static void main(String s[]) throws Exception {
 		try {
-			Example_BarefootBar ex1 = new Example_BarefootBar();
-			ex1.DoExample();
+			//Example_BarefootBar ex1 = new Example_BarefootBar();
+			//ex1.DoExample();
+			
+			Example_TRex ex2 = new Example_TRex();
+			ex2.DoExample();
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
