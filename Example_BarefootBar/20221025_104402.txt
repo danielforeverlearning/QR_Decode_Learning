@@ -1,0 +1,75 @@
+https://www.halekoa.com/dining-drinks/barefoot-bar-menu-qr
+
+https://www.halekoa.com/dining-drinks/barefoot-bar-menu-qr
+
+mask == white black white
+
+(1) 2025aug29 ok so Wikipedia is same as
+    QR_Format_Information.svg if-and-only-if black is defined as 0.
+	  But i made
+	  original_map.txt and original_map_2.txt as black is 1.
+	  And using mask ((i*j)%3+i+j)%2 == 0
+	  And assuming your code is correct
+	  And assuming codewords go up from bottom-right
+	  you did NOT get h t t p s
+    104 116 116 112 115
+    And stepped thru debugger at https://webqr.com/
+
+(2) Ok transform original_map_2.txt to original_map_3_black0.txt
+    and then try again with mask ((i*j)%3+i+j)%2 == 0
+	ok ..... this did not work you gotta watch whole video to learn
+	and you also got to understand "version" you did not go that far in video.
+	
+	this is from old readme which i deleted:
+	
+	learning how to decode a QR code
+    Sorry not done getting codewords, 
+    stepping thru zxing-ported-to-javascript-code-from-github-jsqrcode in web-browser debugger 
+	decoder.js line 41 breakpoint seems 
+	mycodeword[0]  == codewordBytes[0] 
+	mycodeword[4]  == codewordBytes[1] 
+	mycodeword[8]  == codewordBytes[2] 
+	mycodeword[12] == codewordBytes[3] 
+	mycodeword[16] == codewordBytes[4] 
+	but then have to fix code that gets codewords
+	
+(3)	Downloads folder contains:
+	jsqrcode-master
+	
+	uploading folder 
+	jsqrcode-master
+	
+	or just step thru https://webqr.com/
+		
+(4) there are dynamic vs static qrcodes, 
+    dynamic is a short-url that redirects,
+	static is the url string no redirect.
+    this example is version6 41x41
+    but it has colorful-brand-logo in middle with CTA (call to action)
+    you will have to learn error-correction and qrcode generation/encoding first
+    for now since you are learning its best to stick with simpler
+    black and white only qrcodes say version 6 or less
+    before learning more complex qrcodes,
+    again have to learn error-correction and colors CTA.
+	
+(5) 2025sept1 ok it is original_map_2.txt and mask5.txt 
+	after getting D bytes in correct sequential order, look at
+    The-structure-for-QR-code-of-version-6-with-error-correction-level-medium-figure-is.png
+	Made 20221025_104402_codewords.txt from debugger stepping thru https://webqr.com/
+	Wrote function Decode_Correct_Sequential_Codewords
+	so it is a static QR code NOT a dynamic QR code.
+	https://www.thonky.com/qr-code-tutorial/error-correction-table
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
