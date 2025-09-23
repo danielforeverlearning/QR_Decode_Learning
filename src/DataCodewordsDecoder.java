@@ -145,21 +145,36 @@ public class DataCodewordsDecoder {
 		}
 	}//Decode_Correct_Sequential_Codewords
 	
-	
-	
 
 	public boolean Decode_Correct_Sequential_Codewords(ArrayList<Integer> block1,
 			                                           ArrayList<Integer> block2,
 			                                           ArrayList<Integer> block3,
 			                                           ArrayList<Integer> block4)
-	{
-		try {
-			
+	{		
 			ArrayList<Integer> data = new ArrayList<Integer>();
 			data.addAll(block1);
 			data.addAll(block2);
 			data.addAll(block3);
 			data.addAll(block4);
+			boolean result = decode(data);
+			return result;
+	}//Decode_Correct_Sequential_Codewords
+	
+	
+	public boolean Decode_Correct_Sequential_Codewords(ArrayList<Integer> block1,
+                                                       ArrayList<Integer> block2)
+	{		
+			ArrayList<Integer> data = new ArrayList<Integer>();
+			data.addAll(block1);
+			data.addAll(block2);
+			boolean result = decode(data);
+			return result;
+	}//Decode_Correct_Sequential_Codewords
+	
+			
+	private boolean decode(ArrayList<Integer> data)
+	{
+		try {
 			
 			int ii                = 0;
 			boolean getIndicator  = true;
@@ -255,11 +270,11 @@ public class DataCodewordsDecoder {
 			return true;
 		}
 		catch (Exception ex) {
-			System.out.println("Decode_Correct_Sequential_Codewords: An exception occurred!");
+			System.out.println("decode: An exception occurred!");
 			ex.printStackTrace();
 			return false;
 		}
-	}//Decode_Correct_Sequential_Codewords
+	}//decode
 	
 	
 	

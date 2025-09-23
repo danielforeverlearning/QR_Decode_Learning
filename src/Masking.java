@@ -58,11 +58,11 @@ public class Masking {
 	}
 	
 	
-	public void Write_Wikipedia_Mask_6() {
+	public void Write_Wikipedia_Mask_6(int len) {
 		try {
-			FileWriter myWriter = new FileWriter("mask_6.txt");
-			for (int ii=0; ii <= 40; ii++) {
-			    for (int jj=0; jj <= 40; jj++) {
+			FileWriter myWriter = new FileWriter("./bin/mask6_" + len + ".txt");
+			for (int ii=0; ii < len; ii++) {
+			    for (int jj=0; jj < len; jj++) {
 					int answer = (ii/2 + jj/3)%2;
 					if (answer == 0)
 						myWriter.write("i"); //i means invert the color
