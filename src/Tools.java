@@ -5,13 +5,18 @@ public class Tools {
 		
 	}//constructor
 	
+	//Can only do maximum 11 bits long
 	public int ConvertBinaryByteStringToPositiveInteger(String binaryByteString) {
-		int[] two_pow = {128, 64, 32, 16, 8, 4, 2, 1};
-		int answer = 0;
-		for (int ii=0; ii <= 7; ii++) {
+		if (binaryByteString.length() > 11)
+			return Integer.MIN_VALUE;
+		
+		int[] rev_2_pow = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
+		int   answer = 0;
+		int   from_the_end = binaryByteString.length() - 1;
+		for (int ii=from_the_end; ii >= 0; ii--) {
 			char mychar = binaryByteString.charAt(ii);
 			if (mychar == '1')
-				answer += two_pow[ii];
+				answer += rev_2_pow[from_the_end - ii];
 		}
         return answer;		
 	}//ConvertBinaryByteStringToPositiveInteger

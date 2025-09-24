@@ -71,14 +71,9 @@ public class Example_TRex {
 		  //These codewords we got from stepping thru online javascript code
 		  //https://webqr.com/
 		  DataCodewordsDecoder dec = new DataCodewordsDecoder();
-		  //length field says 31 but it is longer in truth
 		  dec.Decode_Correct_Sequential_Codewords("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
-		  //dec.DecodeCorrectSequentialCodewordsDespiteLengthField("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
-		  //wait it is because new encoding and length
-		  //first encoding was byte and length = 31
-		  //need to repair code
-		  
-		  
+		  //1st encoding was byte and length = 31
+		  //2nd encoding is alphanumeric encoding
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
 		  

@@ -35,53 +35,7 @@ Alphanumeric mode: 13 bits
 Byte mode: 16 bits
 Japanese mode: 12 bits
 
-Alphanumeric encoding table
-------------------------------
-0 0
-1 1
-2 2
-3 3
-4 4
-5 5
-6 6
-7 7
-8 8
-9 9
-A 10
-B 11
-C 12
-D 13
-E 14
-F 15
-G 16
-H 17
-I 18
-J 19
-K 20
-L 21
-M 22
-N 23
-O 24
-P 25
-Q 26
-R 27
-S 28
-T 29
-U 30
-V 31
-W 32
-X 33
-Y 34
-Z 35
-  36 (space)
-$ 37
-% 38
-* 39
-+ 40
-- 41
-. 42
-/ 43
-: 44
+
 
 Alphanumeric Mode Encoding:
 For alphanumeric mode encoding, 
@@ -101,8 +55,9 @@ Please refer to the alphanumeric table to find these numbers.
 The column on the left shows the alphanumeric character, 
 and the column on the right shows the number that represents it.
 For each pair of characters, 
-get the number representation (from the alphanumeric table) of the first character 
-and multiply it by 45. Then add that number to the number representation of the second character.
+get the number representation (from the alphanumeric table) 
+of the first character and multiply it by 45. 
+Then add that number to the number representation of the second character.
 
 For example, the first pair in HELLO WORLD is HE.
 
@@ -129,6 +84,13 @@ Follow the instructions on the data encoding page to add any remaining bits as n
 
 public class DataCodewordsDecoder {
 	
+	char[] Alphanumeric_encoding_table = { 
+			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+			'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+			'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '$', '%', '*',
+			'+', '-', '.', '/', ':' };
+	
 	enum ENCODING_INDICATOR {
 		NUMERIC,                          //0001 (10bits per 3 digits) 
 		ALPHANUMERIC,                     //0010 (11bits per 2 characters)
@@ -150,134 +112,10 @@ public class DataCodewordsDecoder {
 	}//constructor
 	
 	
-	public boolean DecodeCorrectSequentialCodewordsDespiteLengthField(String input_filename) {
-		File inputFile        = null;
-		Scanner inputReader   = null;
-		int ii=0;
-		try {
-			inputFile        = new File(input_filename);
-			inputReader      = new Scanner(inputFile);
-			boolean getIndicator  = true;
-			boolean EOF_reached   = false;
-			int length            = 0;
-			ENCODING_INDICATOR encoding = ENCODING_INDICATOR.UNKNOWN;
-			
-			String startOfByte    = "";
-			
-			while (EOF_reached == false) {
-				
-				if (getIndicator) {
-					
-					String padded8str = "00000000";
-				    String inputData  = inputReader.nextLine();
-				    int number = Integer.parseInt(inputData);
-					//System.out.println("number=" + number);
-                    String binaryString = Integer.toBinaryString(number);
-					//System.out.println("binaryString=" + binaryString);
-				    if (binaryString.length() == 8)
-						padded8str = binaryString;
-					else
-						padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-                    //System.out.println("padded8str=" + padded8str);
-					
-					if (padded8str.startsWith("0001"))
-						encoding = ENCODING_INDICATOR.NUMERIC;
-					else if (padded8str.startsWith("0010"))
-						encoding = ENCODING_INDICATOR.ALPHANUMERIC;
-					else if (padded8str.startsWith("0100"))
-						encoding = ENCODING_INDICATOR.BYTE;
-					else if (padded8str.startsWith("1000"))
-						encoding = ENCODING_INDICATOR.KANJI;
-					else if (padded8str.startsWith("0011"))
-						encoding = ENCODING_INDICATOR.STRUCTURED_APPEND;
-					else if (padded8str.startsWith("0111"))
-						encoding = ENCODING_INDICATOR.EXTENDED_CHANNEL_INTERPRETATION;
-					else if (padded8str.startsWith("0101"))
-						encoding = ENCODING_INDICATOR.FNC1_1ST_POSITION;
-					else if (padded8str.startsWith("1001"))
-						encoding = ENCODING_INDICATOR.FNC1_2ND_POSITION;
-					else if (padded8str.startsWith("0000"))
-						encoding = ENCODING_INDICATOR.END_OF_MESSAGE;
-					else
-						encoding = ENCODING_INDICATOR.UNKNOWN;
-					
-				    System.out.println("INDICATOR=" + padded8str.substring(0,4) + " , " + encoding);
-					if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.END_OF_MESSAGE)) {
-					    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.END_OF_MESSAGE, exiting.....");
-                        return false;						
-					}
-					
-					//get length
-					String startOfLength = padded8str.substring(4,8);
-				    inputData = inputReader.nextLine();
-					System.out.println("inputData=" + inputData);
-					number = Integer.parseInt(inputData);
-					System.out.println("number=" + number);
-					binaryString = Integer.toBinaryString(number);
-				    if (binaryString.length() == 8)
-						padded8str = binaryString;
-					else
-						padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-					System.out.println("padded8str=" + padded8str);
-					binaryString = startOfLength + padded8str.substring(0,4);
-					System.out.println("binaryString=" + binaryString);
-					length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
-					System.out.println("length=" + length);
-					
-					startOfByte = padded8str.substring(4,8);
-					
-					System.out.println("startOfByte=" + startOfByte);
-					
-					getIndicator = false;
-				} 
-				else {
-				    while (true) { //ignore length field go till EOF
-						String padded8str = "00000000";
-				        String inputData  = "";
-				        try {
-				        	inputData = inputReader.nextLine();
-				        	ii++;
-				        }
-				        catch (NoSuchElementException ex) {
-							//EOF reached
-							inputReader.close();
-							EOF_reached = true;
-							break;
-						}
-				        int number = Integer.parseInt(inputData);
-					    //System.out.println("number=" + number);
-                        String binaryString = Integer.toBinaryString(number);
-					    //System.out.println("binaryString=" + binaryString);
-				        if (binaryString.length() == 8)
-						    padded8str = binaryString;
-					    else
-						    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-						//System.out.println("padded8str=" + padded8str);
-						
-						String mybyte = startOfByte + padded8str.substring(0,4);
-						int ascii_decimal_int = tool.ConvertBinaryByteStringToPositiveInteger(mybyte);
-						char character = (char) ascii_decimal_int;
-						
-						System.out.println(ii + ": ascii_decimal_int=" + ascii_decimal_int + " = " + character);
-						if (ascii_decimal_int == 32) {
-							System.out.println("SPACE FOUND ASSUME NOT 1 BYTE ASCII ENCODING ANYMORE");
-							System.out.println("FOR TREX 21 BYTES AFTER SPACE WHICH IS / AND -hjahalloween");
-							System.out.println("BUT 60B0D49A5A923A1F58-58383001 IS 27 BYTES LONG");
-						}
-						startOfByte = padded8str.substring(4,8);
-					}//ignore length field go till EOF
-				}//getIndicator==false
-			}//while
-		}
-		catch (Exception ex) {
-			System.out.println("DecodeCorrectSequentialCodewordsDespiteLengthField: An exception occurred!");
-			ex.printStackTrace();
-			return false;
-		}
-		return true;
-	}//DecodeCorrectSequentialCodewordsDespiteLengthField
 	
-
+	//so far only works if 1st encoding is byte
+	//and there is no 2nd encoding
+	//or 2nd encoding is byte or alphanumeric
 	public boolean Decode_Correct_Sequential_Codewords(String input_filename) {
 		try {
 			
@@ -288,20 +126,20 @@ public class DataCodewordsDecoder {
 			boolean getIndicator  = true;
 			int length            = 0;
 			int indicator_count   = 0;
-			ENCODING_INDICATOR encoding = ENCODING_INDICATOR.UNKNOWN;
-			boolean need_to_use_startOfByte = false;
+			ENCODING_INDICATOR encoding     = ENCODING_INDICATOR.UNKNOWN;
 			
-			String startOfByte    = "";
-			String inputData      = "";
+			String startOfByte      = "";
+			int startOfByteLen      = 0;
+			String inputData        = "";
 			
 			while (true) {
 				
 				if (getIndicator) {
 					indicator_count++;
-					if (need_to_use_startOfByte == false) //on byte boundary
+					getIndicator = false;
+					if (startOfByteLen == 0) //getIndicator on byte boundary
 					{
 						String padded8str = "00000000";
-						
 						try {
 							inputData  = inputReader.nextLine();
 						}
@@ -311,14 +149,11 @@ public class DataCodewordsDecoder {
 							break;
 						}
 					    int number = Integer.parseInt(inputData);
-						//System.out.println("number=" + number);
 	                    String binaryString = Integer.toBinaryString(number);
-						//System.out.println("binaryString=" + binaryString);
 					    if (binaryString.length() == 8)
 							padded8str = binaryString;
 						else
 							padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-	                    //System.out.println("padded8str=" + padded8str);
 						
 						if (padded8str.startsWith("0001"))
 							encoding = ENCODING_INDICATOR.NUMERIC;
@@ -342,8 +177,8 @@ public class DataCodewordsDecoder {
 							encoding = ENCODING_INDICATOR.UNKNOWN;
 						
 					    System.out.println("INDICATOR" + indicator_count + " = " + padded8str.substring(0,4) + " , " + encoding);
-						if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.END_OF_MESSAGE)) {
-						    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.END_OF_MESSAGE, exiting.....");
+						if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.ALPHANUMERIC)) {
+						    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.ALPHANUMERIC, exiting.....");
 						    inputReader.close();
 						    return false;						
 						}
@@ -358,95 +193,191 @@ public class DataCodewordsDecoder {
 							inputReader.close();
 							break;
 						}
-						System.out.println("inputData=" + inputData);
 						number = Integer.parseInt(inputData);
-						System.out.println("number=" + number);
 						binaryString = Integer.toBinaryString(number);
 					    if (binaryString.length() == 8)
 							padded8str = binaryString;
 						else
 							padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-						System.out.println("padded8str=" + padded8str);
-						binaryString = startOfLength + padded8str.substring(0,4);
-						System.out.println("binaryString=" + binaryString);
-						length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
-						System.out.println("length=" + length);
 						
-						startOfByte = padded8str.substring(4,8);
-						
-						System.out.println("startOfByte=" + startOfByte);
-						
-						getIndicator = false;
-					}//on byte boundary
-					else //need_to_use_startOfByte
-					{
-						if (startOfByte.startsWith("0001"))
-							encoding = ENCODING_INDICATOR.NUMERIC;
-						else if (startOfByte.startsWith("0010"))
-							encoding = ENCODING_INDICATOR.ALPHANUMERIC;
-						else if (startOfByte.startsWith("0100"))
-							encoding = ENCODING_INDICATOR.BYTE;
-						else if (startOfByte.startsWith("1000"))
-							encoding = ENCODING_INDICATOR.KANJI;
-						else if (startOfByte.startsWith("0011"))
-							encoding = ENCODING_INDICATOR.STRUCTURED_APPEND;
-						else if (startOfByte.startsWith("0111"))
-							encoding = ENCODING_INDICATOR.EXTENDED_CHANNEL_INTERPRETATION;
-						else if (startOfByte.startsWith("0101"))
-							encoding = ENCODING_INDICATOR.FNC1_1ST_POSITION;
-						else if (startOfByte.startsWith("1001"))
-							encoding = ENCODING_INDICATOR.FNC1_2ND_POSITION;
-						else if (startOfByte.startsWith("0000"))
-							encoding = ENCODING_INDICATOR.END_OF_MESSAGE;
-						else
-							encoding = ENCODING_INDICATOR.UNKNOWN;
-						
-						System.out.println("INDICATOR" + indicator_count + " = " + encoding);
-						if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.END_OF_MESSAGE)) {
-						    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.END_OF_MESSAGE, exiting.....");
-						    inputReader.close();
-						    return false;						
+						if (encoding == ENCODING_INDICATOR.BYTE)
+						{
+							binaryString = startOfLength + padded8str.substring(0,4);
+							length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
+							System.out.println("length=" + length);
+							startOfByte = padded8str.substring(4,8);
+							startOfByteLen = 4;
 						}
-						
-						
-					}//need_to_use_startOfByte
-				} 
+						else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC)
+						{
+							binaryString = startOfLength + padded8str.substring(0,5);
+							//binaryString is 9 bits long
+							length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
+							System.out.println("length=" + length);
+							startOfByte = padded8str.substring(5,8);
+							startOfByteLen = 3;
+						}
+						else
+						{
+							System.out.println("Should never get here");
+						    inputReader.close();
+						    return false;
+						}
+					}//getIndicator on byte boundary
+					else //getIndicator startOfByte has partial byte
+					{
+						if (startOfByteLen == 4) {
+							if (startOfByte.startsWith("0001"))
+								encoding = ENCODING_INDICATOR.NUMERIC;
+							else if (startOfByte.startsWith("0010"))
+								encoding = ENCODING_INDICATOR.ALPHANUMERIC;
+							else if (startOfByte.startsWith("0100"))
+								encoding = ENCODING_INDICATOR.BYTE;
+							else if (startOfByte.startsWith("1000"))
+								encoding = ENCODING_INDICATOR.KANJI;
+							else if (startOfByte.startsWith("0011"))
+								encoding = ENCODING_INDICATOR.STRUCTURED_APPEND;
+							else if (startOfByte.startsWith("0111"))
+								encoding = ENCODING_INDICATOR.EXTENDED_CHANNEL_INTERPRETATION;
+							else if (startOfByte.startsWith("0101"))
+								encoding = ENCODING_INDICATOR.FNC1_1ST_POSITION;
+							else if (startOfByte.startsWith("1001"))
+								encoding = ENCODING_INDICATOR.FNC1_2ND_POSITION;
+							else if (startOfByte.startsWith("0000"))
+								encoding = ENCODING_INDICATOR.END_OF_MESSAGE;
+							else
+								encoding = ENCODING_INDICATOR.UNKNOWN;
+							
+							System.out.println("INDICATOR" + indicator_count + " = " + encoding);
+							if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.ALPHANUMERIC)) {
+							    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.ALPHANUMERIC, exiting.....");
+							    inputReader.close();
+							    return false;						
+							}
+							
+							//assuming on byte boundary
+							//getting length
+							//ver 1 thru 9, byte encoding 8bits, alphanumeric 9bits
+							String padded8str = "00000000";
+							try {
+								inputData  = inputReader.nextLine();
+							}
+							catch (NoSuchElementException ex) {
+								//EOF reached
+								inputReader.close();
+								break;
+							}
+						    int number = Integer.parseInt(inputData);
+		                    String binaryString = Integer.toBinaryString(number);
+						    if (binaryString.length() == 8)
+								padded8str = binaryString;
+							else
+								padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+						    
+						    if (encoding == ENCODING_INDICATOR.BYTE)
+							{
+								length = tool.ConvertBinaryByteStringToPositiveInteger(padded8str);
+								System.out.println("length=" + length);
+								startOfByteLen = 0;
+								startOfByte = "";
+							}
+							else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC)
+							{
+								//need 1 more byte and take 1 bit
+								String startOfLength = padded8str;
+								padded8str = "00000000";
+								try {
+									inputData  = inputReader.nextLine();
+								}
+								catch (NoSuchElementException ex) {
+									//EOF reached
+									inputReader.close();
+									break;
+								}
+							    number = Integer.parseInt(inputData);
+			                    binaryString = Integer.toBinaryString(number);
+							    if (binaryString.length() == 8)
+									padded8str = binaryString;
+								else
+									padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+							    startOfLength += padded8str.substring(0,1);
+							    length = tool.ConvertBinaryByteStringToPositiveInteger(startOfLength);
+								System.out.println("length=" + length);
+								startOfByte = padded8str.substring(1,8);
+								startOfByteLen = 7;
+							}
+						}//if (startOfByteLen == 4)
+						else {
+							System.out.println("did not code for startOfByteLen !=4 getting indicator");
+							inputReader.close();
+							return false;
+						}
+					}//getIndicator startOfByte has partial byte
+				}//getIndicator
 				else {
 				    if (length > 0) {
-						String padded8str = "00000000";
-						try {
-							inputData  = inputReader.nextLine();
+				    	if (encoding == ENCODING_INDICATOR.BYTE)
+				    	{
+							String padded8str = "00000000";
+							try {
+								inputData  = inputReader.nextLine();
+							}
+							catch (NoSuchElementException ex) {
+								//EOF reached
+								inputReader.close();
+								break;
+							}
+					        int number = Integer.parseInt(inputData);
+	                        String binaryString = Integer.toBinaryString(number);
+					        if (binaryString.length() == 8)
+							    padded8str = binaryString;
+						    else
+							    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+							
+							String mybyte = startOfByte + padded8str.substring(0,4);
+							int ascii_decimal_int = tool.ConvertBinaryByteStringToPositiveInteger(mybyte);
+							char character = (char) ascii_decimal_int;
+							
+							System.out.println(" ascii_decimal_int=" + ascii_decimal_int + " = " + character);
+							
+							startOfByte = padded8str.substring(4,8);
+							startOfByteLen = 4;
+				    	}
+				    	else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC)
+						{
+				    		if (length >= 2) //pair of alphanumchars
+				    		{
+				    			int need_more_bits_len = 11 - startOfByteLen;
+				    			String padded8str = "00000000";
+								try {
+									inputData  = inputReader.nextLine();
+								}
+								catch (NoSuchElementException ex) {
+									//EOF reached
+									inputReader.close();
+									break;
+								}
+						        int number = Integer.parseInt(inputData);
+		                        String binaryString = Integer.toBinaryString(number);
+						        if (binaryString.length() == 8)
+								    padded8str = binaryString;
+							    else
+								    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+						
+						        String str11bits = startOfByte + padded8str.substring(0, need_more_bits_len);
+						        int twocharint = tool.ConvertBinaryByteStringToPositiveInteger(str11bits);
+				    			
+				    		}//pair of alphanumchars
+				    		else
+				    		{
+				    			
+				    		}//last alphanumchar
 						}
-						catch (NoSuchElementException ex) {
-							//EOF reached
-							inputReader.close();
-							break;
-						}
-				        int number = Integer.parseInt(inputData);
-					    //System.out.println("number=" + number);
-                        String binaryString = Integer.toBinaryString(number);
-					    //System.out.println("binaryString=" + binaryString);
-				        if (binaryString.length() == 8)
-						    padded8str = binaryString;
-					    else
-						    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
-						//System.out.println("padded8str=" + padded8str);
-						
-						String mybyte = startOfByte + padded8str.substring(0,4);
-						int ascii_decimal_int = tool.ConvertBinaryByteStringToPositiveInteger(mybyte);
-						char character = (char) ascii_decimal_int;
-						
-						System.out.println(" ascii_decimal_int=" + ascii_decimal_int + " = " + character);
-						
-						startOfByte = padded8str.substring(4,8);
 						length--;
-					}
+					}//length > 0
 					else {
 						getIndicator = true;
-						//if last encoding was byte you need to use startOfByte
-						if (encoding == ENCODING_INDICATOR.BYTE)
-							need_to_use_startOfByte = true;
-					}
+					}//length == 0
 				}
 			}//while
 		}//try
