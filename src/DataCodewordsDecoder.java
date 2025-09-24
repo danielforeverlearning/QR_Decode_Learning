@@ -3,6 +3,104 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
+/***********************************************
+Versions 1 through 9
+Numeric mode: 10 bits
+Alphanumeric mode: 9 bits
+Byte mode: 8 bits
+Japanese mode: 8 bits
+
+Alphanumeric
+-------------
+0 0
+1 1
+2 2
+3 3
+4 4
+5 5
+6 6
+7 7
+8 8
+9 9
+A 10
+B 11
+C 12
+D 13
+E 14
+F 15
+G 16
+H 17
+I 18
+J 19
+K 20
+L 21
+M 22
+N 23
+O 24
+P 25
+Q 26
+R 27
+S 28
+T 29
+U 30
+V 31
+W 32
+X 33
+Y 34
+Z 35
+  36 (space)
+$ 37
+% 38
+* 39
++ 40
+- 41
+. 42
+/ 43
+: 44
+
+Alphanumeric Mode Encoding:
+For alphanumeric mode encoding, 
+I will use the example input of HELLO WORLD. 
+For this example, I will use version 1. 
+Remember, alphanumeric mode can only encode uppercase letters, 
+not lowercase. Refer to the alphanumeric table 
+for a list of the characters that can be encoded in alphanumeric mode.
+
+(1)Break up into pairs
+First, break up the string into pairs of characters: HE, LL, O , WO, RL, D
+
+(2)Create a binary number for each pair
+For alphanumeric mode, 
+each alphanumeric character is represented by a number. 
+Please refer to the alphanumeric table to find these numbers. 
+The column on the left shows the alphanumeric character, 
+and the column on the right shows the number that represents it.
+For each pair of characters, 
+get the number representation (from the alphanumeric table) of the first character 
+and multiply it by 45. Then add that number to the number representation of the second character.
+
+For example, the first pair in HELLO WORLD is HE.
+
+H → 17
+E → 14
+
+Following the steps in the previous paragraph, 
+multiply the first number by 45, then add that to the second number:
+(45 * 17) + 14 = 779
+
+Now convert that number into an 11-bit binary string, 
+padding on the left with 0s if necessary.
+
+779 → 01100001011
+
+If you are encoding an odd number of characters, 
+as we are here, take the numeric representation 
+of the final character and convert it into a 6-bit binary string.
+
+Next: Finish the Data Encoding Step
+Follow the instructions on the data encoding page to add any remaining bits as necessary.
+************************************************/
+
 
 public class DataCodewordsDecoder {
 	
