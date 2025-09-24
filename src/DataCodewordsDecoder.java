@@ -4,14 +4,39 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /***********************************************
+
+length field after encoding-mode 4 bits
+----------------------------------------
+The following lists contain the sizes of the 
+character count indicators for each mode and version. 
+For example, if encoding HELLO WORLD in a version 1 QR code 
+in alphanumeric mode, the character count indicator must be 9 bits long. 
+The character count of HELLO WORLD is 11. 
+In binary, 11 is 1011. 
+Pad it on the left to make it 9 bits long: 000001011. 
+Put this after the mode indicator from step 3 to 
+get the following bit string: 0010 000001011
+
 Versions 1 through 9
 Numeric mode: 10 bits
 Alphanumeric mode: 9 bits
 Byte mode: 8 bits
 Japanese mode: 8 bits
 
-Alphanumeric
--------------
+Versions 10 through 26
+Numeric mode: 12 bits
+Alphanumeric mode: 11 bits
+Byte mode: 16
+Japanese mode: 10 bits
+
+Versions 27 through 40
+Numeric mode: 14 bits
+Alphanumeric mode: 13 bits
+Byte mode: 16 bits
+Japanese mode: 12 bits
+
+Alphanumeric encoding table
+------------------------------
 0 0
 1 1
 2 2
