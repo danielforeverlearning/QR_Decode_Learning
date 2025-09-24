@@ -44,7 +44,7 @@ public class Example_TRex {
   		  Masking mask = new Masking();
 		  mask.Write_Wikipedia_Mask_6(QRpixellen);
 		  
-		  nomaskyetmap.Change_3FindersToA_TimingToZ_AlignmentToZ(5);
+		  nomaskyetmap.Change_Finders_Timing_Alignment(5);
 		  nomaskyetmap.DumpMap("./Example_TRex/rowcolmap_AZ.txt");
   		  
 		  
@@ -66,12 +66,18 @@ public class Example_TRex {
 		  RowColumnMapReader mymap = new RowColumnMapReader(QRpixellen, QRpixellen);
 		  mymap.Load("./Example_TRex/rowcolmap_AZ_mask6.txt");
 		  
-		  //too tired, bugs in  below because did not repair code after making rowcolmapwriter
-		  mymap.Find_DC_And_ECC_FromMap(134);
+		  mymap.Find_Codewords(134);
 		  
+		  //These codewords we got from stepping thru online javascript code
+		  //https://webqr.com/
+		  DataCodewordsDecoder dec = new DataCodewordsDecoder();
+		  //length field says 31 but it is longer in truth
+		  //dec.Decode_Correct_Sequential_Codewords("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
+		  dec.DecodeCorrectSequentialCodewordsDespiteLengthField("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
 		  
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
+		  
 		  
 		  ArrayList<Integer> interleaved_codewords = mymap.Get_codewords();
 		  ArrayList<Integer> dc_block1  = new ArrayList<Integer>();
