@@ -10,10 +10,12 @@ public class QR_Decode  {
 	
 	
 	public static boolean Change_OriginalMap_Black0(String input_filename, String output_filename) {
+		FileWriter myWriter = null;		
+		Scanner inputReader = null;
 		try {
-			FileWriter myWriter = new FileWriter(output_filename);		
+			myWriter = new FileWriter(output_filename);		
 			File inputFile = new File(input_filename);
-			Scanner inputReader = new Scanner(inputFile);
+			inputReader = new Scanner(inputFile);
 			boolean inputNextLine = inputReader.hasNextLine();
 			while (inputNextLine) {
 				String inputData = inputReader.nextLine();
@@ -34,6 +36,8 @@ public class QR_Decode  {
 						myWriter.write('0');
 					else {
 						System.out.println("Change_OriginalMap_Black0: Unsupported character found in the input file, FORCING QUIT!");
+						inputReader.close();
+						myWriter.close();
 						return false;							
 					}
 				}
@@ -51,6 +55,14 @@ public class QR_Decode  {
 		catch (Exception ex) {
 			System.out.println("Change_OriginalMap_Black0: An exception occurred!");
 			ex.printStackTrace();
+			inputReader.close();
+			try {
+				myWriter.close();
+			}
+			catch (IOException ex2) {
+				System.out.println("Change_OriginalMap_Black0: IOException close myWriter");
+				ex2.printStackTrace();
+			}
 			return false;
 		}
 	}//Change_OriginalMap_Black0

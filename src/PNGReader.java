@@ -70,7 +70,7 @@ public class PNGReader {
 		int end_black_xx=0;
 		int end_black_yy=0;
 		
-		String white = Integer.toBinaryString(-1); //white
+		//String white = Integer.toBinaryString(-1); //white
 		while (blackstr.isEmpty()) {
             for (int xx = 0; xx < width; xx++) {
                 int pixel = image.getRGB(xx, yy);

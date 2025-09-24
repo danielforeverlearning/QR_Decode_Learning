@@ -214,13 +214,16 @@ public class Masking {
 	
 	
 	public boolean Do_Mask(String input_filename, String mask_filename, String output_filename) {
+		Scanner inputReader = null;
+		Scanner maskReader = null;
+		FileWriter myWriter = null;
 		try {
-			FileWriter myWriter = new FileWriter(output_filename);
+			myWriter = new FileWriter(output_filename);
 			
 			File inputFile = new File(input_filename);
 			File maskFile = new File(mask_filename);
-			Scanner inputReader = new Scanner(inputFile);
-			Scanner maskReader = new Scanner(maskFile);
+			inputReader = new Scanner(inputFile);
+			maskReader = new Scanner(maskFile);
 			boolean inputNextLine = inputReader.hasNextLine();
 			boolean maskNextLine = maskReader.hasNextLine();
 			while (inputNextLine && maskNextLine) {
@@ -232,6 +235,9 @@ public class Masking {
 				
 				if (inputLen != maskLen) {
 					System.out.println("Do_Mask: inputLen and maskLen NOT EQUAL FORCING QUIT!");
+					inputReader.close();
+					maskReader.close();
+					myWriter.close();
 					return false;
 				}
 				
@@ -261,11 +267,17 @@ public class Masking {
 						else {
 							System.out.println("Do_Mask: Unsupported character found in the input file, FORCING QUIT!");
 							System.out.println("Do_Mask: inputChar=" + inputChar);
+							inputReader.close();
+							maskReader.close();
+							myWriter.close();
 							return false;							
 						}
 					}
 					else {
 						System.out.println("Do_Mask: Unsupported character found in the mask file, FORCING QUIT");
+						inputReader.close();
+						maskReader.close();
+						myWriter.close();
 						return false;
 					}
 				}
@@ -285,6 +297,19 @@ public class Masking {
 		catch (Exception ex) {
 			System.out.println("Do_Mask: An exception occurred!");
 			ex.printStackTrace();
+			inputReader.close();
+			maskReader.close();
+			if (myWriter != null)
+			{
+				try
+				{
+					myWriter.close();
+				}
+				catch (IOException ex2) {
+					System.out.println("Do_Mask: IOException, failed close myWriter!");
+					ex2.printStackTrace();
+				}
+			}
 			return false;
 		}
 	}//Do_Mask

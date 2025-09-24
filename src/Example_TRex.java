@@ -72,13 +72,17 @@ public class Example_TRex {
 		  //https://webqr.com/
 		  DataCodewordsDecoder dec = new DataCodewordsDecoder();
 		  //length field says 31 but it is longer in truth
-		  //dec.Decode_Correct_Sequential_Codewords("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
-		  dec.DecodeCorrectSequentialCodewordsDespiteLengthField("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
+		  dec.Decode_Correct_Sequential_Codewords("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
+		  //dec.DecodeCorrectSequentialCodewordsDespiteLengthField("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
+		  //wait it is because new encoding and length
+		  //first encoding was byte and length = 31
+		  //need to repair code
+		  
 		  
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
 		  
-		  
+		  /*****
 		  ArrayList<Integer> interleaved_codewords = mymap.Get_codewords();
 		  ArrayList<Integer> dc_block1  = new ArrayList<Integer>();
 		  ArrayList<Integer> dc_block2  = new ArrayList<Integer>();
@@ -106,18 +110,19 @@ public class Example_TRex {
 		  block2.addAll(dc_block2);
 		  block2.addAll(ecc_block2);
 		  
-		  
-		  /*
+		  ErrorCorrection err_correct = new ErrorCorrection();
 		  int max_root_alpha_exp = ecc_block1.size() - 1;
-		  ArrayList<Integer> nonzero_syndrome = new ArrayList<Integer>(); 
-			for (int ii=0; ii <= max_root_alpha_exp; ii++)
-			{
-			     int syndrome = ecc1.CalculateSyndrome(received_block_codewords, ii);
+		  ArrayList<Integer> nonzero_syndrome = new ArrayList<Integer>();
+		  Integer[] block1_array = null;
+		  block1.toArray(block1_array);
+		  for (int ii=0; ii <= max_root_alpha_exp; ii++)
+		  {
+			     int syndrome = err_correct.CalculateSyndrome(block1_array, ii);
 			     if (syndrome != 0)
 			    	 nonzero_syndrome.add(syndrome);
-			}
-			System.out.println("received_block_codewords: nonzero_syndrome.size = " + nonzero_syndrome.size());
-		  */
+		  }
+		  System.out.println("nonzero_syndrome.size = " + nonzero_syndrome.size());
+		  *****/
 		  
 		  
 		  /****************

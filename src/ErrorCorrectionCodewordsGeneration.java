@@ -616,9 +616,13 @@ class ErrorCorrectionCodewordsGeneration
 	private ArrayList<Integer> gen_poly_decimal;
 	
 	private ArrayList<Integer> result_decimal;
+	
+	private Tools tool;
 
 	public ErrorCorrectionCodewordsGeneration(ArrayList<Integer> myintarray, int myint)
 	{
+		tool = new Tools();
+		
 		countErrorCorrectionCodewords = myint;
 		
 		msg_poly_alphaexp = new ArrayList<Integer>();
@@ -706,14 +710,14 @@ class ErrorCorrectionCodewordsGeneration
 	{
 		msg_poly_alphaexp.clear();
 		for (int ii=0; ii < msg_poly_decimal.size(); ii++)
-			msg_poly_alphaexp.add(Table_Integer_To_Exponent_Of_Alpha[msg_poly_decimal.get(ii)]);
+			msg_poly_alphaexp.add(tool.Table_Integer_To_Exponent_Of_Alpha()[msg_poly_decimal.get(ii)]);
 	}//Create_MsgPolyAlphaExp
 	
 	private void Create_GenPolyDecimal()
 	{
 		gen_poly_decimal.clear();
 		for (int ii=0; ii < gen_poly_alphaexp.size(); ii++)
-			gen_poly_decimal.add(Table_Exponent_Of_Alpha_To_Integer[gen_poly_alphaexp.get(ii)]);
+			gen_poly_decimal.add(tool.Table_Exponent_Of_Alpha_To_Integer()[gen_poly_alphaexp.get(ii)]);
 	}//Create_GenPolyDecimal
 	
 	private void DebugPrintArray(String name, ArrayList<Integer> array)
@@ -725,46 +729,6 @@ class ErrorCorrectionCodewordsGeneration
 		System.out.println();
 	}//DebugPrintArray
 	
-	
-	/************************************************************************************************
-	QR Code Log Antilog Table for Galois Field 256
-	The following table contains the log and antilog values that are used in GF(256) arithmetic, 
-	which is used for generating the error correction codes required for QR codes.
-	*************************************************************************************************/
-	
-	private int[] Table_Exponent_Of_Alpha_To_Integer = { 1,     2,   4,   8,  16,  32,  64, 128,  29,  58, 116, 232, 205, 135,  19,  38,
-	                                             76,  152,  45,  90, 180, 117, 234, 201, 143,   3,   6,  12,  24,  48,  96, 192,
-	                                             157,  39,  78, 156,  37,  74, 148,  53, 106, 212, 181, 119, 238, 193, 159,  35,
-	                                             70,  140,   5,  10,  20,  40,  80, 160,  93, 186, 105, 210, 185, 111, 222, 161,
-	                                             95,  190,  97, 194, 153,  47,  94, 188, 101, 202, 137,  15,  30,  60, 120, 240,
-	                                             253, 231, 211, 187, 107, 214, 177, 127, 254, 225, 223, 163,  91, 182, 113, 226,
-	                                             217, 175,  67, 134,  17,  34,  68, 136,  13,  26,  52, 104, 208, 189, 103, 206,
-	                                             129,  31,  62, 124, 248, 237, 199, 147,  59, 118, 236, 197, 151,  51, 102, 204,
-	                                             133,  23,  46,  92, 184, 109, 218, 169,  79, 158,  33,  66, 132,  21,  42,  84,
-	                                             168,  77, 154,  41,  82, 164,  85, 170,  73, 146,  57, 114, 228, 213, 183, 115,
-	                                             230, 209, 191,  99, 198, 145,  63, 126, 252, 229, 215, 179, 123, 246, 241, 255,
-	                                             227, 219, 171,  75, 150,  49,  98, 196, 149,  55, 110, 220, 165,  87, 174,  65,
-	                                             130,  25,  50, 100, 200, 141,   7,  14,  28,  56, 112, 224, 221, 167,  83, 166,
-	                                             81,  162,  89, 178, 121, 242, 249, 239, 195, 155,  43,  86, 172,  69, 138,   9,
-	                                             18,   36,  72, 144,  61, 122, 244, 245, 247, 243, 251, 235, 203, 139,  11,  22,
-	                                             44,   88, 176, 125, 250, 233, 207, 131,  27,  54, 108, 216, 173,  71, 142,   1  };
-												 
-	private int[] Table_Integer_To_Exponent_Of_Alpha = {   Integer.MAX_VALUE, 0, 1, 25, 2, 50, 26, 198, 3, 223, 51, 238, 27, 104, 199, 75,
-	                                               4, 100, 224, 14, 52, 141, 239, 129, 28, 193, 105, 248, 200, 8, 76, 113,
-	                                               5, 138, 101, 47, 225, 36, 15, 33, 53, 147, 142, 218, 240, 18, 130, 69,
-	                                              29, 181, 194, 125, 106, 39, 249, 185, 201, 154, 9, 120, 77, 228, 114, 166,
-	                                               6, 191, 139, 98, 102, 221, 48, 253, 226, 152, 37, 179, 16, 145, 34, 136,
-	                                              54, 208, 148, 206, 143, 150, 219, 189, 241, 210, 19, 92, 131, 56, 70, 64,
-	                                              30, 66, 182, 163, 195, 72, 126, 110, 107, 58, 40, 84, 250, 133, 186, 61,
-	                                             202, 94, 155, 159, 10, 21, 121, 43, 78, 212, 229, 172, 115, 243, 167, 87,
-	                                               7, 112, 192, 247, 140, 128, 99, 13, 103, 74, 222, 237, 49, 197, 254, 24,
-	                                             227, 165, 153, 119, 38, 184, 180, 124, 17, 68, 146, 217, 35, 32, 137, 46,
-	                                              55, 63, 209, 91, 149, 188, 207, 205, 144, 135, 151, 178, 220, 252, 190, 97,
-	                                             242, 86, 211, 171, 20, 42, 93, 158, 132, 60, 57, 83, 71, 109, 65, 162,
-	                                              31, 45, 67, 216, 183, 123, 164, 118, 196, 23, 73, 236, 127, 12, 111, 246,
-	                                             108, 161, 59, 82, 41, 157, 85, 170, 251, 96, 134, 177, 187, 204, 62, 90,
-	                                             203, 89, 95, 176, 156, 169, 160, 81, 11, 245, 22, 235, 122, 117, 44, 215,
-	                                              79, 174, 213, 233, 230, 231, 173, 232, 116, 214, 244, 234, 168, 80, 88, 175   };
 	
 	private int[][] Table_Generator_Polynomial_AlphaExp = { 
 			null,
@@ -948,7 +912,7 @@ class ErrorCorrectionCodewordsGeneration
 					int alpha_exp          = temp1_alpha_exp + temp2_alpha_exp;
 					if (alpha_exp >= 256)
 						alpha_exp %= 255;
-					int alphadecimal       = Table_Exponent_Of_Alpha_To_Integer[alpha_exp];
+					int alphadecimal       = tool.Table_Exponent_Of_Alpha_To_Integer()[alpha_exp];
 					
 					if (x_exp == highest_x_exp)
 						answer_alphadecimal.set(0, alphadecimal);
@@ -964,7 +928,7 @@ class ErrorCorrectionCodewordsGeneration
 			ArrayList<Integer> answer_alpha_exp = new ArrayList<Integer>();
 			for (int ii=0; ii < answer_alphadecimal.size(); ii++)
 			{
-				int alpha_exp = Table_Integer_To_Exponent_Of_Alpha[answer_alphadecimal.get(ii)];
+				int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[answer_alphadecimal.get(ii)];
 				answer_alpha_exp.add(alpha_exp);
 			}
 			big_gen_poly_alpha_exp.add(answer_alpha_exp);
@@ -985,196 +949,5 @@ class ErrorCorrectionCodewordsGeneration
 		 }
 		 *****/
 	}//Make_GeneratorPolynomial_Table
-	
-	//QRcode-ver6H
-	//k == 15 d.c per block
-	//n == 15 d.c per block + 28 e.c.c per block
-	//(n - k) == 28
-	//Maximum number of corrupted symbols we can recover is 14 per block
-	public int CalculateSyndrome(int[] recv, int root_alpha_exp)
-	{
-		ArrayList<Integer> arr = new ArrayList<Integer>();
-		for (int ii=0; ii < recv.length; ii++)
-		{
-			int x_exp = recv.length - ii - 1;
-			//when you calculate syndromes which should be 0 you use x=power of 2 in GF(256) example 2^0 2^1 2^2 2^3 2^4 2^5
-			//it is 0 because when you made generator-polynomial
-			//(x - 2^0)(x - 2^1)(x - 2^2)(x - 2^3).....
-			
-			int coeff_decimal = recv[ii];
-			//alpha==2
-			
-			if (coeff_decimal != 0)
-			{
-			     int coeff_alphaexp =  Table_Integer_To_Exponent_Of_Alpha[coeff_decimal];
-			
-			     //for now root is (x - 2^0) so x==2^0,      (2^a)^b == 2^(a*b)
-			     int exp_sum = coeff_alphaexp + (root_alpha_exp * x_exp);
-			     if (exp_sum >= 256)
-			    	 exp_sum %= 255;
-			     int temp = Table_Exponent_Of_Alpha_To_Integer[exp_sum];
-			
-			     arr.add(temp);
-			}
-		}
-		
-		int temp = 0;
-		for (int ii=0; ii < arr.size(); ii++)
-			temp ^= arr.get(ii);
-		
-		return temp;
-	}//CalculateSyndrome
-	
-	public int FindBadSyndromeCoeffs(int[] recv, int x_to_the, int unknown_ii)
-	{
-		int poly_exp = 0;
-		ArrayList<Integer> arr = new ArrayList<Integer>();
-		for (int ii=0; ii < recv.length; ii++)
-		{
-			int x_exp = recv.length - ii - 1;
-			if (ii == unknown_ii)
-			{
-				poly_exp = (x_to_the * x_exp);
-				if (poly_exp >= 256)
-					poly_exp %= 255;
-			}
-			else
-			{	
-				int coeff_decimal = recv[ii];
-				//alpha==2
-				
-				if (coeff_decimal != 0)
-				{
-				     int coeff_alphaexp =  Table_Integer_To_Exponent_Of_Alpha[coeff_decimal];
-				
-				     //for now root is (x - 2^0) so x==2^0,      (2^a)^b == 2^(a*b)
-				     int exp_sum = coeff_alphaexp + (x_to_the * x_exp);
-				     if (exp_sum >= 256)
-				    	 exp_sum %= 255;
-				     int temp = Table_Exponent_Of_Alpha_To_Integer[exp_sum];
-				
-				     arr.add(temp);
-				}
-			}
-		}//for
-		
-		int tempint = 0;
-		for (int ii=0; ii < arr.size(); ii++)
-			tempint ^= arr.get(ii);
-		
-		int temp_exp = Table_Integer_To_Exponent_Of_Alpha[tempint];
-		
-		
-		//remember it is GF256 math
-		//(unknown_ss * 2^poly_exp) XOR 2^temp_exp == 0
-		//(unknown_ss * 2^poly_exp)                == 2^temp_exp
-		//
-		//unknown_ss == 2^unknown_exp
-		//
-		//(2^unknown_exp * 2^poly_exp)             == 2^temp_exp
-		//
-		//unknown_exp + poly_exp == temp_exp
-		int unknown_exp = temp_exp - poly_exp;
-		if (unknown_exp < 0)
-			unknown_exp += 255;
-		else
-			unknown_exp %= 255;
-		return unknown_exp;
-	}//FindBadSyndromeCoeffs
-	
-	
-	public ArrayList<ArrayList<Integer>> BuildUnknownResults(int[] received_block_codewords, int max_root_alpha_exp)
-	{
-		int last_res = 0;
-		ArrayList<ArrayList<Integer>> unk_results = new ArrayList<ArrayList<Integer>>();
-		for (int unknown_ii=0; unknown_ii < received_block_codewords.length; unknown_ii++)
-		{
-			ArrayList<Integer> results = new ArrayList<Integer>();
-			for (int x_to_the=0; x_to_the <= max_root_alpha_exp; x_to_the++)
-			{		 
-			     int res = FindBadSyndromeCoeffs(received_block_codewords, x_to_the, unknown_ii);
-			     results.add(res);
-			     if (x_to_the == 0)
-			    	 last_res = res;
-			     else
-			     {
-			    	 if (last_res != res)
-			    		  break;
-			     }
-			}
-			unk_results.add(results);
-		}
-		return unk_results;
-	}//BuildUnknownResults
-	
-	
-	public void DebugPrint_UnknownResults(ArrayList<ArrayList<Integer>> unk_results)
-	{
-		System.out.println();
-		for (int unkpos=0; unkpos < unk_results.size(); unkpos++)
-		{
-			System.out.print("unkpos" + unkpos + ":");
-			ArrayList<Integer> results = unk_results.get(unkpos);
-			for (int ii=0; ii < results.size(); ii++)
-				System.out.printf("%5d ", results.get(ii));
-			System.out.println();
-		}
-		System.out.println();
-	}//DebugPrint_UnknownResults
-	
-	
-	public ArrayList<String> FindCorrectableByteLocations(ArrayList<ArrayList<Integer>> unk_results, int max_root_alpha_exp)
-	{
-		ArrayList<String> arr = new ArrayList<String>();
-		for (int unknown_ii=0; unknown_ii < unk_results.size(); unknown_ii++)
-		{
-			ArrayList<Integer> syndrome_arr = unk_results.get(unknown_ii);
-			int syndrome_arr_size = syndrome_arr.size();
-			if ((max_root_alpha_exp + 1) == syndrome_arr_size)
-			{
-				int ss=0;
-				int last_res = syndrome_arr.get(0);
-				for (ss=0; ss < syndrome_arr_size; ss++)
-				{
-					 int temp = syndrome_arr.get(ss);
-				     if (temp != last_res)
-				    	 break;
-				}
-				if (ss == syndrome_arr_size)
-				{
-					String str = unknown_ii + "," + last_res;
-					arr.add(str);
-				}
-			}
-		}
-		return arr;
-	}//FindCorrectableByteIndices
-	
-	public ArrayList<String> CorrectCorrectableBytes(ArrayList<String> correctable_byte_arr, int max_root_alpha_exp, int recv_length)
-	{
-		ArrayList<String> corrections = new ArrayList<String>();
-		for (int ii=0; ii < correctable_byte_arr.size(); ii++)
-		{
-			String str = correctable_byte_arr.get(ii);
-			String[] strarray = str.split(",");
-			Integer byteloc = Integer.parseInt(strarray[0]);
-			Integer unknown_good_coeff_as_alphaexp = Integer.parseInt(strarray[1]);
-			int unknown_good_coeff_decimal = Table_Exponent_Of_Alpha_To_Integer[unknown_good_coeff_as_alphaexp];
-			corrections.add(byteloc + "," + unknown_good_coeff_decimal);
-		}
-		return corrections;
-	}//CorrectCorrectableBytes
-	
-	public void DebugPrint_Corrections(ArrayList<String> corrections)
-	{
-		for (int ii=0; ii < corrections.size(); ii++)
-		{
-			String str = corrections.get(ii);
-			String[] strarray = str.split(",");
-			Integer byteloc = Integer.parseInt(strarray[0]);
-			Integer coeff = Integer.parseInt(strarray[1]);
-			System.out.println("DebugPrint_Corrections:byteloc=" + byteloc + " coeff=" + coeff);
-		}
-	}//DebugPrint_Corrections
 	
 }//class
