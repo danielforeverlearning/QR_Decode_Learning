@@ -164,8 +164,9 @@ public class DataCodewordsDecoder {
 
 			boolean getIndicator  = true;
 			int length            = 0;
-			int indicator_count       = 0;
+			int indicator_count   = 0;
 			ENCODING_INDICATOR encoding = ENCODING_INDICATOR.UNKNOWN;
+			boolean need_to_use_startOfByte = false;
 			
 			String startOfByte    = "";
 			String inputData      = "";
@@ -174,7 +175,7 @@ public class DataCodewordsDecoder {
 				
 				if (getIndicator) {
 					indicator_count++;
-					if (indicator_count == 1) //on byte boundary
+					if (need_to_use_startOfByte == false) //on byte boundary
 					{
 						String padded8str = "00000000";
 						
@@ -217,7 +218,7 @@ public class DataCodewordsDecoder {
 						else
 							encoding = ENCODING_INDICATOR.UNKNOWN;
 						
-					    System.out.println("INDICATOR=" + padded8str.substring(0,4) + " , " + encoding);
+					    System.out.println("INDICATOR" + indicator_count + " = " + padded8str.substring(0,4) + " , " + encoding);
 						if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.END_OF_MESSAGE)) {
 						    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.END_OF_MESSAGE, exiting.....");
 						    inputReader.close();
@@ -253,8 +254,8 @@ public class DataCodewordsDecoder {
 						System.out.println("startOfByte=" + startOfByte);
 						
 						getIndicator = false;
-					}//indicator_count==1 on byte boundary
-					else //indicator_count > 1 need old startOfByte
+					}//on byte boundary
+					else //need_to_use_startOfByte
 					{
 						if (startOfByte.startsWith("0001"))
 							encoding = ENCODING_INDICATOR.NUMERIC;
@@ -277,7 +278,7 @@ public class DataCodewordsDecoder {
 						else
 							encoding = ENCODING_INDICATOR.UNKNOWN;
 						
-					    System.out.println("INDICATOR=" + startOfByte.substring(0,4) + " , " + encoding);
+						System.out.println("INDICATOR" + indicator_count + " = " + encoding);
 						if ((encoding != ENCODING_INDICATOR.BYTE) && (encoding != ENCODING_INDICATOR.END_OF_MESSAGE)) {
 						    System.out.println("Sorry, so far only know ENCODING_INDICATOR.BYTE or ENCODING_INDICATOR.END_OF_MESSAGE, exiting.....");
 						    inputReader.close();
@@ -285,7 +286,7 @@ public class DataCodewordsDecoder {
 						}
 						
 						
-					}//indicator_count > 1 need old startOfByte
+					}//need_to_use_startOfByte
 				} 
 				else {
 				    if (length > 0) {
@@ -319,6 +320,9 @@ public class DataCodewordsDecoder {
 					}
 					else {
 						getIndicator = true;
+						//if last encoding was byte you need to use startOfByte
+						if (encoding == ENCODING_INDICATOR.BYTE)
+							need_to_use_startOfByte = true;
 					}
 				}
 			}//while
