@@ -89,7 +89,7 @@ public class DataCodewordsDecoder {
 			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
 			'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
 			'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '$', '%', '*',
-			'+', '-', '.', '/', ':' };
+			'+', '-', '.', '/', ':' };  
 	
 	enum ENCODING_INDICATOR {
 		NUMERIC,                          //0001 (10bits per 3 digits) 
@@ -112,10 +112,6 @@ public class DataCodewordsDecoder {
 	}//constructor
 	
 	
-	
-	//so far only works if 1st encoding is byte
-	//and there is no 2nd encoding
-	//or 2nd encoding is byte or alphanumeric
 	public boolean Decode_Correct_Sequential_Codewords(String input_filename) {
 		try {
 			
@@ -129,7 +125,6 @@ public class DataCodewordsDecoder {
 			ENCODING_INDICATOR encoding     = ENCODING_INDICATOR.UNKNOWN;
 			
 			String startOfByte      = "";
-			int startOfByteLen      = 0;
 			String inputData        = "";
 			
 			while (true) {
@@ -137,7 +132,7 @@ public class DataCodewordsDecoder {
 				if (getIndicator) {
 					indicator_count++;
 					getIndicator = false;
-					if (startOfByteLen == 0) //getIndicator on byte boundary
+					if (startOfByte.length() == 0) //getIndicator on byte boundary
 					{
 						String padded8str = "00000000";
 						try {
@@ -206,7 +201,6 @@ public class DataCodewordsDecoder {
 							length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
 							System.out.println("length=" + length);
 							startOfByte = padded8str.substring(4,8);
-							startOfByteLen = 4;
 						}
 						else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC)
 						{
@@ -215,7 +209,6 @@ public class DataCodewordsDecoder {
 							length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
 							System.out.println("length=" + length);
 							startOfByte = padded8str.substring(5,8);
-							startOfByteLen = 3;
 						}
 						else
 						{
@@ -226,7 +219,7 @@ public class DataCodewordsDecoder {
 					}//getIndicator on byte boundary
 					else //getIndicator startOfByte has partial byte
 					{
-						if (startOfByteLen == 4) {
+						if (startOfByte.length() == 4) { //getIndicator startOfByteLen == 4
 							if (startOfByte.startsWith("0001"))
 								encoding = ENCODING_INDICATOR.NUMERIC;
 							else if (startOfByte.startsWith("0010"))
@@ -278,7 +271,6 @@ public class DataCodewordsDecoder {
 							{
 								length = tool.ConvertBinaryByteStringToPositiveInteger(padded8str);
 								System.out.println("length=" + length);
-								startOfByteLen = 0;
 								startOfByte = "";
 							}
 							else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC)
@@ -304,14 +296,95 @@ public class DataCodewordsDecoder {
 							    length = tool.ConvertBinaryByteStringToPositiveInteger(startOfLength);
 								System.out.println("length=" + length);
 								startOfByte = padded8str.substring(1,8);
-								startOfByteLen = 7;
 							}
-						}//if (startOfByteLen == 4)
-						else {
-							System.out.println("did not code for startOfByteLen !=4 getting indicator");
-							inputReader.close();
-							return false;
-						}
+						}//getIndicator startOfByteLen == 4
+						else { //getIndicator startOfByteLen != 4
+							String encodingstr = "";
+							if (startOfByte.length() < 4)
+							{
+								String padded8str = "00000000";
+								try {
+									inputData  = inputReader.nextLine();
+								}
+								catch (NoSuchElementException ex) {
+									//EOF reached
+									inputReader.close();
+									break;
+								}
+							    int number = Integer.parseInt(inputData);
+			                    String binaryString = Integer.toBinaryString(number);
+							    if (binaryString.length() == 8)
+									padded8str = binaryString;
+								else
+									padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+							    
+							    startOfByte += padded8str;
+							}
+							encodingstr = startOfByte.substring(0, 4);
+							startOfByte = startOfByte.substring(4);
+							if (encodingstr.startsWith("0001"))
+								encoding = ENCODING_INDICATOR.NUMERIC;
+							else if (encodingstr.startsWith("0010"))
+								encoding = ENCODING_INDICATOR.ALPHANUMERIC;
+							else if (encodingstr.startsWith("0100"))
+								encoding = ENCODING_INDICATOR.BYTE;
+							else if (encodingstr.startsWith("1000"))
+								encoding = ENCODING_INDICATOR.KANJI;
+							else if (encodingstr.startsWith("0011"))
+								encoding = ENCODING_INDICATOR.STRUCTURED_APPEND;
+							else if (encodingstr.startsWith("0111"))
+								encoding = ENCODING_INDICATOR.EXTENDED_CHANNEL_INTERPRETATION;
+							else if (encodingstr.startsWith("0101"))
+								encoding = ENCODING_INDICATOR.FNC1_1ST_POSITION;
+							else if (encodingstr.startsWith("1001"))
+								encoding = ENCODING_INDICATOR.FNC1_2ND_POSITION;
+							else if (encodingstr.startsWith("0000"))
+								encoding = ENCODING_INDICATOR.END_OF_MESSAGE;
+							else
+								encoding = ENCODING_INDICATOR.UNKNOWN;
+							
+							System.out.println("INDICATOR" + indicator_count + " = " + encoding);
+							
+							/************************************
+							 length field
+							 -------------
+							 Versions 1 through 9
+							      Numeric mode: 10 bits
+							      Alphanumeric mode: 9 bits
+							      Byte mode: 8 bits
+							      Japanese mode: 8 bits
+							************************************/
+							int need_bit_len = 0;
+							if (encoding == ENCODING_INDICATOR.NUMERIC)
+								need_bit_len = 10;
+							else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC)
+								need_bit_len = 9;
+							else
+								need_bit_len = 8;
+							
+							while (startOfByte.length() < need_bit_len)
+							{
+								String padded8str = "00000000";
+								try {
+									inputData  = inputReader.nextLine();
+								}
+								catch (NoSuchElementException ex) {
+									//EOF reached
+									inputReader.close();
+									break;
+								}
+							    int number = Integer.parseInt(inputData);
+			                    String binaryString = Integer.toBinaryString(number);
+							    if (binaryString.length() == 8)
+									padded8str = binaryString;
+								else
+									padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+							    startOfByte += padded8str;
+							}
+							length = tool.ConvertBinaryByteStringToPositiveInteger(startOfByte.substring(0,need_bit_len));
+							System.out.println("length=" + length);
+							startOfByte = startOfByte.substring(need_bit_len);
+						}//getIndicator startOfByteLen != 4
 					}//getIndicator startOfByte has partial byte
 				}//getIndicator
 				else {
@@ -341,13 +414,13 @@ public class DataCodewordsDecoder {
 							System.out.println(" ascii_decimal_int=" + ascii_decimal_int + " = " + character);
 							
 							startOfByte = padded8str.substring(4,8);
-							startOfByteLen = 4;
-				    	}
+							length--;
+				    	}//encoding == ENCODING_INDICATOR.BYTE
 				    	else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC)
 						{
 				    		if (length >= 2) //pair of alphanumchars
 				    		{
-				    			int need_more_bits_len = 11 - startOfByteLen;
+				    			int need_more_bits_len = 11 - startOfByte.length();
 				    			String padded8str = "00000000";
 								try {
 									inputData  = inputReader.nextLine();
@@ -364,16 +437,121 @@ public class DataCodewordsDecoder {
 							    else
 								    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
 						
-						        String str11bits = startOfByte + padded8str.substring(0, need_more_bits_len);
-						        int twocharint = tool.ConvertBinaryByteStringToPositiveInteger(str11bits);
-				    			
+						        String str11bits = "";
+						        if (need_more_bits_len <= 8)
+						            str11bits = startOfByte + padded8str.substring(0, need_more_bits_len);
+						        else
+						        {
+						        	str11bits = startOfByte + padded8str;
+						        	need_more_bits_len -= 8;
+						        	padded8str = "00000000";
+									try {
+										inputData  = inputReader.nextLine();
+									}
+									catch (NoSuchElementException ex) {
+										//EOF reached
+										inputReader.close();
+										break;
+									}
+							        number = Integer.parseInt(inputData);
+			                        binaryString = Integer.toBinaryString(number);
+							        if (binaryString.length() == 8)
+									    padded8str = binaryString;
+								    else
+									    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+							        str11bits += padded8str.substring(0, need_more_bits_len);
+						        }
+						        int str11int = tool.ConvertBinaryByteStringToPositiveInteger(str11bits);
+						        int mychar2int = str11int % 45;
+						        int mychar1int = str11int / 45;
+						        char mychar2 = Alphanumeric_encoding_table[mychar2int];
+						        char mychar1 = Alphanumeric_encoding_table[mychar1int];
+						        System.out.println(" alphanumeric_encoding_int=" + mychar1int + " = " + mychar1);
+						        System.out.println(" alphanumeric_encoding_int=" + mychar2int + " = " + mychar2);
+						        //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
+						        length -= 2;
+						        startOfByte = padded8str.substring(need_more_bits_len);
 				    		}//pair of alphanumchars
+				    		else //last alphanumchar
+				    		{
+				    			if (startOfByte.length() < 6)
+				    			{
+				    				String padded8str = "00000000";
+				    				try {
+										inputData  = inputReader.nextLine();
+									}
+									catch (NoSuchElementException ex) {
+										//EOF reached
+										inputReader.close();
+										break;
+									}
+							        int number = Integer.parseInt(inputData);
+			                        String binaryString = Integer.toBinaryString(number);
+							        if (binaryString.length() == 8)
+									    padded8str = binaryString;
+								    else
+									    padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
+							        startOfByte += padded8str;
+				    			}
+				    			int mychar1int = tool.ConvertBinaryByteStringToPositiveInteger(startOfByte.substring(0,6));
+						        char mychar1 = Alphanumeric_encoding_table[mychar1int];
+						        System.out.println(" alphanumeric_encoding_int=" + mychar1int + " = " + mychar1);
+						        //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
+						        length--;
+						        startOfByte = startOfByte.substring(6);
+				    		}//last alphanumchar
+						}//encoding == ENCODING_INDICATOR.ALPHANUMERIC
+				    	else if (encoding == ENCODING_INDICATOR.NUMERIC)
+				    	{
+				    		/************************************
+				    		 Numeric Mode Encoding
+							 To illustrate numeric mode encoding, 
+							 the example input is 8675309
+							 
+				    		 Step 1: Break String Up Into Groups of Three
+								To encode a string of digits in numeric mode, 
+								first split the string into groups of 3 digits.
+								If the string's length is not a multiple of 3, 
+								the final group of digits will have to be only 
+								1 or 2 numbers long.
+								
+								After splitting into groups of three:
+								867 530 9
+								
+							 Step 2: Convert each group into binary
+								Now treat each group of digits as
+								a 3 digit number 
+								(or fewer than 3, 
+								if the final group is 2 or 1 digits long). 
+								Convert that 3-digit number into 10 binary bits. 
+								If a group starts with a 0, 
+								it should be interpreted as a 2-digit number 
+								and you should convert it to 7 binary bits, 
+								and if there are 2 0s at the beginning of a group, 
+								it should be interpreted as a 1-digit number 
+								and you should convert it to 4 binary bits. 
+								Similarly, if the final group consists of only 2 digits, 
+								you should convert it to 7 binary bits, 
+								and if the final group consists of only 1 digit, 
+								you should convert it to 4 binary bits.
+								
+								Converting to binary:
+								867 → 1101100011
+
+								530 → 1000010010
+
+								9 → 1001
+				    		************************************/
+				    		if (length >= 3)
+				    		{
+				    			int dummy=0;
+				    			dummy++;
+				    		}
 				    		else
 				    		{
 				    			
-				    		}//last alphanumchar
-						}
-						length--;
+				    		}
+				    	}
 					}//length > 0
 					else {
 						getIndicator = true;
