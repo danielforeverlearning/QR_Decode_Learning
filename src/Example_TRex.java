@@ -48,7 +48,7 @@ public class Example_TRex {
 		  nomaskyetmap.DumpMap("./Example_TRex/rowcolmap_AZ.txt");
   		  
 		  
-		  boolean success = mask.Do_Mask("./Example_TRex/rowcolmap_AZ.txt", "./bin/mask6_" + QRpixellen + ".txt", "./Example_TRex/rowcolmap_AZ_mask6.txt");
+		  boolean success = mask.Do_Mask("./Example_TRex/rowcolmap_AZ.txt", "./mask6_" + QRpixellen + ".txt", "./Example_TRex/rowcolmap_AZ_mask6.txt");
 		  if (!success)
 		  {
 		        System.out.println("ERROR");
@@ -65,19 +65,17 @@ public class Example_TRex {
 		  **********************************************************************************************************************/
 		  RowColumnMapReader mymap = new RowColumnMapReader(QRpixellen, QRpixellen);
 		  mymap.Load("./Example_TRex/rowcolmap_AZ_mask6.txt");
-		  
 		  mymap.Find_Codewords(134);
 		  
 		  //These codewords we got from stepping thru online javascript code
 		  //https://webqr.com/
 		  DataCodewordsDecoder dec = new DataCodewordsDecoder();
-		  dec.Decode_Correct_Sequential_Codewords("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
+		  //dec.Decode_Correct_Sequential_Codewords("./Example_TRex/good-codewords-sequence-from-online-website-debugger.txt");
 		  //1st encoding was byte and length = 31
 		  //2nd encoding is alphanumeric encoding
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
 		  //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
-		  
-		  /*****
+                  
 		  ArrayList<Integer> interleaved_codewords = mymap.Get_codewords();
 		  ArrayList<Integer> dc_block1  = new ArrayList<Integer>();
 		  ArrayList<Integer> dc_block2  = new ArrayList<Integer>();
@@ -95,8 +93,9 @@ public class Example_TRex {
 				  ecc_block1.add(interleaved_codewords.get(ii));
 				  ecc_block2.add(interleaved_codewords.get(ii+1));
 			  }
-		  }
-		  
+                  }
+                  
+                  /*****
 		  ArrayList<Integer> block1 = new ArrayList<Integer>();
 		  block1.addAll(dc_block1);
 		  block1.addAll(ecc_block1);
@@ -117,29 +116,7 @@ public class Example_TRex {
 			    	 nonzero_syndrome.add(syndrome);
 		  }
 		  System.out.println("nonzero_syndrome.size = " + nonzero_syndrome.size());
-		  *****/
-		  
-		  
-		  /****************
-		  FileWriter myWriter = new FileWriter("./Example_TRex/check-dc-sequence.txt");
-		  for (int ii=0; ii < deinterleaved_dc_block1.size(); ii++)
-		  {
-			  myWriter.write(deinterleaved_dc_block1.get(ii).toString());
-			  myWriter.write('\n');
-		  }
-		  for (int ii=0; ii < deinterleaved_dc_block2.size(); ii++)
-		  {
-			  myWriter.write(deinterleaved_dc_block2.get(ii).toString());
-			  myWriter.write('\n');
-		  }
-		  myWriter.close();
-		  ********************/
-		  
-		  /**********************************************************
-		  DataCodewordsDecoder dec = new DataCodewordsDecoder();
-		  dec.Decode_Correct_Sequential_Codewords(deinterleaved_dc_block1,
-				                                  deinterleaved_dc_block2);
-		  **********************************************************/
+                  *****/
 	}//DoExample
 
 }//class
