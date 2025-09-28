@@ -1,4 +1,14 @@
 
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.util.Scanner;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
+
+
 public class Tools {
 	
 	public Tools() {
@@ -69,8 +79,49 @@ public class Tools {
 	
 	public int[] Table_Integer_To_Exponent_Of_Alpha()
 	{
-		return Integer_To_Exponent_Of_Alpha;
+            return Integer_To_Exponent_Of_Alpha;
 	}
-	
+        
+        public ArrayList<Integer> IntegerTextFileToArrayList(String filepath)
+        {
+            ArrayList<Integer> myarray = new ArrayList<Integer>();
+            Scanner inputReader = null;
+            try {
+                    File inputFile = new File(filepath);
+                    inputReader = new Scanner(inputFile);
+                    while (true)
+                    {
+                        String inputData = inputReader.nextLine();
+                        Integer myint = Integer.parseInt(inputData);
+                        myarray.add(myint);
+                    }
+            }
+            catch (NoSuchElementException ex) {
+                //EOF reached
+                inputReader.close();
+                return myarray;
+            } 
+            catch (Exception ex) {
+                System.out.println("IntegerTextFileToArrayList: An exception occurred!");
+                ex.printStackTrace();
+                return null;
+            }
+        }//IntegerTextFileToArrayList
+        
+        public void ArrayListToIntegerTextFile(String outputfilepath, ArrayList<Integer> myarray)
+        {
+            try {
+                FileWriter myWriter = new FileWriter(outputfilepath);
+                for (int ii=0; ii < myarray.size(); ii++) {
+                    myWriter.write(myarray.get(ii).toString());
+                    myWriter.write('\n');
+                }	
+                myWriter.close();
+            }
+            catch (Exception ex) {
+		System.out.println("ArrayListToIntegerTextFile: An exception occurred!");
+		ex.printStackTrace();
+            }
+        }//ArrayListToIntegerTextFile
 }//class
 
