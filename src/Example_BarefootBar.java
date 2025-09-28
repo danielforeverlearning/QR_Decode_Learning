@@ -22,15 +22,27 @@ public class Example_BarefootBar {
 		DataCodewordsDecoder dec = new DataCodewordsDecoder();
 		dec.Decode_Correct_Sequential_Codewords("./Example_BarefootBar/20221025_104402_codewords.txt");
 		ArrayList<Integer> good_sequence = tool.IntegerTextFileToArrayList("./Example_BarefootBar/20221025_104402_codewords.txt");
+                ArrayList<Integer> good_dc_block1 = new ArrayList<Integer>();
+                ArrayList<Integer> good_dc_block2 = new ArrayList<Integer>();
+                ArrayList<Integer> good_dc_block3 = new ArrayList<Integer>();
+                ArrayList<Integer> good_dc_block4 = new ArrayList<Integer>();
+                for (int ii=0;  ii < 15; ii++)
+                    good_dc_block1.add(good_sequence.get(ii));
+                for (int ii=15; ii < 30; ii++)
+                    good_dc_block2.add(good_sequence.get(ii));
+                for (int ii=30; ii < 45; ii++)
+                    good_dc_block3.add(good_sequence.get(ii));
+                for (int ii=45; ii < 60; ii++)
+                    good_dc_block4.add(good_sequence.get(ii));
                 ArrayList<Integer> good_interleave = new ArrayList<Integer>();
-                for (int ii=0; ii < good_sequence.size(); ii += 4)
+                for (int ii=0;  ii < 15; ii++)
                 {
-                    good_interleave.add(good_sequence.get(ii));
-                    good_interleave.add(good_sequence.get(ii+1));
-                    good_interleave.add(good_sequence.get(ii+2));
-                    good_interleave.add(good_sequence.get(ii+3));
+                    good_interleave.add(good_dc_block1.get(ii));
+                    good_interleave.add(good_dc_block2.get(ii));
+                    good_interleave.add(good_dc_block3.get(ii));
+                    good_interleave.add(good_dc_block4.get(ii));
                 }
-                tool.ArrayListToIntegerTextFile("./Example_BarefootBar/good_interleave.txt", good_interleave);
+                //tool.ArrayListToIntegerTextFile("./Example_BarefootBar/good_interleave.txt", good_interleave);
 		
 		
 		
@@ -117,9 +129,7 @@ public class Example_BarefootBar {
 			System.out.println("ERROR");
 			return;
 		}
-		int ecc_per_block_6H = 28;
-		int dc_per_block_6H  = 15;
-		int num_of_blocks_6H = 4;
+		
 		RowColumnMapReader mymap = new RowColumnMapReader(41,41);
 		mymap.Load("./Example_BarefootBar/after_mask5_bad_branding_area.txt");
 		mymap.Find_Codewords(172);
@@ -279,48 +289,20 @@ public class Example_BarefootBar {
                  generate correct ecc codewords
                  and we can just move on
                  ********************************************/
-		ArrayList<Integer> barefootbar_correct = tool.IntegerTextFileToArrayList("./Example_BarefootBar/20221025_104402_codewords.txt");
-                System.out.println("barefootbar_correct.size = " + barefootbar_correct.size());
-                ArrayList<Integer> barefootbar_dc_block1 = new ArrayList<Integer>();
-                ArrayList<Integer> barefootbar_dc_block2 = new ArrayList<Integer>();
-                ArrayList<Integer> barefootbar_dc_block3 = new ArrayList<Integer>();
-                ArrayList<Integer> barefootbar_dc_block4 = new ArrayList<Integer>();
-                for (int ii=0; ii < 15; ii++)
-                    barefootbar_dc_block1.add(barefootbar_correct.get(ii));
-                for (int ii=15; ii < 30; ii++)
-                    barefootbar_dc_block2.add(barefootbar_correct.get(ii));
-                for (int ii=30; ii < 45; ii++)
-                    barefootbar_dc_block3.add(barefootbar_correct.get(ii));
-                for (int ii=45; ii < 60; ii++)
-                    barefootbar_dc_block4.add(barefootbar_correct.get(ii));
-                
-                System.out.println("barefootbar_dc_block1.size = " + barefootbar_dc_block1.size());
-                System.out.println("barefootbar_dc_block2.size = " + barefootbar_dc_block2.size());
-                System.out.println("barefootbar_dc_block3.size = " + barefootbar_dc_block3.size());
-                System.out.println("barefootbar_dc_block4.size = " + barefootbar_dc_block4.size());
                             
-                ErrorCorrectionCodewordsGeneration eccgen1  = new ErrorCorrectionCodewordsGeneration(barefootbar_dc_block1, 28);
+                ErrorCorrectionCodewordsGeneration eccgen1  = new ErrorCorrectionCodewordsGeneration(good_dc_block1, 28);
                 ArrayList<Integer> barefootbar_ecc_block1 = eccgen1.Get_ECC_Decimal();
                 
-                ErrorCorrectionCodewordsGeneration eccgen2  = new ErrorCorrectionCodewordsGeneration(barefootbar_dc_block2, 28);
+                ErrorCorrectionCodewordsGeneration eccgen2  = new ErrorCorrectionCodewordsGeneration(good_dc_block2, 28);
                 ArrayList<Integer> barefootbar_ecc_block2 = eccgen2.Get_ECC_Decimal();
                 
-                ErrorCorrectionCodewordsGeneration eccgen3  = new ErrorCorrectionCodewordsGeneration(barefootbar_dc_block3, 28);
+                ErrorCorrectionCodewordsGeneration eccgen3  = new ErrorCorrectionCodewordsGeneration(good_dc_block3, 28);
                 ArrayList<Integer> barefootbar_ecc_block3 = eccgen3.Get_ECC_Decimal();
                 
-                ErrorCorrectionCodewordsGeneration eccgen4  = new ErrorCorrectionCodewordsGeneration(barefootbar_dc_block4, 28);
+                ErrorCorrectionCodewordsGeneration eccgen4  = new ErrorCorrectionCodewordsGeneration(good_dc_block4, 28);
                 ArrayList<Integer> barefootbar_ecc_block4 = eccgen4.Get_ECC_Decimal();
                 
-                ArrayList<Integer> barefootbar_good_branding_area = new ArrayList<Integer>();
-                ArrayList<Integer> barefootbar_interleaved_dc = new ArrayList<Integer>();
                 ArrayList<Integer> barefootbar_interleaved_ecc = new ArrayList<Integer>();
-                for (int ii=0; ii < 15; ii++)
-                {
-                    barefootbar_interleaved_dc.add(barefootbar_dc_block1.get(ii));
-                    barefootbar_interleaved_dc.add(barefootbar_dc_block2.get(ii));
-                    barefootbar_interleaved_dc.add(barefootbar_dc_block3.get(ii));
-                    barefootbar_interleaved_dc.add(barefootbar_dc_block4.get(ii));
-                }
                 for (int ii=0; ii < 28; ii++)
                 {
                     barefootbar_interleaved_ecc.add(barefootbar_ecc_block1.get(ii));
@@ -328,13 +310,12 @@ public class Example_BarefootBar {
                     barefootbar_interleaved_ecc.add(barefootbar_ecc_block3.get(ii));
                     barefootbar_interleaved_ecc.add(barefootbar_ecc_block4.get(ii));
                 }
-                barefootbar_good_branding_area.addAll(barefootbar_interleaved_dc);
-                barefootbar_good_branding_area.addAll(barefootbar_interleaved_ecc);
                 
-                tool.ArrayListToIntegerTextFile("./Example_BarefootBar/barefootbar_interleaved_dc.txt", barefootbar_interleaved_dc);
+                ArrayList<Integer> barefootbar_good_branding_area = new ArrayList<Integer>();
+                barefootbar_good_branding_area.addAll(good_interleave);
+                barefootbar_good_branding_area.addAll(barefootbar_interleaved_ecc);
 
-//bug somewhere should be perfect
-/*****
+//i think bug is in mapwriter i think i don't know too tired :(
 		RowColumnMapWriter mapwriter = new RowColumnMapWriter("./Example_BarefootBar/ver6-blank.txt", 41, 41);
 		try {
                     mapwriter.FillMap(barefootbar_good_branding_area);
@@ -342,17 +323,21 @@ public class Example_BarefootBar {
 		catch (Exception ex) {
                     ex.printStackTrace();
 		}
-		mapwriter.DumpMap("./Example_BarefootBar/barefootbar_good_branding_beforemask.txt");
-		
-                //boolean theend = mask.Do_Mask("./Example_BarefootBar/barefootbar_good_branding_beforemask.txt", "./mask_5.txt", "./Example_BarefootBar/barefootbar_good_branding_aftermask.txt");
+		mapwriter.DumpMap("./Example_BarefootBar/barefootbar_mapwriter.txt");
+
+                //boolean theend = mask.Do_Mask("./Example_BarefootBar/barefootbar_mapwriter.txt", "./mask_5.txt", "./Example_BarefootBar/barefootbar_mapwriter_aftermask.txt");
 		//if (!theend)
 		//{
                 //    System.out.println("ERROR");
                 //    return;
 		//}
 		
+                int ecc_per_block_6H = 28;
+		int dc_per_block_6H  = 15;
+		int num_of_blocks_6H = 4;
                 RowColumnMapReader correct_map = new RowColumnMapReader(41,41);
-		correct_map.Load("./Example_BarefootBar/barefootbar_good_branding_beforemask.txt");
+		correct_map.Load("./Example_BarefootBar/barefootbar_mapwriter.txt");
+                correct_map.DumpMap("./Example_BarefootBar/barefootbar_mapreader.txt");
 		correct_map.Find_Codewords(num_of_blocks_6H * dc_per_block_6H);
                 ArrayList<Integer> interleaved_correct_map_data = correct_map.Get_codewords();
 		ArrayList<Integer> deinterleaved_correct_map_block1 = new ArrayList<Integer>();
@@ -371,7 +356,6 @@ public class Example_BarefootBar {
 				                        deinterleaved_correct_map_block2,
 				                        deinterleaved_correct_map_block3,
 				                        deinterleaved_correct_map_block4);
-*****/
                 
 	}//DoExample
 
