@@ -84,7 +84,7 @@ public class Masking {
 		//i means invert the color
 		//d means do not invert the color
 		try {
-			FileWriter myWriter = new FileWriter("./bin/mask_5.txt");
+			FileWriter myWriter = new FileWriter("./mask_5.txt");
 			for (int ii=0; ii <= 40; ii++) {
 			    for (int jj=0; jj <= 40; jj++) {
 					int answer = ((ii*jj)%3+ii+jj)%2;

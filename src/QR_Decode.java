@@ -71,11 +71,11 @@ public class QR_Decode  {
 	public static void main(String s[]) throws Exception {
                 System.out.println("STARTING");
 		try {
-			//Example_BarefootBar ex1 = new Example_BarefootBar();
-			//ex1.DoExample();
+			Example_BarefootBar ex1 = new Example_BarefootBar();
+			ex1.DoExample();
 			
-			Example_TRex ex2 = new Example_TRex();
-			ex2.DoExample();
+			//Example_TRex ex2 = new Example_TRex();
+			//ex2.DoExample();
                         //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
 		}
 		catch (Exception ex) {

@@ -18,12 +18,12 @@ public class Example_BarefootBar {
 		
 		//These codewords we got from stepping thru online javascript code
 		//https://webqr.com/
-		//DataCodewordsDecoder dec = new DataCodewordsDecoder();
-		//dec.Decode_Correct_Sequential_Codewords("./bin/20221025_104402_codewords.txt");
+		DataCodewordsDecoder dec = new DataCodewordsDecoder();
+		dec.Decode_Correct_Sequential_Codewords("./Example_BarefootBar/20221025_104402_codewords.txt");
 		
 		Masking mask = new Masking();
 		mask.Write_Wikipedia_Mask_5();
-		boolean success = mask.Do_Mask("./Example_BarefootBar/original_map_2.txt", "./bin/mask_5.txt", "./Example_BarefootBar/after_mask5.txt");
+		boolean success = mask.Do_Mask("./Example_BarefootBar/original_map_2.txt", "./mask_5.txt", "./Example_BarefootBar/after_mask5.txt");
 		if (!success)
 		{
 			System.out.println("ERROR");
@@ -45,11 +45,11 @@ public class Example_BarefootBar {
 		int num_of_blocks_6H = 4;
 		RowColumnMapReader mymap = new RowColumnMapReader(41,41);
 		mymap.Load("./Example_BarefootBar/after_mask5.txt");
-		mymap.FindDataCodewordsFromMap(num_of_blocks_6H, dc_per_block_6H,0,0);
+		mymap.Find_Codewords(num_of_blocks_6H * dc_per_block_6H);
 		//mymap.DebugPrint_mybyte();
 		//mymap.DebugPrint_codewords();
 		
-		ArrayList<Integer> interleaved_datacodewords = mymap.Get_datacodewords();
+		ArrayList<Integer> interleaved_datacodewords = mymap.Get_codewords();
 		ArrayList<Integer> deinterleaved_datacodewords_01_thru_15 = new ArrayList<Integer>();
 		ArrayList<Integer> deinterleaved_datacodewords_16_thru_30 = new ArrayList<Integer>();
 		ArrayList<Integer> deinterleaved_datacodewords_31_thru_45 = new ArrayList<Integer>();
@@ -63,13 +63,15 @@ public class Example_BarefootBar {
 			deinterleaved_datacodewords_46_thru_60.add(interleaved_datacodewords.get(ii+3));
 		}
 		
-		/*****
+                //if you uncomment below it will be bad because you need to correct branding-area
+		/*******************************************
 		DataCodewordsDecoder dec = new DataCodewordsDecoder();
 		dec.Decode_Correct_Sequential_Codewords(deinterleaved_datacodewords_01_thru_15,
-				                                deinterleaved_datacodewords_16_thru_30,
-				                                deinterleaved_datacodewords_31_thru_45,
-				                                deinterleaved_datacodewords_46_thru_60);
-		*****/
+				                        deinterleaved_datacodewords_16_thru_30,
+				                        deinterleaved_datacodewords_31_thru_45,
+				                        deinterleaved_datacodewords_46_thru_60);
+                ************************/
+		
 		
 		ErrorCorrectionCodewordsGeneration ecc1 = new ErrorCorrectionCodewordsGeneration(deinterleaved_datacodewords_01_thru_15, ecc_per_block_6H);
 		ErrorCorrectionCodewordsGeneration ecc2 = new ErrorCorrectionCodewordsGeneration(deinterleaved_datacodewords_16_thru_30, ecc_per_block_6H);
@@ -103,7 +105,7 @@ public class Example_BarefootBar {
 				ex.printStackTrace();
 			}
 			mapwriter.DumpMap("./Example_BarefootBar/cow.txt");
-			boolean theend = mask.Do_Mask("./Example_BarefootBar/cow.txt", "./bin/mask_5.txt", "./Example_BarefootBar/final.txt");
+			boolean theend = mask.Do_Mask("./Example_BarefootBar/cow.txt", "./mask_5.txt", "./Example_BarefootBar/final.txt");
 			if (!theend)
 			{
 				System.out.println("ERROR");
@@ -136,16 +138,17 @@ public class Example_BarefootBar {
 			System.out.print(ecc_block1.get(ii) + " ");
 		System.out.println();
 		
-		int[] correct_block_codewords = 
+		Integer[] correct_block_codewords = 
 			{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134,
 			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
 			  116, 192, 73, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
 		
-        Boolean non_zero_syndrome_found = false;
-        int max_root_alpha_exp = ecc_block1.size() - 1;
+                Boolean non_zero_syndrome_found = false;
+                int max_root_alpha_exp = ecc_block1.size() - 1;
+                ErrorCorrection err_corrector = new ErrorCorrection();
 		for (int ii=0; ii <= max_root_alpha_exp; ii++)
 		{
-		     int syndrome = ecc1.CalculateSyndrome(correct_block_codewords, ii);
+		     int syndrome = err_corrector.CalculateSyndrome(correct_block_codewords, ii);
 		     if (syndrome != 0)
 		    	 non_zero_syndrome_found = true;
 		}
@@ -160,7 +163,7 @@ public class Example_BarefootBar {
 		//(n - k) == 28
 		//Maximum number of corrupted symbols we can recover is 14 per block
 		
-		int[] received_block_codewords = 
+		Integer[] received_block_codewords = 
 			{ 67, 174, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134,
 			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
 			  116, 192, 73, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
@@ -169,7 +172,7 @@ public class Example_BarefootBar {
 		ArrayList<Integer> nonzero_syndrome = new ArrayList<Integer>(); 
 		for (int ii=0; ii <= max_root_alpha_exp; ii++)
 		{
-		     int syndrome = ecc1.CalculateSyndrome(received_block_codewords, ii);
+		     int syndrome = err_corrector.CalculateSyndrome(received_block_codewords, ii);
 		     if (syndrome != 0)
 		    	 nonzero_syndrome.add(syndrome);
 		}
@@ -178,15 +181,15 @@ public class Example_BarefootBar {
 		//now we know what we recv is corrupt but not how corrupt
 		//try to find which byte/bytes is/are bad
 
-		ArrayList<ArrayList<Integer>> unk_results = ecc1.BuildUnknownResults(received_block_codewords, max_root_alpha_exp);
-		ecc1.DebugPrint_UnknownResults(unk_results);
+		ArrayList<ArrayList<Integer>> unk_results = err_corrector.BuildUnknownResults(received_block_codewords, max_root_alpha_exp);
+		err_corrector.DebugPrint_UnknownResults(unk_results);
 		
-		ArrayList<String>  correctable_byte_arr = ecc1.FindCorrectableByteLocations(unk_results, max_root_alpha_exp);
+		ArrayList<String>  correctable_byte_arr = err_corrector.FindCorrectableByteLocations(unk_results, max_root_alpha_exp);
 		System.out.println("correctable_byte_arr.size == " + correctable_byte_arr.size());
 		System.out.println("correctable_byte_arr[0] == "   + correctable_byte_arr.get(0));
 		
-		ArrayList<String> corrections = ecc1.CorrectCorrectableBytes(correctable_byte_arr, max_root_alpha_exp, received_block_codewords.length);
-		ecc1.DebugPrint_Corrections(corrections);
+		ArrayList<String> corrections = err_corrector.CorrectCorrectableBytes(correctable_byte_arr, max_root_alpha_exp, received_block_codewords.length);
+		err_corrector.DebugPrint_Corrections(corrections);
 	}//DoExample
 
 }//class
