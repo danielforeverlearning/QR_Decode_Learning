@@ -201,11 +201,6 @@ public class Example_BarefootBar {
                 
                 
                 
-  //then work on why can not error-correct-after-eyeballing-bad-branding-area              
-/*****
-                
-                
-                
 
 
 		//lets just introduce 1 bit of 1 byte error and see if code works good
@@ -299,9 +294,7 @@ public class Example_BarefootBar {
 		//Number of Data Codewords in Each of Group1's Blocks = 15
 		//Number of Blocks in Group2                          = 0
 		//Number of Data Codewords in Each of Group2's Blocks = 0
-                Masking mask = new Masking();
-		mask.Write_Wikipedia_Mask_5();
-		boolean success = mask.Do_Mask("./Example_BarefootBar/original_map_3_branding_area_eyeballs_filled.txt", "./mask_5.txt", "./Example_BarefootBar/after_mask5_bad_branding_area.txt");
+		success = mask.Do_Mask("./Example_BarefootBar/original_map_3_branding_area_eyeballs_filled.txt", "./mask_5.txt", "./Example_BarefootBar/after_mask5_bad_branding_area.txt");
 		if (!success)
 		{
 			System.out.println("ERROR");
@@ -315,118 +308,133 @@ public class Example_BarefootBar {
 		//mymap.DebugPrint_codewords();
 		
 		ArrayList<Integer> interleaved = mymap.Get_codewords();
-		ArrayList<Integer> dc_block1 = new ArrayList<Integer>();
-		ArrayList<Integer> dc_block2 = new ArrayList<Integer>();
-		ArrayList<Integer> dc_block3 = new ArrayList<Integer>();
-		ArrayList<Integer> dc_block4 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_dc_block1 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_dc_block2 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_dc_block3 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_dc_block4 = new ArrayList<Integer>();
 
 		for (int ii=0; ii < 60; ii += 4)
 		{
-			dc_block1.add(interleaved.get(ii));
-			dc_block2.add(interleaved.get(ii+1));
-			dc_block3.add(interleaved.get(ii+2));
-			dc_block4.add(interleaved.get(ii+3));
+			brand_dc_block1.add(interleaved.get(ii));
+			brand_dc_block2.add(interleaved.get(ii+1));
+			brand_dc_block3.add(interleaved.get(ii+2));
+			brand_dc_block4.add(interleaved.get(ii+3));
 		}
 		
-		ArrayList<Integer> ecc_block1 = new ArrayList<Integer>();
-		ArrayList<Integer> ecc_block2 = new ArrayList<Integer>();
-		ArrayList<Integer> ecc_block3 = new ArrayList<Integer>();
-		ArrayList<Integer> ecc_block4 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_ecc_block1 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_ecc_block2 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_ecc_block3 = new ArrayList<Integer>();
+		ArrayList<Integer> brand_ecc_block4 = new ArrayList<Integer>();
                 
                 for (int ii=60; ii < 172; ii += 4)
 		{
-			ecc_block1.add(interleaved.get(ii));
-			ecc_block2.add(interleaved.get(ii+1));
-			ecc_block3.add(interleaved.get(ii+2));
-			ecc_block4.add(interleaved.get(ii+3));
+			brand_ecc_block1.add(interleaved.get(ii));
+			brand_ecc_block2.add(interleaved.get(ii+1));
+			brand_ecc_block3.add(interleaved.get(ii+2));
+			brand_ecc_block4.add(interleaved.get(ii+3));
 		}
 		
                 //*****************************
                 // data block1 and ecc_block1
                 //*****************************
                 ArrayList<Integer> recv_block1_al = new ArrayList<Integer>();
-                recv_block1_al.addAll(dc_block1);
-                recv_block1_al.addAll(ecc_block1);
+                recv_block1_al.addAll(brand_dc_block1);
+                recv_block1_al.addAll(brand_ecc_block1);
                 Integer[] recv_block1 = new Integer[recv_block1_al.size()];
                 recv_block1_al.toArray(recv_block1);
-                ArrayList<Integer> recv_block1_nonzero_syndrome = new ArrayList<Integer>(); 
+                ArrayList<Integer> recv_block1_nonzero_syndrome = new ArrayList<Integer>();
+                ArrayList<Integer> recv_block1_zero_syndrome = new ArrayList<Integer>();
 		for (int ii=0; ii <= max_root_alpha_exp; ii++)
 		{
 		     int syndrome = err_corrector.CalculateSyndrome(recv_block1, ii);
 		     if (syndrome != 0)
 		    	 recv_block1_nonzero_syndrome.add(syndrome);
+                     else
+                         recv_block1_zero_syndrome.add(ii);
 		}
 		System.out.println("recv_block1_nonzero_syndrome.size = " + recv_block1_nonzero_syndrome.size());
+                System.out.println("recv_block1_zero_syndrome.size = " + recv_block1_zero_syndrome.size());
                 
-                ArrayList<ArrayList<Integer>> unk_results_block1 = err_corrector.BuildUnknownResults(recv_block1, max_root_alpha_exp);
-		err_corrector.DebugPrint_UnknownResults(unk_results_block1);
-                System.out.println("recv_block1 CAN NOT BE FIXED");
+                //ArrayList<ArrayList<Integer>> unk_results_block1 = err_corrector.BuildUnknownResults(recv_block1, max_root_alpha_exp);
+		//err_corrector.DebugPrint_UnknownResults(unk_results_block1);
+                
                 
                 //*****************************
                 // data block2 and ecc_block2
                 //*******************************
                 ArrayList<Integer> recv_block2_al = new ArrayList<Integer>();
-                recv_block2_al.addAll(dc_block2);
-                recv_block2_al.addAll(ecc_block2);
+                recv_block2_al.addAll(brand_dc_block2);
+                recv_block2_al.addAll(brand_ecc_block2);
                 Integer[] recv_block2 = new Integer[recv_block2_al.size()];
                 recv_block2_al.toArray(recv_block2);
-                ArrayList<Integer> recv_block2_nonzero_syndrome = new ArrayList<Integer>(); 
+                ArrayList<Integer> recv_block2_nonzero_syndrome = new ArrayList<Integer>();
+                ArrayList<Integer> recv_block2_zero_syndrome = new ArrayList<Integer>();
 		for (int ii=0; ii <= max_root_alpha_exp; ii++)
 		{
 		     int syndrome = err_corrector.CalculateSyndrome(recv_block2, ii);
 		     if (syndrome != 0)
 		    	 recv_block2_nonzero_syndrome.add(syndrome);
+                     else
+                         recv_block2_zero_syndrome.add(ii);
 		}
 		System.out.println("recv_block2_nonzero_syndrome.size = " + recv_block2_nonzero_syndrome.size());
+                System.out.println("recv_block2_zero_syndrome.size = " + recv_block2_zero_syndrome.size());
                 
                 ArrayList<ArrayList<Integer>> unk_results_block2 = err_corrector.BuildUnknownResults(recv_block2, max_root_alpha_exp);
 		err_corrector.DebugPrint_UnknownResults(unk_results_block2);
-                System.out.println("recv_block2 CAN NOT BE FIXED");
+                
 
                 //*****************************
                 // data block3 and ecc_block3
                 //*****************************
                 ArrayList<Integer> recv_block3_al = new ArrayList<Integer>();
-                recv_block3_al.addAll(dc_block3);
-                recv_block3_al.addAll(ecc_block3);
+                recv_block3_al.addAll(brand_dc_block3);
+                recv_block3_al.addAll(brand_ecc_block3);
                 Integer[] recv_block3 = new Integer[recv_block3_al.size()];
                 recv_block3_al.toArray(recv_block3);
                 ArrayList<Integer> recv_block3_nonzero_syndrome = new ArrayList<Integer>(); 
+                ArrayList<Integer> recv_block3_zero_syndrome = new ArrayList<Integer>(); 
 		for (int ii=0; ii <= max_root_alpha_exp; ii++)
 		{
 		     int syndrome = err_corrector.CalculateSyndrome(recv_block3, ii);
 		     if (syndrome != 0)
 		    	 recv_block3_nonzero_syndrome.add(syndrome);
+                     else
+                         recv_block3_zero_syndrome.add(ii);
 		}
 		System.out.println("recv_block3_nonzero_syndrome.size = " + recv_block3_nonzero_syndrome.size());
+                System.out.println("recv_block3_zero_syndrome.size = " + recv_block3_zero_syndrome.size());
                 
                 ArrayList<ArrayList<Integer>> unk_results_block3 = err_corrector.BuildUnknownResults(recv_block3, max_root_alpha_exp);
 		err_corrector.DebugPrint_UnknownResults(unk_results_block3);
-                System.out.println("recv_block3 CAN NOT BE FIXED");
                 
     
                 //*****************************
                 //data block4 and ecc_block4
                 //*****************************
                 ArrayList<Integer> recv_block4_al = new ArrayList<Integer>();
-                recv_block4_al.addAll(dc_block4);
-                recv_block4_al.addAll(ecc_block4);
+                recv_block4_al.addAll(brand_dc_block4);
+                recv_block4_al.addAll(brand_ecc_block4);
                 Integer[] recv_block4 = new Integer[recv_block4_al.size()];
                 recv_block4_al.toArray(recv_block4);
-                ArrayList<Integer> recv_block4_nonzero_syndrome = new ArrayList<Integer>(); 
+                ArrayList<Integer> recv_block4_nonzero_syndrome = new ArrayList<Integer>();
+                ArrayList<Integer> recv_block4_zero_syndrome = new ArrayList<Integer>();
 		for (int ii=0; ii <= max_root_alpha_exp; ii++)
 		{
 		     int syndrome = err_corrector.CalculateSyndrome(recv_block4, ii);
 		     if (syndrome != 0)
 		    	 recv_block4_nonzero_syndrome.add(syndrome);
+                     else
+                         recv_block4_zero_syndrome.add(ii);
 		}
 		System.out.println("recv_block4_nonzero_syndrome.size = " + recv_block4_nonzero_syndrome.size());
+                System.out.println("recv_block4_zero_syndrome.size = " + recv_block4_zero_syndrome.size());
                 
                 ArrayList<ArrayList<Integer>> unk_results_block4 = err_corrector.BuildUnknownResults(recv_block4, max_root_alpha_exp);
 		err_corrector.DebugPrint_UnknownResults(unk_results_block4);
-                System.out.println("recv_block4 CAN NOT BE FIXED");
                 
-                //shoot all 4 blocks can not be fixed :(
+                
+/*****
                 
                 //starting at 1 byte at a time see if we can just fix 1 byte of a block
                 //just see
@@ -458,8 +466,7 @@ public class Example_BarefootBar {
                     else
                         test_block[byteloc] = old_val;
                 }
-*****/
-                
+*****/                
 	}//DoExample
 
 }//class
