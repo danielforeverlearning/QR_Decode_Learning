@@ -179,9 +179,9 @@ public class PNGReader {
 					if (A_str.equals("11111111") == false)
 						System.out.println("PurpleEdgedSquareBlackOrWhite: Alpha not equal to 11111111 found");
 					
-					R_sum += tool.ConvertBinaryByteStringToPositiveInteger(R_str);
-					G_sum += tool.ConvertBinaryByteStringToPositiveInteger(G_str);
-					B_sum += tool.ConvertBinaryByteStringToPositiveInteger(B_str);
+					R_sum += tool.ConvertBinaryStringToPositiveInteger(R_str);
+					G_sum += tool.ConvertBinaryStringToPositiveInteger(G_str);
+					B_sum += tool.ConvertBinaryStringToPositiveInteger(B_str);
 					count++;
 				}
 			}

@@ -17,8 +17,11 @@ import java.io.FileNotFoundException;
  * bits long: 000001011. Put this after the mode indicator from step 3 to get
  * the following bit string: 0010 000001011
  *
- * Versions 1 through 9 Numeric mode: 10 bits Alphanumeric mode: 9 bits Byte
- * mode: 8 bits Japanese mode: 8 bits
+ * Versions 1 through 9 
+ * Numeric mode: 10 bits 
+ * Alphanumeric mode: 9 bits 
+ * Byte mode: 8 bits 
+ * Japanese mode: 8 bits
  *
  * Versions 10 through 26 Numeric mode: 12 bits Alphanumeric mode: 11 bits Byte
  * mode: 16 Japanese mode: 10 bits
@@ -88,10 +91,16 @@ public class DataCodewordsDecoder {
     }
 
     private Tools tool;
+    private ArrayList<Integer> save_byteencdata_as_integer_NO_ENC_IND_NO_LENGTH = new ArrayList<Integer>();
 
     public DataCodewordsDecoder() {
         tool = new Tools();
     }//constructor
+    
+    public ArrayList<Integer> Get_save_byteencdata_as_integer_NO_ENC_IND_NO_LENGTH()
+    {
+        return save_byteencdata_as_integer_NO_ENC_IND_NO_LENGTH;
+    }
 
     private boolean decode(ArrayList<Integer> data) {
         try {
@@ -101,6 +110,8 @@ public class DataCodewordsDecoder {
             int length = 0;
             int indicator_count = 0;
             ENCODING_INDICATOR encoding = ENCODING_INDICATOR.UNKNOWN;
+            
+            save_byteencdata_as_integer_NO_ENC_IND_NO_LENGTH.clear();
 
             String startOfByte = "";
 
@@ -164,13 +175,13 @@ public class DataCodewordsDecoder {
 
                         if (encoding == ENCODING_INDICATOR.BYTE) {
                             binaryString = startOfLength + padded8str.substring(0, 4);
-                            length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
+                            length = tool.ConvertBinaryStringToPositiveInteger(binaryString);
                             System.out.println("length=" + length);
                             startOfByte = padded8str.substring(4, 8);
                         } else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC) {
                             binaryString = startOfLength + padded8str.substring(0, 5);
                             //binaryString is 9 bits long
-                            length = tool.ConvertBinaryByteStringToPositiveInteger(binaryString);
+                            length = tool.ConvertBinaryStringToPositiveInteger(binaryString);
                             System.out.println("length=" + length);
                             startOfByte = padded8str.substring(5, 8);
                         } else {
@@ -225,7 +236,7 @@ public class DataCodewordsDecoder {
                             }
 
                             if (encoding == ENCODING_INDICATOR.BYTE) {
-                                length = tool.ConvertBinaryByteStringToPositiveInteger(padded8str);
+                                length = tool.ConvertBinaryStringToPositiveInteger(padded8str);
                                 System.out.println("length=" + length);
                                 startOfByte = "";
                             } else if (encoding == ENCODING_INDICATOR.ALPHANUMERIC) {
@@ -241,7 +252,7 @@ public class DataCodewordsDecoder {
                                     padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
                                 }
                                 startOfLength += padded8str.substring(0, 1);
-                                length = tool.ConvertBinaryByteStringToPositiveInteger(startOfLength);
+                                length = tool.ConvertBinaryStringToPositiveInteger(startOfLength);
                                 System.out.println("length=" + length);
                                 startOfByte = padded8str.substring(1, 8);
                             }
@@ -315,7 +326,7 @@ public class DataCodewordsDecoder {
                                 }
                                 startOfByte += padded8str;
                             }
-                            length = tool.ConvertBinaryByteStringToPositiveInteger(startOfByte.substring(0, need_bit_len));
+                            length = tool.ConvertBinaryStringToPositiveInteger(startOfByte.substring(0, need_bit_len));
                             System.out.println("length=" + length);
                             startOfByte = startOfByte.substring(need_bit_len);
                         }//getIndicator startOfByteLen != 4
@@ -335,10 +346,11 @@ public class DataCodewordsDecoder {
                             }
 
                             String mybyte = startOfByte + padded8str.substring(0, 4);
-                            int ascii_decimal_int = tool.ConvertBinaryByteStringToPositiveInteger(mybyte);
+                            int ascii_decimal_int = tool.ConvertBinaryStringToPositiveInteger(mybyte);
                             char character = (char) ascii_decimal_int;
 
                             System.out.println(" ascii_decimal_int=" + ascii_decimal_int + " = " + character);
+                            save_byteencdata_as_integer_NO_ENC_IND_NO_LENGTH.add(ascii_decimal_int);
 
                             startOfByte = padded8str.substring(4, 8);
                             length--;
@@ -374,7 +386,7 @@ public class DataCodewordsDecoder {
                                     }
                                     str11bits += padded8str.substring(0, need_more_bits_len);
                                 }
-                                int str11int = tool.ConvertBinaryByteStringToPositiveInteger(str11bits);
+                                int str11int = tool.ConvertBinaryStringToPositiveInteger(str11bits);
                                 int mychar2int = str11int % 45;
                                 int mychar1int = str11int / 45;
                                 char mychar2 = Alphanumeric_encoding_table[mychar2int];
@@ -398,7 +410,7 @@ public class DataCodewordsDecoder {
                                     }
                                     startOfByte += padded8str;
                                 }
-                                int mychar1int = tool.ConvertBinaryByteStringToPositiveInteger(startOfByte.substring(0, 6));
+                                int mychar1int = tool.ConvertBinaryStringToPositiveInteger(startOfByte.substring(0, 6));
                                 char mychar1 = Alphanumeric_encoding_table[mychar1int];
                                 System.out.println(" alphanumeric_encoding_int=" + mychar1int + " = " + mychar1);
                                 //https://www.signupgenius.com/go/60B0D49A5A923A1F58-58383001-hjahalloween
@@ -463,7 +475,7 @@ public class DataCodewordsDecoder {
                                     str10bits = startOfByte.substring(0, 10);
                                     startOfByte = startOfByte.substring(10);
                                 }
-                                int myint = tool.ConvertBinaryByteStringToPositiveInteger(str10bits);
+                                int myint = tool.ConvertBinaryStringToPositiveInteger(str10bits);
                                 System.out.printf(" numeric_encoding_int=%03d\n", myint);
                                 length -= 3;
                             } else if (length == 2) {
@@ -487,7 +499,7 @@ public class DataCodewordsDecoder {
                                     str7bits = startOfByte.substring(0, 7);
                                     startOfByte = startOfByte.substring(7);
                                 }
-                                int myint = tool.ConvertBinaryByteStringToPositiveInteger(str7bits);
+                                int myint = tool.ConvertBinaryStringToPositiveInteger(str7bits);
                                 System.out.printf(" numeric_encoding_int=%02d\n", myint);
                                 length -= 2;
                             } else if (length == 1) {
@@ -511,7 +523,7 @@ public class DataCodewordsDecoder {
                                     str4bits = startOfByte.substring(0, 4);
                                     startOfByte = startOfByte.substring(4);
                                 }
-                                int myint = tool.ConvertBinaryByteStringToPositiveInteger(str4bits);
+                                int myint = tool.ConvertBinaryStringToPositiveInteger(str4bits);
                                 System.out.println(" numeric_encoding_int=" + myint);
                                 length--;
                             }

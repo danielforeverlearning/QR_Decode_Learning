@@ -16,20 +16,20 @@ public class Tools {
 	}//constructor
 	
 	//Can only do maximum 11 bits long
-	public int ConvertBinaryByteStringToPositiveInteger(String binaryByteString) {
-		if (binaryByteString.length() > 11)
+	public int ConvertBinaryStringToPositiveInteger(String binaryString) {
+		if (binaryString.length() > 11)
 			return Integer.MIN_VALUE;
 		
 		int[] rev_2_pow = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
 		int   answer = 0;
-		int   from_the_end = binaryByteString.length() - 1;
+		int   from_the_end = binaryString.length() - 1;
 		for (int ii=from_the_end; ii >= 0; ii--) {
-			char mychar = binaryByteString.charAt(ii);
+			char mychar = binaryString.charAt(ii);
 			if (mychar == '1')
 				answer += rev_2_pow[from_the_end - ii];
 		}
         return answer;		
-	}//ConvertBinaryByteStringToPositiveInteger
+	}//ConvertBinaryStringToPositiveInteger
 	
 
 	/************************************************************************************************
@@ -123,5 +123,83 @@ public class Tools {
 		ex.printStackTrace();
             }
         }//ArrayListToIntegerTextFile
+        
+        public void ArrayListTo_Integer_ASCII_TextFile(String outputfilepath, ArrayList<Integer> myarray)
+        {
+            try {
+                FileWriter myWriter = new FileWriter(outputfilepath);
+                for (int ii=0; ii < myarray.size(); ii++) {
+                    myWriter.write(myarray.get(ii).toString());
+                    myWriter.write(" = ");
+                    myWriter.write((char)((int)myarray.get(ii)));
+                    myWriter.write('\n');
+                }	
+                myWriter.close();
+            }
+            catch (Exception ex) {
+		System.out.println("ArrayListTo_Integer_ASCII_TextFile: An exception occurred!");
+		ex.printStackTrace();
+            }
+        }//ArrayListTo_Integer_ASCII_TextFile
+        
+        
+        public ArrayList<Integer> Add_ByteEncIndAndLength(ArrayList<Integer> block1,
+                                                          ArrayList<Integer> block2,
+                                                          ArrayList<Integer> block3,
+                                                          ArrayList<Integer> block4,
+                                                          int max_length)
+        {
+            //encoding == ENCODING_INDICATOR.BYTE == 0100 (4-bits)
+            //length (8-bits)
+            //d.c (each 8-bits, so not on byte-boundary)
+            //add at end
+            //encoding == ENCODING_INDICATOR.TERMINATOR == 0000 (4-bits)
+            //pad to 8-bits-byte
+            //pad 236 and 17 as bytes till max length
+            ArrayList<Integer> good_data_only_in_correct_sequence = new ArrayList<Integer>();
+            good_data_only_in_correct_sequence.addAll(block1);
+            good_data_only_in_correct_sequence.addAll(block2);
+            good_data_only_in_correct_sequence.addAll(block3);
+            good_data_only_in_correct_sequence.addAll(block4);
+            
+            ArrayList<Integer> results = new ArrayList<Integer>();
+            String byte_enc_str = "0100";
+            Integer length = good_data_only_in_correct_sequence.size();
+            String len_str = Integer.toBinaryString(length);
+            String padded8str = "00000000";
+            if (len_str.length() < 8)
+                len_str = padded8str.substring(0, 8 - len_str.length()) + len_str;
+            String ind_str = byte_enc_str + len_str;
+            results.add(ConvertBinaryStringToPositiveInteger(ind_str.substring(0,8)));
+            String startOfByte = ind_str.substring(8);
+            for (int ii=0; ii < good_data_only_in_correct_sequence.size(); ii++) {
+                padded8str = "00000000";
+                String tempstr = Integer.toBinaryString(good_data_only_in_correct_sequence.get(ii));
+                if (tempstr.length() < 8)
+                    tempstr = padded8str.substring(0, 8 - tempstr.length()) + tempstr;
+                
+                tempstr = startOfByte + tempstr;
+                results.add(ConvertBinaryStringToPositiveInteger(tempstr.substring(0,8)));
+                startOfByte = tempstr.substring(8);
+            }
+            
+            //startOfByte.length() == 4
+            startOfByte += "0000"; //encoding == ENCODING_INDICATOR.TERMINATOR == 0000 (4-bits)
+            results.add(ConvertBinaryStringToPositiveInteger(startOfByte));
+            
+            int end_padding_len = max_length - results.size();
+            for (int ii=0; ii < end_padding_len; ii++)
+            {
+                if ((ii % 2) == 0)
+                    results.add(236);
+                else
+                    results.add(17);
+            }
+       
+                
+            return results;
+        }//Add_ByteEncIndAndLength
+                
+        
 }//class
 
