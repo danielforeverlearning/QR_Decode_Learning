@@ -140,7 +140,7 @@ public class RowColumnMapWriter {
 		else
 			padded8str = padded8str.substring(0, 8 - binaryString.length()) + binaryString;
          
-		//System.out.println(all_codewords.size());
+		System.out.println("FillMap all_codewords.size == " + all_codewords.size());
 		while (ii < all_codewords.size())
 		{
 			//usual case
@@ -325,6 +325,18 @@ public class RowColumnMapWriter {
 			}
 		}//for
 	}//FillMap
+        
+        public void Change_Remaining_E_To_0()
+        {
+            for (int yy=0; yy < row_count; yy++)
+            {
+		for (int xx=0; xx < col_count; xx++)
+                {
+                    if (map[xx][yy] == 'E')
+                        map[xx][yy] = '0';
+                }
+            }
+        }//Change_Remaining_E_To_0
 	
 }//class
 

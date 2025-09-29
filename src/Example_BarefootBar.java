@@ -71,129 +71,141 @@ public class Example_BarefootBar {
                 //correct_dc_sequence_with_byteencind
                 //****************************************************
                 
+                ArrayList<Integer> correct_dc_block1 = new ArrayList<Integer>();
+                ArrayList<Integer> correct_dc_block2 = new ArrayList<Integer>();
+                ArrayList<Integer> correct_dc_block3 = new ArrayList<Integer>();
+                ArrayList<Integer> correct_dc_block4 = new ArrayList<Integer>();
+                for (int ii=0; ii < 15; ii++)
+                    correct_dc_block1.add(correct_dc_sequence_with_byteencind.get(ii));
+                for (int ii=15; ii < 30; ii++)
+                    correct_dc_block2.add(correct_dc_sequence_with_byteencind.get(ii));
+                for (int ii=30; ii < 45; ii++)
+                    correct_dc_block3.add(correct_dc_sequence_with_byteencind.get(ii));
+                for (int ii=45; ii < 60; ii++)
+                    correct_dc_block4.add(correct_dc_sequence_with_byteencind.get(ii));
                 
+                ArrayList<Integer> correct_dc_interleaved = new ArrayList<Integer>();
+                for (int ii=0; ii < 15; ii++)
+                {
+                    correct_dc_interleaved.add(correct_dc_block1.get(ii));
+                    correct_dc_interleaved.add(correct_dc_block2.get(ii));
+                    correct_dc_interleaved.add(correct_dc_block3.get(ii));
+                    correct_dc_interleaved.add(correct_dc_block4.get(ii));
+                }
+                tool.ArrayListToIntegerTextFile("./Example_BarefootBar/correct_dc_interleaved.txt", correct_dc_interleaved);
                 
-                
-                /*****
                 System.out.println("***** TEST RowColumnMapWriter *****");
-                RowColumnMapWriter testmapwriter = new RowColumnMapWriter("./Example_BarefootBar/ver6-blank.txt", 41, 41);
+                RowColumnMapWriter test_dc_only_mapwriter = new RowColumnMapWriter("./Example_BarefootBar/ver6-blank.txt", 41, 41);
 		try {
                     //DO NOT ADD EC-codewords they will be 'E' in the map
-                    testmapwriter.FillMap(correct_interleaved_dc_only);
+                    test_dc_only_mapwriter.FillMap(correct_dc_interleaved);
 		}
 		catch (Exception ex) {
                     ex.printStackTrace();
 		}
                 //DO NOT ADD EC-codewords they will be 'E' in the map
-                testmapwriter.DumpMap("./Example_BarefootBar/test_map.txt");
+                test_dc_only_mapwriter.DumpMap("./Example_BarefootBar/test_dc_only_mapwriter.txt");
                 
-                RowColumnMapReader testread = new RowColumnMapReader(41,41);
-                testread.Load("./Example_BarefootBar/test_map.txt");
-                testread.Find_Codewords(60);
-                ArrayList<Integer> test_interleaved_array = testread.Get_codewords();
-                tool.ArrayListToIntegerTextFile("./Example_BarefootBar/test_interleaved_array.txt", test_interleaved_array);
-
+                RowColumnMapReader test_dc_only_mapread = new RowColumnMapReader(41,41);
+                test_dc_only_mapread.Load("./Example_BarefootBar/test_dc_only_mapwriter.txt");
+                test_dc_only_mapread.Find_Codewords(60);
+                ArrayList<Integer> test_dc_interleaved = test_dc_only_mapread.Get_codewords();
+                tool.ArrayListToIntegerTextFile("./Example_BarefootBar/test_dc_interleaved.txt", test_dc_interleaved);
                 
-                ArrayList<Integer> after_mask5_block1 = new ArrayList<Integer>();
-                ArrayList<Integer> after_mask5_block2 = new ArrayList<Integer>();
-                ArrayList<Integer> after_mask5_block3 = new ArrayList<Integer>();
-                ArrayList<Integer> after_mask5_block4 = new ArrayList<Integer>();
-                for (int ii=0; ii < after_mask5_map_interleaved.size(); ii += 4)
+                //****************************************************
+                //Verified:
+                //correct_dc_interleaved == test_dc_interleaved
+                //****************************************************
+                
+                ArrayList<Integer> test_dc_block1 = new ArrayList<Integer>();
+                ArrayList<Integer> test_dc_block2 = new ArrayList<Integer>();
+                ArrayList<Integer> test_dc_block3 = new ArrayList<Integer>();
+                ArrayList<Integer> test_dc_block4 = new ArrayList<Integer>();
+                for (int ii=0; ii < test_dc_interleaved.size(); ii += 4)
                 {
-                    after_mask5_block1.add(after_mask5_map_interleaved.get(ii));
-                    after_mask5_block2.add(after_mask5_map_interleaved.get(ii+1));
-                    after_mask5_block3.add(after_mask5_map_interleaved.get(ii+2));
-                    after_mask5_block4.add(after_mask5_map_interleaved.get(ii+3));
+                    test_dc_block1.add(test_dc_interleaved.get(ii));
+                    test_dc_block2.add(test_dc_interleaved.get(ii+1));
+                    test_dc_block3.add(test_dc_interleaved.get(ii+2));
+                    test_dc_block4.add(test_dc_interleaved.get(ii+3));
+                }
+
+                System.out.println("***** test_dc_block1thru4_dec.Decode_Correct_Sequential_Codewords *****");
+                DataCodewordsDecoder test_dc_block1thru4_dec = new DataCodewordsDecoder();
+                test_dc_block1thru4_dec.Decode_Correct_Sequential_Codewords(test_dc_block1, 
+                                                                            test_dc_block2, 
+                                                                            test_dc_block3, 
+                                                                            test_dc_block4);
+                //****************************************************
+                //Verified:
+                //correct_dc_block1 == test_dc_block1
+                //correct_dc_block2 == test_dc_block2
+                //correct_dc_block3 == test_dc_block3
+                //correct_dc_block4 == test_dc_block4
+                //****************************************************
+                
+                ErrorCorrectionCodewordsGeneration eccgen1  = new ErrorCorrectionCodewordsGeneration(correct_dc_block1, 28);
+                ArrayList<Integer> ecc_block1 = eccgen1.Get_ECC_Decimal();
+                System.out.println("ecc_block1.size == " + ecc_block1.size());
+                
+                ErrorCorrectionCodewordsGeneration eccgen2  = new ErrorCorrectionCodewordsGeneration(correct_dc_block2, 28);
+                ArrayList<Integer> ecc_block2 = eccgen2.Get_ECC_Decimal();
+                System.out.println("ecc_block2.size == " + ecc_block2.size());
+                
+                ErrorCorrectionCodewordsGeneration eccgen3  = new ErrorCorrectionCodewordsGeneration(correct_dc_block3, 28);
+                ArrayList<Integer> ecc_block3 = eccgen3.Get_ECC_Decimal();
+                System.out.println("ecc_block3.size == " + ecc_block3.size());
+                
+                ErrorCorrectionCodewordsGeneration eccgen4  = new ErrorCorrectionCodewordsGeneration(correct_dc_block4, 28);
+                ArrayList<Integer> ecc_block4 = eccgen4.Get_ECC_Decimal();
+                System.out.println("ecc_block4.size == " + ecc_block4.size());
+                
+                ArrayList<Integer> ecc_interleaved = new ArrayList<Integer>();
+                for (int ii=0; ii < 28; ii++)
+                {
+                    ecc_interleaved.add(ecc_block1.get(ii));
+                    ecc_interleaved.add(ecc_block2.get(ii));
+                    ecc_interleaved.add(ecc_block3.get(ii));
+                    ecc_interleaved.add(ecc_block4.get(ii));
                 }
                 
-                System.out.println("***** after_mask5_dec.Decode_Correct_Sequential_Codewords *****");
-                DataCodewordsDecoder after_mask5_dec = new DataCodewordsDecoder();
-                after_mask5_dec.Decode_Correct_Sequential_Codewords(after_mask5_block1, 
-                                                                    after_mask5_block2, 
-                                                                    after_mask5_block3, 
-                                                                    after_mask5_block4);
+                ArrayList<Integer> all_codewords = new ArrayList<Integer>();
+                all_codewords.addAll(correct_dc_interleaved);
+                all_codewords.addAll(ecc_interleaved);
                 
-                
-                //First, try to make a good QR-Code 
-                //then work on why can not error-correct-after-eyeballing-bad-branding-area
-
-                ArrayList<Integer> good_msg_data_only = dec.Get_save_byteencdata_as_integer_NO_ENC_IND_NO_LENGTH();
-                ArrayList<Integer> good_sequence_with_byteencindlen = tool.Add_ByteEncIndAndLength_To_GoodDataInSequence(good_msg_data_only, 60);
-                
-                
-                
-                ArrayList<Integer> good_interleave = new ArrayList<Integer>();
-                for (int ii=0;  ii < 15; ii++)
-                {
-                    good_interleave.add(good_dc_block1.get(ii));
-                    good_interleave.add(good_dc_block2.get(ii));
-                    good_interleave.add(good_dc_block3.get(ii));
-                    good_interleave.add(good_dc_block4.get(ii));
-                }
-                
-                
-                
-		RowColumnMapWriter mapwriter = new RowColumnMapWriter("./Example_BarefootBar/ver6-blank.txt", 41, 41);
+                System.out.println("***** all_codewords_mapwriter *****");
+                RowColumnMapWriter all_codewords_mapwriter = new RowColumnMapWriter("./Example_BarefootBar/ver6-blank.txt", 41, 41);
 		try {
-                    mapwriter.FillMap(good_interleave);
+                    all_codewords_mapwriter.FillMap(all_codewords);
 		}
 		catch (Exception ex) {
                     ex.printStackTrace();
 		}
-		mapwriter.DumpMap("./Example_BarefootBar/good_interleave_map.txt");
-		
-                int ecc_per_block_6H = 28;
-		int dc_per_block_6H  = 15;
-		int num_of_blocks_6H = 4;
-                RowColumnMapReader just_msg_map = new RowColumnMapReader(41,41);
-		just_msg_map.Load("./Example_BarefootBar/good_interleave_map.txt");
-		just_msg_map.Find_Codewords(num_of_blocks_6H * dc_per_block_6H);
-                ArrayList<Integer> just_msg_interleaved = just_msg_map.Get_codewords();
-		ArrayList<Integer> just_msg_block1 = new ArrayList<Integer>();
-		ArrayList<Integer> just_msg_block2 = new ArrayList<Integer>();
-		ArrayList<Integer> just_msg_block3 = new ArrayList<Integer>();
-		ArrayList<Integer> just_msg_block4 = new ArrayList<Integer>();
-
-		for (int ii=0; ii < just_msg_interleaved.size(); ii += 4)
+                //Last 7 bits are still 'E' because it is not part of codewords
+                all_codewords_mapwriter.Change_Remaining_E_To_0();
+                all_codewords_mapwriter.DumpMap("./Example_BarefootBar/all_codewords_mapwriter.txt");
+                
+                //****************************************************
+                //Verified:
+                //after_mask5.txt == all_codewords_mapwriter.txt + branding_area_filled_in
+                //****************************************************
+                
+                
+                Masking mask = new Masking();
+		boolean success = mask.Do_Mask("./Example_BarefootBar/all_codewords_mapwriter.txt", "./mask_5.txt", "./Example_BarefootBar/final_map.txt");
+		if (!success)
 		{
-			just_msg_block1.add(just_msg_interleaved.get(ii));
-			just_msg_block2.add(just_msg_interleaved.get(ii+1));
-			just_msg_block3.add(just_msg_interleaved.get(ii+2));
-			just_msg_block4.add(just_msg_interleaved.get(ii+3));
+			System.out.println("ERROR");
+			return;
 		}
                 
-                System.out.println("***** just_msg TEST *****");
-		dec.Decode_Correct_Sequential_Codewords(just_msg_block1,
-				                        just_msg_block2,
-				                        just_msg_block3,
-				                        just_msg_block4);
-                
-                *****/
                 
                 
                 
-                
+  //then work on why can not error-correct-after-eyeballing-bad-branding-area              
 /*****
-                ErrorCorrectionCodewordsGeneration eccgen1  = new ErrorCorrectionCodewordsGeneration(good_dc_block1, 28);
-                ArrayList<Integer> barefootbar_ecc_block1 = eccgen1.Get_ECC_Decimal();
                 
-                ErrorCorrectionCodewordsGeneration eccgen2  = new ErrorCorrectionCodewordsGeneration(good_dc_block2, 28);
-                ArrayList<Integer> barefootbar_ecc_block2 = eccgen2.Get_ECC_Decimal();
                 
-                ErrorCorrectionCodewordsGeneration eccgen3  = new ErrorCorrectionCodewordsGeneration(good_dc_block3, 28);
-                ArrayList<Integer> barefootbar_ecc_block3 = eccgen3.Get_ECC_Decimal();
                 
-                ErrorCorrectionCodewordsGeneration eccgen4  = new ErrorCorrectionCodewordsGeneration(good_dc_block4, 28);
-                ArrayList<Integer> barefootbar_ecc_block4 = eccgen4.Get_ECC_Decimal();
-                
-                ArrayList<Integer> barefootbar_interleaved_ecc = new ArrayList<Integer>();
-                for (int ii=0; ii < 28; ii++)
-                {
-                    barefootbar_interleaved_ecc.add(barefootbar_ecc_block1.get(ii));
-                    barefootbar_interleaved_ecc.add(barefootbar_ecc_block2.get(ii));
-                    barefootbar_interleaved_ecc.add(barefootbar_ecc_block3.get(ii));
-                    barefootbar_interleaved_ecc.add(barefootbar_ecc_block4.get(ii));
-                }
 
 
 		//lets just introduce 1 bit of 1 byte error and see if code works good
