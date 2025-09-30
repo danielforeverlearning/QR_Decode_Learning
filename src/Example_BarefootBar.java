@@ -472,37 +472,6 @@ public class Example_BarefootBar {
 		err_corrector.DebugPrint_UnknownResults(unk_results_block4);
                 
                 
-                
-                //starting at 1 byte at a time see if we can just fix 1 byte of a block
-                //just see
-                Integer[] test_block = new Integer[recv_block4_al.size()];
-                recv_block4_al.toArray(test_block);
-                boolean found_correctable_byte = false;
-                for (int byteloc=0; byteloc < 43; byteloc++)
-                {
-                    int old_val = test_block[byteloc];
-                    for (int byteval=0; byteval < 256; byteval++)
-                    {
-                        test_block[byteloc] = byteval;
-                        ArrayList<ArrayList<Integer>> test_block_unk_results = err_corrector.BuildUnknownResults(test_block, max_root_alpha_exp);
-                        //err_corrector.DebugPrint_UnknownResults(test_block_unk_results);
-
-                        ArrayList<String>  test_block_correctable_byte_arr = err_corrector.FindCorrectableByteLocations(test_block_unk_results, max_root_alpha_exp);
-                        System.out.println("byteloc=" + byteloc + " byteval=" + byteval);
-                        if (test_block_correctable_byte_arr.size() > 0)
-                        {
-                            System.out.println("yay found correctable byte!!!!!");
-                            System.out.println("byteloc=" + byteloc);
-                            System.out.println("byteval=" + byteval);
-                            found_correctable_byte = true;
-                            break;
-                        }
-                    }
-                    if (found_correctable_byte)
-                        break;
-                    else
-                        test_block[byteloc] = old_val;
-                }
 *****/                
 	}//DoExample
 
