@@ -199,33 +199,20 @@ public class Example_BarefootBar {
 		}
                 
                 
+                /**********************************************************************
+		QRcode-ver6H
                 
+                For QR code version 6, error correction level H, 
+                the code has n = 28 total error-correction-codewords and 
+                k = 15 data-codewords per block. 
+                A Reed-Solomon code can correct up to 
+                t = floor((n-k)/2) errors, 
+                so in this case,
+                t = floor((28-15)/2) = floor(6.5) = 6 errors per block.
+                ***********************************************************************/
                 
-
-
-		//lets just introduce 1 bit of 1 byte error and see if code works good
-		//version 6-H
-		//k == 15 d.c per block
-		//n == 15 d.c per block + 28 e.c.c per block == 43 codewords per block
-		//(n - k) == 28
-		//Maximum number of incorrect codewords per block that can be fixed is 14.
-		
-                //***************************************************************************************************
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //these correct_block_codewords include indicator-4bits-byte-encoding-indicator-and-8bits-length-58
-                //i don't think this is correct way to have encoding-indicator-and-length included
-                //i think correct way is just message-data only
-                //idk idk too tired, just do make good qr-code first too tired
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //WARNING!!!!!
-                //****************************************************************************************************
+                //Code below only works for maximum-1-byte-error-correction
+                
 		Integer[] correct_block_codewords = 
 			{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134, //data codewords
 			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, //error-correction codewords 
@@ -242,17 +229,14 @@ public class Example_BarefootBar {
 		}
 		System.out.println("correct_block_codewords: non_zero_syndrome_found = " + non_zero_syndrome_found);
 		
-		//change 3rd data byte
-		//changing from 135 to 130
-		
-		//QRcode-ver6H
-		//k == 15 d.c per block
-		//n == 15 d.c per block + 28 e.c.c per block
-		//(n - k) == 28
-		//Maximum number of corrupted symbols we can recover is 14 per block
-		
+                
+                
+                /******************************************
+		just change 1 byte
+		*******************************************/
+                
 		Integer[] received_block_codewords = 
-			{ 67, 166, 130, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134,
+			{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 0, 230, 134,
 			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
 			  116, 192, 73, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
 		     
@@ -268,18 +252,70 @@ public class Example_BarefootBar {
 		//now we know what we recv is corrupt but not how corrupt
 		//try to find which byte/bytes is/are bad
 
-		ArrayList<ArrayList<Integer>> unk_results = err_corrector.BuildUnknownResults(received_block_codewords, max_root_alpha_exp);
-		err_corrector.DebugPrint_UnknownResults(unk_results);
-		
-		ArrayList<String>  correctable_byte_arr = err_corrector.FindCorrectableByteLocations(unk_results, max_root_alpha_exp);
-		System.out.println("correctable_byte_arr.size == " + correctable_byte_arr.size());
-		System.out.println("correctable_byte_arr[0] == "   + correctable_byte_arr.get(0));
-		
-		ArrayList<String> corrections = err_corrector.CorrectCorrectableBytes(correctable_byte_arr, max_root_alpha_exp, received_block_codewords.length);
-		err_corrector.DebugPrint_Corrections(corrections);
+                if (nonzero_syndrome.size() > 0)
+                {
+                    ArrayList<ArrayList<Integer>> unk_results = err_corrector.BuildUnknownResults(received_block_codewords, max_root_alpha_exp);
+                    err_corrector.DebugPrint_UnknownResults(unk_results);
+
+                    ArrayList<String>  correctable_byte_arr = err_corrector.FindCorrectableByteLocations(unk_results, max_root_alpha_exp);
+                    System.out.println("correctable_byte_arr.size == " + correctable_byte_arr.size());
+                    if (correctable_byte_arr.size() > 0)
+                        System.out.println("correctable_byte_arr[0] == "   + correctable_byte_arr.get(0));
+
+                    if (correctable_byte_arr.size() > 0)
+                    {
+                        ArrayList<String> corrections = err_corrector.CorrectCorrectableBytes(correctable_byte_arr, max_root_alpha_exp, received_block_codewords.length);
+                        err_corrector.DebugPrint_Corrections(corrections);
+                    }
+                }
                 
+                /****************************************
+                 just change 2 bytes from correct-array
+                 ****************************************/
+                System.out.println("***** just change 2 bytes *****");
                 
+                Integer[] received_2byte_errors_codewords = 
+			{ 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 0, 230, 134,
+			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
+			  116, 192, 73, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
                 
+                nonzero_syndrome.clear();
+		for (int ii=0; ii <= max_root_alpha_exp; ii++)
+		{
+		     int syndrome = err_corrector.CalculateSyndrome(received_2byte_errors_codewords, ii);
+		     if (syndrome != 0)
+		    	 nonzero_syndrome.add(syndrome);
+		}
+		System.out.println("received_2byte_errors_codewords: nonzero_syndrome.size = " + nonzero_syndrome.size());
+                if (nonzero_syndrome.size() > 0)
+                {
+                    BruteForceMaximumByteErrorDetectionCorrection2 myobj = new BruteForceMaximumByteErrorDetectionCorrection2(received_2byte_errors_codewords, max_root_alpha_exp);
+                    myobj.Process();
+                    System.out.println("Process2: DONE");
+                }
+                
+                /****************************************
+                 just change 3 bytes from correct-array
+                 check timing about failure of
+                 class BruteForceMaximumByteErrorDetectionCorrection2
+                 function Process
+                 ****************************************/
+                System.out.println("***** just change 3 bytes *****");
+                Integer[] received_3byte_errors_codewords = 
+			{ 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 0, 230, 134,
+			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
+			  116, 192, 0, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
+                BruteForceMaximumByteErrorDetectionCorrection2 failobj = new BruteForceMaximumByteErrorDetectionCorrection2(received_3byte_errors_codewords, max_root_alpha_exp);
+                failobj.Process();
+                System.out.println("BruteForceMaximumByteErrorDetectionCorrection2 Process failure DONE");
+                
+                BruteForceMaximumByteErrorDetectionCorrection3 myobj3 = new BruteForceMaximumByteErrorDetectionCorrection3(received_3byte_errors_codewords, max_root_alpha_exp);
+                myobj3.Process();
+                System.out.println("Process3: DONE");
+                //Dang that took a long-ass time like 1 minute per index1
+                //Need a farm or something
+                
+ /*****               
                 //****************************************************************************
                 //lets try to correct for real because it has bad branding area
                 //*****************************************************************************
@@ -349,14 +385,16 @@ public class Example_BarefootBar {
 		     int syndrome = err_corrector.CalculateSyndrome(recv_block1, ii);
 		     if (syndrome != 0)
 		    	 recv_block1_nonzero_syndrome.add(syndrome);
-                     else
+                     else {
+                         System.out.println("recv_block1: syndrome==0 for ii==" + ii);
                          recv_block1_zero_syndrome.add(ii);
+                     }
 		}
 		System.out.println("recv_block1_nonzero_syndrome.size = " + recv_block1_nonzero_syndrome.size());
                 System.out.println("recv_block1_zero_syndrome.size = " + recv_block1_zero_syndrome.size());
                 
-                //ArrayList<ArrayList<Integer>> unk_results_block1 = err_corrector.BuildUnknownResults(recv_block1, max_root_alpha_exp);
-		//err_corrector.DebugPrint_UnknownResults(unk_results_block1);
+                ArrayList<ArrayList<Integer>> unk_results_block1 = err_corrector.BuildUnknownResults(recv_block1, max_root_alpha_exp);
+		err_corrector.DebugPrint_UnknownResults(unk_results_block1);
                 
                 
                 //*****************************
@@ -434,7 +472,6 @@ public class Example_BarefootBar {
 		err_corrector.DebugPrint_UnknownResults(unk_results_block4);
                 
                 
-/*****
                 
                 //starting at 1 byte at a time see if we can just fix 1 byte of a block
                 //just see

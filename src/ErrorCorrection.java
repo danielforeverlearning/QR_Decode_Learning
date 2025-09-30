@@ -5,11 +5,17 @@ public class ErrorCorrection {
 
     private Tools tool = new Tools();
 
-    //QRcode-ver6H
-    //k == 15 d.c per block
-    //n == 15 d.c per block + 28 e.c.c per block
-    //(n - k) == 28
-    //Maximum number of corrupted symbols we can recover is 14 per block
+    /**********************************************************************
+		QRcode-ver6H
+                
+                For QR code version 6, error correction level H, 
+                the code has n = 28 total error-correction-codewords and 
+                k = 15 data-codewords per block. 
+                A Reed-Solomon code can correct up to 
+                t = floor((n-k)/2) errors, 
+                so in this case,
+                t = floor((28-15)/2) = floor(6.5) = 6 errors per block.
+    ***********************************************************************/
     public int CalculateSyndrome(Integer[] recv, int root_alpha_exp) {
 
         ArrayList<Integer> arr = new ArrayList<Integer>();
@@ -108,7 +114,8 @@ public class ErrorCorrection {
                 results.add(res);
                 if (x_to_the == 0) {
                     last_res = res;
-                } else {
+                } 
+                else {
                     if (last_res != res) {
                         break;
                     }
