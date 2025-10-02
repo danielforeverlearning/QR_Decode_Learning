@@ -327,8 +327,17 @@ public class Example_BarefootBar {
                 (x + alpha^1)(x + alpha^2) for 2 E.C.C
                 let us print both so we can verify example
                 ***************************************************************/
-                tool.Print_GF7_GenPolynomial(3, 0);
-                tool.Print_GF7_GenPolynomial(3, 1);
+                //tool.Print_GF7_GenPolynomial(3, 0);
+                //tool.Print_GF7_GenPolynomial(3, 1);
+                
+                /************************************************************
+                 No, it does not use generator-polynomial,
+                 Just make Berlekamp_Welch_algorithm class
+                 and step thru it with user-input to see if we can get the
+                 same matrix as in the example
+                 ************************************************************/
+                
+                
                 
                 
  /*****               
