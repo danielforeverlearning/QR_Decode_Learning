@@ -7,7 +7,8 @@ import java.util.Scanner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-
+import java.math.BigInteger;
+import java.math.BigDecimal;
 
 public class Tools {
 	
@@ -199,6 +200,167 @@ public class Tools {
                 
             return results;
         }//Add_ByteEncIndAndLength
+        
+        
+        public void Print_GF7_GenPolynomial(Integer alpha, Integer StartWithAlphaExpCoefficient)
+        {
+            System.out.println();
+            System.out.println("***** Print_GF7_GenPolynomial_Start_With_AlphaToThe0  alpha==" + (int)alpha + "*****");
+            System.out.println("***** Remember this is GF7-world not normal base10-decimal-world  alpha==" + (int)alpha + "*****");
+            
+            //GF-world not normal base10-decimal-world
+            //(x + alpha^0)(x + alpha^1)
+            //x^2 + (alpha^1 + alpha^0)x + alpha^1
+            //(alpha^0)(x^2) + (alpha^1 + alpha^0)x^1 + alpha^1(x^0)
+            //(alpha^0)(x^2) + (alpha^1 + 1)x^1 + alpha^1
+            
+            ArrayList<ArrayList<Integer>> big_gen_poly_alphadecimalcoeff_xtothexexp = new ArrayList<ArrayList<Integer>>();
+            //minimum amount of error-correction-codewords == 2
+            //maximum amount of error-correction-codewords == 7
+            big_gen_poly_alphadecimalcoeff_xtothexexp.add(null); //0 error_correction_codewords
+            big_gen_poly_alphadecimalcoeff_xtothexexp.add(null); //1 error_correction_codewords
+
+            //term1 will be the big term that keeps getting bigger
+            ArrayList<Integer> bigterm_alphadecimal = new ArrayList<Integer>();
+            ArrayList<Integer> bigterm_x_exp = new ArrayList<Integer>();
+            //in GF(whatever such as 256 or 7) world 
+            //- is same as + in multiplication
+            //n == number of E.C.C
+            //(x - alpha^0).....(x - alpha^(n-1))
+            //
+            //so for 2 E.C.C
+            //(x - alpha^0)(x - alpha^1)
+            //((alpha^0)x^1 + (alpha^0)x^0) * ((alpha^0)x^1 + (alpha^1)x^0)
+            //
+            //term2 will be (x + alpha^(n-1)) 
+            //it will always be total size 4
+            Integer[] smallterm_alphadecimal = {0, 0};
+            Integer[] smallterm_x_exp = {0, 0};
+
+            ArrayList<Integer> alphadecimalcoeff_xtothexexp = new ArrayList<Integer>();
+            //index0 is for biggest x to the xexp
+
+            //answer will have 1 more than highest-term-count
+            //since we start with (x + 1)(x + alpha^1) for n==2
+            //that means there will be 3 terms
+            //with highest x exponent of 2 as in x^2
+            alphadecimalcoeff_xtothexexp.add(0); //coefficient for x^2
+            alphadecimalcoeff_xtothexexp.add(0); //coefficient for x^1
+            alphadecimalcoeff_xtothexexp.add(0); //coefficient for x^0
+            Integer highest_x_exp = 2;
+
+            for (Integer nn = 2; nn <= 7; nn++) {
+                if (nn == 2) {
+                    if (StartWithAlphaExpCoefficient == 0)
+                    {
+                         bigterm_alphadecimal.add(1);
+                         bigterm_x_exp.add(1);
+                         bigterm_alphadecimal.add(1);
+                         bigterm_x_exp.add(0);
+                    
+                         smallterm_alphadecimal[0] = 1;
+                         smallterm_x_exp[0] = 1;
+                         smallterm_alphadecimal[1] = alpha;
+                         smallterm_x_exp[1] = 0;
+                    }
+                    else if (StartWithAlphaExpCoefficient == 1)
+                    {
+                         bigterm_alphadecimal.add(1);
+                         bigterm_x_exp.add(1);
+                         bigterm_alphadecimal.add(alpha);
+                         bigterm_x_exp.add(0);
+                    
+                         smallterm_alphadecimal[0] = 1;
+                         smallterm_x_exp[0] = 1;
+                         smallterm_alphadecimal[1] = (int)Math.pow(alpha, 2);
+                         smallterm_x_exp[1] = 0;
+                    }
+                } else {
+                    bigterm_alphadecimal.clear();
+                    bigterm_x_exp.clear();
+                    
+                    //java has changed
+                    //can not use
+                    //coeff_x_to_the_xexp.clear
+                    //must use
+                    //new ArrayList<Integer>()
+                    //because of gen_poly below
+                    alphadecimalcoeff_xtothexexp = new ArrayList<Integer>();
+
+                    //(x - a^0).....(x - a^(n-2))
+                    
+                    ArrayList<Integer> gen_poly = big_gen_poly_alphadecimalcoeff_xtothexexp.get(nn - 1);
+                    for (int ii = 0; ii < gen_poly.size(); ii++) {
+                        bigterm_alphadecimal.add(gen_poly.get(ii));
+                        bigterm_x_exp.add(gen_poly.size() - ii - 1);
+                        alphadecimalcoeff_xtothexexp.add(0);
+                    }
+                    alphadecimalcoeff_xtothexexp.add(0);
+
+                    //smallterm will be 
+                    //(a^0x^1 - a^(n-1)x^0)
+                    //or
+                    //(a^0x^1 - a^nx^0)
+                    //it will always be total size 4
+                    if (StartWithAlphaExpCoefficient == 0)
+                    {
+                        smallterm_alphadecimal[0] = 1;
+                        smallterm_x_exp[0] = 1;
+                        smallterm_alphadecimal[1] = (int)Math.pow(alpha, nn - 1);
+                        smallterm_x_exp[1] = 0;
+                    }
+                    else if (StartWithAlphaExpCoefficient == 1)
+                    {
+                        smallterm_alphadecimal[0] = 1;
+                        smallterm_x_exp[0] = 1;
+                        smallterm_alphadecimal[1] = (int)Math.pow(alpha, nn);
+                        smallterm_x_exp[1] = 0;
+                    }
+
+                    highest_x_exp = nn;
+                }
+
+                //  (x^(n-1) + ..... blah blah)* (x + alpha^(n-1))
+                for (int bigterm_ii = 0; bigterm_ii < bigterm_alphadecimal.size(); bigterm_ii++) {
+                    Integer temp1_alphadecimal = bigterm_alphadecimal.get(bigterm_ii);
+                    int temp1_x_exp = bigterm_x_exp.get(bigterm_ii);
+                    for (int smallterm_ii = 0; smallterm_ii < 2; smallterm_ii++) {
+                        Integer temp2_alphadecimal = smallterm_alphadecimal[smallterm_ii];
+                        Integer temp2_x_exp = smallterm_x_exp[smallterm_ii];
+
+                        int x_exp = temp1_x_exp + temp2_x_exp;
+                        Integer alphadecimal = temp1_alphadecimal * temp2_alphadecimal;
+                        
+                        //alpha is normally 2
+                        //but in GF(7)-example
+                        //alpha is 3
+
+                        if (x_exp == highest_x_exp) {
+                            //alphadecimal should always be 1 but keep code for human-readability-understanding
+                            alphadecimalcoeff_xtothexexp.set(0, alphadecimal);
+                        } else {
+                            int index = highest_x_exp - x_exp;
+                            Integer temp = alphadecimalcoeff_xtothexexp.get(index);
+                            temp += alphadecimal;
+                            temp %= 7;
+                            alphadecimalcoeff_xtothexexp.set(index, temp);
+                        }
+                    }//term2_ii
+                }//term1_ii
+
+                big_gen_poly_alphadecimalcoeff_xtothexexp.add(alphadecimalcoeff_xtothexexp);
+                System.out.println();
+                System.out.print("E.C.C count == " + nn + " : ");
+                
+                for (int ii=0; ii < alphadecimalcoeff_xtothexexp.size(); ii++)
+                {
+                    System.out.print(alphadecimalcoeff_xtothexexp.get(ii) + "x^" + (alphadecimalcoeff_xtothexexp.size() - ii - 1));
+                    if (ii != (alphadecimalcoeff_xtothexexp.size() - 1))
+                        System.out.print(" + ");
+                }
+                
+            }//for nn
+        }//Print_GF7_GenPolynomial
                 
         
 }//class

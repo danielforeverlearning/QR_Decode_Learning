@@ -300,20 +300,36 @@ public class Example_BarefootBar {
                  class BruteForceMaximumByteErrorDetectionCorrection2
                  function Process
                  ****************************************/
-                System.out.println("***** just change 3 bytes *****");
-                Integer[] received_3byte_errors_codewords = 
-			{ 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 0, 230, 134,
-			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
-			  116, 192, 0, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
-                BruteForceMaximumByteErrorDetectionCorrection2 failobj = new BruteForceMaximumByteErrorDetectionCorrection2(received_3byte_errors_codewords, max_root_alpha_exp);
-                failobj.Process();
-                System.out.println("BruteForceMaximumByteErrorDetectionCorrection2 Process failure DONE");
+                //System.out.println("***** just change 3 bytes *****");
+                //Integer[] received_3byte_errors_codewords = 
+		//	{ 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 0, 230, 134,
+		//	  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
+		//	  116, 192, 0, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
+                //BruteForceMaximumByteErrorDetectionCorrection2 failobj = new BruteForceMaximumByteErrorDetectionCorrection2(received_3byte_errors_codewords, max_root_alpha_exp);
+                //failobj.Process();
+                //System.out.println("BruteForceMaximumByteErrorDetectionCorrection2 Process failure DONE");
+                //
+                //BruteForceMaximumByteErrorDetectionCorrection3 myobj3 = new BruteForceMaximumByteErrorDetectionCorrection3(received_3byte_errors_codewords, max_root_alpha_exp);
+                //myobj3.Process();
+                //System.out.println("Process3: DONE");
                 
-                BruteForceMaximumByteErrorDetectionCorrection3 myobj3 = new BruteForceMaximumByteErrorDetectionCorrection3(received_3byte_errors_codewords, max_root_alpha_exp);
-                myobj3.Process();
-                System.out.println("Process3: DONE");
-                //Dang that took a long-ass time like 1 minute per index1
-                //Need a farm or something
+                /**************************************************************
+                dang this works good but
+                Dang that took a long-ass time like 1 minute per index1
+                Need a farm or something.....just comment it out
+                ok
+                found Berlekamp-Welch algorithm
+                https://en.wikipedia.org/wiki/Berlekamp%E2%80%93Welch_algorithm
+                first do small-GF7-example but before that
+                i don't know if example uses a generator-polynomial that was created using
+                (x + alpha^0)(x + alpha^1) for 2 E.C.C
+                or
+                (x + alpha^1)(x + alpha^2) for 2 E.C.C
+                let us print both so we can verify example
+                ***************************************************************/
+                tool.Print_GF7_GenPolynomial(3, 0);
+                tool.Print_GF7_GenPolynomial(3, 1);
+                
                 
  /*****               
                 //****************************************************************************
