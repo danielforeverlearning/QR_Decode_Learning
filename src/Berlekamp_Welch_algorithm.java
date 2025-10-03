@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Scanner;
+
 
 /********************************************
 The Berlekamp–Welch algorithm, also known as the Welch–Berlekamp algorithm, 
@@ -168,6 +170,96 @@ public class Berlekamp_Welch_algorithm {
             System.out.println();
         }
     }//Debug_Print
+    
+    
+    public void MultiplyAndAdd_GF(int row_mult, int mult_val, int row_add)
+    {
+        for (int col=1; col <= recv_max_index; col++)
+        {
+            int temp = matrix[row_mult][col];
+            temp *= mult_val;
+            temp += matrix[row_add][col];
+            temp = GF_value(temp);
+            matrix[row_add][col] = temp;
+        }
+        
+        int temp = answer_matrix[row_mult];
+        temp *= mult_val;
+        temp += answer_matrix[row_add];
+        temp = GF_value(temp);
+        answer_matrix[row_add] = temp;
+    }//MultiplyAndAdd_GF
+    
+    
+    public void Multiply_Row_GF(int row, int val)
+    {
+        for (int col=1; col <= recv_max_index; col++)
+        {
+            int temp = matrix[row][col];
+            temp *= val;
+            temp = GF_value(temp);
+            matrix[row][col] = temp;
+        }
+        
+        int temp = answer_matrix[row];
+        temp *= val;
+        temp = GF_value(temp);
+        answer_matrix[row] = temp;
+    }//Multiply_Row_GF
+    
+    
+    public void Add_RowA_By_RowB_GF(int RowA, int RowB)
+    {
+        for (int col=1; col <= recv_max_index; col++)
+        {
+            int Aval = matrix[RowA][col];
+            int Bval = matrix[RowB][col];
+            int temp = Aval + Bval;
+            temp = GF_value(temp);
+            matrix[RowA][col] = temp;
+        }
+        
+        int Aval = answer_matrix[RowA];
+        int Bval = answer_matrix[RowB];
+        int temp = Aval + Bval;
+        temp = GF_value(temp);
+        answer_matrix[RowA] = temp;
+    }//Add_RowA_By_RowB_GF
+    
+    
+    public void Manual_Console_Solve()
+    {   
+        Scanner scanner = new Scanner(System.in);
+           
+        String str = "";
+        while (str.equals("x") == false)
+        {
+            Debug_Print();
+            
+            System.out.println();
+            System.out.println("Enter m,x,y: Multiply row-x by y (GF7)");
+            System.out.println("Enter a,x,y: Add row-x by row-y (GF7)");
+            System.out.println("Enter ma,x,y,z: Multiply row-x by y then add it to row-z(GF7)");
+            System.out.println("Enter x: Exit");
+            System.out.println("Enter:");
+            
+            str = scanner.nextLine();
+            
+            String[] temp = str.split(",");
+            if (temp[0].equals("m"))
+                Multiply_Row_GF(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+            else if (temp[0].equals("a"))
+                Add_RowA_By_RowB_GF(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+            else if (temp[0].equals("ma"))
+                MultiplyAndAdd_GF(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]), Integer.parseInt(temp[3]));
+            else if (temp[0].equals("x") == false)
+            {
+                System.out.println("BAD STRING ENTERED!!!!!");
+                System.out.println();
+            }
+        }
+        
+    }//Manual_Console_Solve
     
     
 }//class
