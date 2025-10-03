@@ -337,7 +337,15 @@ public class Example_BarefootBar {
                  same matrix as in the example
                  ************************************************************/
                 
-                
+                //n == 7 == message data bytes + E.C. bytes
+                //k == 3 == message data bytes
+                //so floor((n-k)/2)== maximum number of errors that can be corrected is 2
+                //b is the received bytes, do not use b[0] so we will not be confused, b will have length==8
+                //correct message =  {1,6,3,6,1,2,2}
+                //errors occur at c2 and c5 resulting in the received code word {1,5,3,6,3,2,2}
+                int[] b = { Integer.MAX_VALUE, 1, 5, 3, 6, 3, 2, 2 };
+                Berlekamp_Welch_algorithm algo = new Berlekamp_Welch_algorithm(7, b, 2);
+                algo.Debug_Print();
                 
                 
  /*****               
