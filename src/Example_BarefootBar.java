@@ -353,16 +353,20 @@ public class Example_BarefootBar {
                     algo.Fill_QuestionMatrix_With_AnswerMatrix();
                     algo.Debug_Print_Q_And_E_Functions();
                     algo.GF_Polynomial_Long_Division_To_Find_F_Function();
+                    ArrayList<String> locandcorrect = algo.Find_Error_Locations_And_Corrections();
+                    
+                    System.out.println();
+                    System.out.println();
+                    System.out.println("***** locandcorrect *****");
+                    for (int ii=0; ii < locandcorrect.size(); ii++)
+                        System.out.println(locandcorrect.get(ii));
                 }
                 else
                     System.out.println("identity_matrix == false");
-                
-                
- /*****               
+                 
                 //****************************************************************************
-                //lets try to correct for real because it has bad branding area
+                //lets try to correct for real 3 error example we created before
                 //*****************************************************************************
-                System.out.println("TRYING TO CORRECT BAD BRANDING AREA CORRECTLY:");
                 //see interleaving.jpg or 
 		//https://www.thonky.com/qr-code-tutorial/error-correction-table
 		//
@@ -373,149 +377,7 @@ public class Example_BarefootBar {
 		//Number of Data Codewords in Each of Group1's Blocks = 15
 		//Number of Blocks in Group2                          = 0
 		//Number of Data Codewords in Each of Group2's Blocks = 0
-		success = mask.Do_Mask("./Example_BarefootBar/original_map_3_branding_area_eyeballs_filled.txt", "./mask_5.txt", "./Example_BarefootBar/after_mask5_bad_branding_area.txt");
-		if (!success)
-		{
-			System.out.println("ERROR");
-			return;
-		}
-		
-		RowColumnMapReader mymap = new RowColumnMapReader(41,41);
-		mymap.Load("./Example_BarefootBar/after_mask5_bad_branding_area.txt");
-		mymap.Find_Codewords(172);
-		//mymap.DebugPrint_mybyte();
-		//mymap.DebugPrint_codewords();
-		
-		ArrayList<Integer> interleaved = mymap.Get_codewords();
-		ArrayList<Integer> brand_dc_block1 = new ArrayList<Integer>();
-		ArrayList<Integer> brand_dc_block2 = new ArrayList<Integer>();
-		ArrayList<Integer> brand_dc_block3 = new ArrayList<Integer>();
-		ArrayList<Integer> brand_dc_block4 = new ArrayList<Integer>();
-
-		for (int ii=0; ii < 60; ii += 4)
-		{
-			brand_dc_block1.add(interleaved.get(ii));
-			brand_dc_block2.add(interleaved.get(ii+1));
-			brand_dc_block3.add(interleaved.get(ii+2));
-			brand_dc_block4.add(interleaved.get(ii+3));
-		}
-		
-		ArrayList<Integer> brand_ecc_block1 = new ArrayList<Integer>();
-		ArrayList<Integer> brand_ecc_block2 = new ArrayList<Integer>();
-		ArrayList<Integer> brand_ecc_block3 = new ArrayList<Integer>();
-		ArrayList<Integer> brand_ecc_block4 = new ArrayList<Integer>();
-                
-                for (int ii=60; ii < 172; ii += 4)
-		{
-			brand_ecc_block1.add(interleaved.get(ii));
-			brand_ecc_block2.add(interleaved.get(ii+1));
-			brand_ecc_block3.add(interleaved.get(ii+2));
-			brand_ecc_block4.add(interleaved.get(ii+3));
-		}
-		
-                //*****************************
-                // data block1 and ecc_block1
-                //*****************************
-                ArrayList<Integer> recv_block1_al = new ArrayList<Integer>();
-                recv_block1_al.addAll(brand_dc_block1);
-                recv_block1_al.addAll(brand_ecc_block1);
-                Integer[] recv_block1 = new Integer[recv_block1_al.size()];
-                recv_block1_al.toArray(recv_block1);
-                ArrayList<Integer> recv_block1_nonzero_syndrome = new ArrayList<Integer>();
-                ArrayList<Integer> recv_block1_zero_syndrome = new ArrayList<Integer>();
-		for (int ii=0; ii <= max_root_alpha_exp; ii++)
-		{
-		     int syndrome = err_corrector.CalculateSyndrome(recv_block1, ii);
-		     if (syndrome != 0)
-		    	 recv_block1_nonzero_syndrome.add(syndrome);
-                     else {
-                         System.out.println("recv_block1: syndrome==0 for ii==" + ii);
-                         recv_block1_zero_syndrome.add(ii);
-                     }
-		}
-		System.out.println("recv_block1_nonzero_syndrome.size = " + recv_block1_nonzero_syndrome.size());
-                System.out.println("recv_block1_zero_syndrome.size = " + recv_block1_zero_syndrome.size());
-                
-                ArrayList<ArrayList<Integer>> unk_results_block1 = err_corrector.BuildUnknownResults(recv_block1, max_root_alpha_exp);
-		err_corrector.DebugPrint_UnknownResults(unk_results_block1);
-                
-                
-                //*****************************
-                // data block2 and ecc_block2
-                //*******************************
-                ArrayList<Integer> recv_block2_al = new ArrayList<Integer>();
-                recv_block2_al.addAll(brand_dc_block2);
-                recv_block2_al.addAll(brand_ecc_block2);
-                Integer[] recv_block2 = new Integer[recv_block2_al.size()];
-                recv_block2_al.toArray(recv_block2);
-                ArrayList<Integer> recv_block2_nonzero_syndrome = new ArrayList<Integer>();
-                ArrayList<Integer> recv_block2_zero_syndrome = new ArrayList<Integer>();
-		for (int ii=0; ii <= max_root_alpha_exp; ii++)
-		{
-		     int syndrome = err_corrector.CalculateSyndrome(recv_block2, ii);
-		     if (syndrome != 0)
-		    	 recv_block2_nonzero_syndrome.add(syndrome);
-                     else
-                         recv_block2_zero_syndrome.add(ii);
-		}
-		System.out.println("recv_block2_nonzero_syndrome.size = " + recv_block2_nonzero_syndrome.size());
-                System.out.println("recv_block2_zero_syndrome.size = " + recv_block2_zero_syndrome.size());
-                
-                ArrayList<ArrayList<Integer>> unk_results_block2 = err_corrector.BuildUnknownResults(recv_block2, max_root_alpha_exp);
-		err_corrector.DebugPrint_UnknownResults(unk_results_block2);
-                
-
-                //*****************************
-                // data block3 and ecc_block3
-                //*****************************
-                ArrayList<Integer> recv_block3_al = new ArrayList<Integer>();
-                recv_block3_al.addAll(brand_dc_block3);
-                recv_block3_al.addAll(brand_ecc_block3);
-                Integer[] recv_block3 = new Integer[recv_block3_al.size()];
-                recv_block3_al.toArray(recv_block3);
-                ArrayList<Integer> recv_block3_nonzero_syndrome = new ArrayList<Integer>(); 
-                ArrayList<Integer> recv_block3_zero_syndrome = new ArrayList<Integer>(); 
-		for (int ii=0; ii <= max_root_alpha_exp; ii++)
-		{
-		     int syndrome = err_corrector.CalculateSyndrome(recv_block3, ii);
-		     if (syndrome != 0)
-		    	 recv_block3_nonzero_syndrome.add(syndrome);
-                     else
-                         recv_block3_zero_syndrome.add(ii);
-		}
-		System.out.println("recv_block3_nonzero_syndrome.size = " + recv_block3_nonzero_syndrome.size());
-                System.out.println("recv_block3_zero_syndrome.size = " + recv_block3_zero_syndrome.size());
-                
-                ArrayList<ArrayList<Integer>> unk_results_block3 = err_corrector.BuildUnknownResults(recv_block3, max_root_alpha_exp);
-		err_corrector.DebugPrint_UnknownResults(unk_results_block3);
-                
-    
-                //*****************************
-                //data block4 and ecc_block4
-                //*****************************
-                ArrayList<Integer> recv_block4_al = new ArrayList<Integer>();
-                recv_block4_al.addAll(brand_dc_block4);
-                recv_block4_al.addAll(brand_ecc_block4);
-                Integer[] recv_block4 = new Integer[recv_block4_al.size()];
-                recv_block4_al.toArray(recv_block4);
-                ArrayList<Integer> recv_block4_nonzero_syndrome = new ArrayList<Integer>();
-                ArrayList<Integer> recv_block4_zero_syndrome = new ArrayList<Integer>();
-		for (int ii=0; ii <= max_root_alpha_exp; ii++)
-		{
-		     int syndrome = err_corrector.CalculateSyndrome(recv_block4, ii);
-		     if (syndrome != 0)
-		    	 recv_block4_nonzero_syndrome.add(syndrome);
-                     else
-                         recv_block4_zero_syndrome.add(ii);
-		}
-		System.out.println("recv_block4_nonzero_syndrome.size = " + recv_block4_nonzero_syndrome.size());
-                System.out.println("recv_block4_zero_syndrome.size = " + recv_block4_zero_syndrome.size());
-                
-                ArrayList<ArrayList<Integer>> unk_results_block4 = err_corrector.BuildUnknownResults(recv_block4, max_root_alpha_exp);
-		err_corrector.DebugPrint_UnknownResults(unk_results_block4);
-                
-                
-*****/                
+		               
 	}//DoExample
 
 }//class

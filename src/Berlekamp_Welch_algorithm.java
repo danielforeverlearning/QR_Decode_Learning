@@ -90,6 +90,10 @@ public class Berlekamp_Welch_algorithm {
     int q_max_index = 0;
     int[] q = null;
     
+    //F is calculated after identity-matrix solved if solvable
+    ArrayList<Integer> F = null;
+    ArrayList<Integer> E = null;
+    
     public Berlekamp_Welch_algorithm(int gf_val, int[] temp_b, int temp_e_count)
     {
         GF = gf_val;
@@ -475,9 +479,9 @@ public class Berlekamp_Welch_algorithm {
         //                    1x^2  2x  4
         //                    --------------------
         //                          
-        ArrayList<Integer> F = new ArrayList<Integer>();
+        F = new ArrayList<Integer>();
+        E = new ArrayList<Integer>();
         ArrayList<Integer> dividend = new ArrayList<Integer>();
-        ArrayList<Integer> E = new ArrayList<Integer>();
         
         for (int qii=q_max_index; qii >= 0; qii--) //q uses q[0], q[0] is coefficient for x^0
             dividend.add(q[qii]);
@@ -534,5 +538,73 @@ public class Berlekamp_Welch_algorithm {
                 System.out.print(" + ");
         }
     }//GF_Polynomial_Long_Division_To_Find_F_Function
+    
+    public ArrayList<String> Find_Error_Locations_And_Corrections() throws Exception
+    {   
+        //error location found if E(ai)==0 and i==location of error in received-bytes
+        //and correction is F(ai)
+        ArrayList<String> locandcorrect = new ArrayList<String>();
+        
+        for (int ii=1; ii <= recv_max_index; ii++)
+        {
+            //calculate E(ai)
+            int sum=0;
+            for (int eterm=0; eterm < E.size(); eterm++)
+            {
+                int coeff = E.get(eterm);
+                int x_exp = E.size() - eterm - 1;
+                int x = a[ii];
+                if (GF == 7)
+                {
+                     int temp = coeff * (int)Math.pow(x, x_exp);
+                     sum += temp;
+                }
+                else if (GF == 256)
+                {
+                    //make sure a(i) = 2^0, 2^1, 2^2, 2^3 ..... 2^(i-1)
+                    //so you can use tables
+                    //that means x==2
+                    throw new Exception("Find_Error_Locations_And_Corrections: did not finish code for GF(256)");
+                }
+                else
+                {
+                    throw new Exception("Find_Error_Locations_And_Corrections: did not finish code for unknown GF because Math.pow may get too big");
+                }
+            }
+            int E_val = GF_value(sum);
+            if (E_val==0) //found error location == ii
+            {
+                //find correction
+                sum = 0;
+                for (int f_term=0; f_term < F.size(); f_term++)
+                {
+                    int coeff = F.get(f_term);
+                    int x_exp = F.size() - f_term - 1;
+                    int x = a[ii];
+                    if (GF == 7)
+                    {
+                          int temp = coeff * (int)Math.pow(x, x_exp);
+                          sum += temp;
+                    }
+                    else if (GF == 256)
+                    {
+                          //make sure a(i) = 2^0, 2^1, 2^2, 2^3 ..... 2^(i-1)
+                          //so you can use tables
+                          //that means x==2
+                          throw new Exception("Find_Error_Locations_And_Corrections: codearea2: did not finish code for GF(256)");
+                    }
+                    else
+                    {
+                          throw new Exception("Find_Error_Locations_And_Corrections: codearea2: did not finish code for unknown GF because Math.pow may get too big");
+                    }
+                }
+                int correction = GF_value(sum);
+                locandcorrect.add(ii + "," + correction);
+                
+            }////found error location == ii
+        }//ai loop
+        
+        return locandcorrect;
+    }//Find_Error_Locations_And_Corrections
     
 }//class
