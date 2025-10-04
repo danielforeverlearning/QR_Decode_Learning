@@ -87,6 +87,9 @@ public class Berlekamp_Welch_algorithm {
     
     int[][] matrix = null;
     
+    int q_max_index = 0;
+    int[] q = null;
+    
     public Berlekamp_Welch_algorithm(int gf_val, int[] temp_b, int temp_e_count)
     {
         GF = gf_val;
@@ -95,6 +98,9 @@ public class Berlekamp_Welch_algorithm {
         
         e_count = temp_e_count;
         e = new int[e_count];
+        
+        q_max_index = recv_max_index - e_count - 1;
+        q = new int[recv_max_index - e_count];// we will use q[0]
         
         a = new int[b.length]; //do not use a[0]
         a[0] = Integer.MAX_VALUE; //do not use a[0] just try to mark it as not used
@@ -402,5 +408,131 @@ public class Berlekamp_Welch_algorithm {
         
         return true;
     }//Make_Column_Good_1_And_0s
+    
+    public void Fill_QuestionMatrix_With_AnswerMatrix()
+    {
+        int ii=1; //answer_matrix[0] is not used
+        
+        for (int err=0; err < e_count; err++)
+        {
+            e[err] = answer_matrix[ii];
+            ii++;
+        }
+        for (int qii=0; qii < q.length; qii++)
+        {
+            q[qii] = answer_matrix[ii];
+            ii++;
+        }
+    }//Fill_QuestionMatrix_With_AnswerMatrix
+    
+    public void Debug_Print_Q_And_E_Functions()
+    {
+        System.out.println();
+        System.out.print("Q(ai) = ");
+        for (int qii=q_max_index; qii >= 0; qii--) //q uses q[0], q[0] is coefficient for x^0
+        {
+            System.out.print(q[qii] + "x^" + qii);
+            if (qii != 0)
+                System.out.print(" + ");
+        }
+        
+        System.out.println();
+        System.out.print("E(ai) = ");
+        for (int eii=e_count; eii >= 0; eii--) //e uses e[0], e[0] is coefficient for x^0, e[e_count] is constrained to 1 and is the coefficient for x^e_count
+        {
+            if (eii == e_count)
+                System.out.print("1x^" + eii + " + ");
+            else
+            {
+                System.out.print(e[eii] + "x^" + eii);
+                if (eii != 0)
+                    System.out.print(" + ");
+            }
+        }
+        System.out.println();
+    }//Debug_Print_Q_And_E_Functions
+    
+    public void GF_Polynomial_Long_Division_To_Find_F_Function()
+    {
+        //q uses q[0], q[0] is coefficient for x^0
+        //e uses e[0], e[0] is coefficient for x^0, e[e_count] is constrained to 1 and is the coefficient for x^e_count
+        //F(ai) = Q(ai) / E(ai)
+        //
+        //example:
+        //Q(ai) = 3x^4 + 1x^3 + 3x^2 + 3x + 4
+        //E(ai) = 1x^2 + 2x + 4
+        //
+        //
+        //F(ai) = 3x^2  2x    1
+        //        --------------------------------
+        //        3x^4  1x^3  3x^2  3x  4
+        //        3x^4  6x^3  12x^2
+        //        --------------------------------
+        //              2x^3  5x^2  3x  4
+        //              2x^3  4x^2  8x
+        //              --------------------------
+        //                    1x^2  2x  4
+        //                    1x^2  2x  4
+        //                    --------------------
+        //                          
+        ArrayList<Integer> F = new ArrayList<Integer>();
+        ArrayList<Integer> dividend = new ArrayList<Integer>();
+        ArrayList<Integer> E = new ArrayList<Integer>();
+        
+        for (int qii=q_max_index; qii >= 0; qii--) //q uses q[0], q[0] is coefficient for x^0
+            dividend.add(q[qii]);
+        
+        for (int eii=e_count; eii >= 0; eii--) //e uses e[0], e[0] is coefficient for x^0, e[e_count] is constrained to 1 and is the coefficient for x^e_count
+        {
+            if (eii == e_count)
+                E.add(1);
+            else
+                E.add(e[eii]);
+        }
+        
+        int E_term_length = e_count + 1;
+        
+        while (dividend.size() >= E_term_length)
+        {
+            int mult=0;
+            for (int ii=0; ii < E.size(); ii++)
+            {
+                if (ii==0)
+                {
+                    mult = dividend.get(ii);
+                    F.add(mult);
+                    dividend.set(ii, 0);
+                }
+                else
+                {
+                    int temp_dividend = dividend.get(ii);
+                    int temp_E = E.get(ii);
+                    int temp = mult * temp_E;
+                    temp = temp_dividend - temp;
+                    temp = GF_value(temp);
+                    dividend.set(ii, temp);
+                }
+            }
+            
+            dividend.remove(0);
+        }
+        
+        System.out.println();
+        System.out.print("F(ai) = ");
+        for (int ii=0; ii < F.size(); ii++)
+        {
+            System.out.print(F.get(ii) + "x^" + (F.size() - ii - 1));
+            if (ii != (F.size() - 1))
+                 System.out.print(" + ");
+        }
+        System.out.println();
+        System.out.print("Remainder = ");
+        for (int ii=0; ii < dividend.size(); ii++)
+        {
+            System.out.print(dividend.get(ii) + "x^" + (dividend.size() - ii - 1));
+            if (ii != (dividend.size() - 1))
+                System.out.print(" + ");
+        }
+    }//GF_Polynomial_Long_Division_To_Find_F_Function
     
 }//class

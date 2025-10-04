@@ -350,6 +350,9 @@ public class Example_BarefootBar {
                 {
                     System.out.println("identity_matrix == true");
                     algo.Debug_Print();
+                    algo.Fill_QuestionMatrix_With_AnswerMatrix();
+                    algo.Debug_Print_Q_And_E_Functions();
+                    algo.GF_Polynomial_Long_Division_To_Find_F_Function();
                 }
                 else
                     System.out.println("identity_matrix == false");
