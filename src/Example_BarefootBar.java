@@ -345,7 +345,14 @@ public class Example_BarefootBar {
                 //errors occur at c2 and c5 resulting in the received code word {1,5,3,6,3,2,2}
                 int[] b = { Integer.MAX_VALUE, 1, 5, 3, 6, 3, 2, 2 };
                 Berlekamp_Welch_algorithm algo = new Berlekamp_Welch_algorithm(7, b, 2);
-                algo.Manual_Console_Solve();
+                boolean identity_matrix = algo.Robot_Solve();
+                if (identity_matrix)
+                {
+                    System.out.println("identity_matrix == true");
+                    algo.Debug_Print();
+                }
+                else
+                    System.out.println("identity_matrix == false");
                 
                 
  /*****               

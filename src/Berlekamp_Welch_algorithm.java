@@ -261,5 +261,146 @@ public class Berlekamp_Welch_algorithm {
         
     }//Manual_Console_Solve
     
+    private boolean Check_Identity_Matrix()
+    {
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            for (int col=1; col <= recv_max_index; col++)
+            {
+                if (matrix[row][col] != 1 && row==col)
+                    return false;
+                else if (matrix[row][col] != 0 && row!=col)
+                    return false;
+            }
+        }
+        return true;
+    }//Check_Identity_Matrix
+    
+    
+    public boolean Robot_Solve()
+    {   
+        int ii=1;
+        while (true)
+        {
+            Debug_Print();
+            
+            boolean good = Make_Column_Good_1_And_0s(ii);
+            if (!good)
+                return false;
+            
+            ii++;
+            if (ii==(recv_max_index + 1))
+                break;
+        }
+        
+        boolean tempbool = Check_Identity_Matrix();
+        return tempbool;
+    }//Robot_Solve
+    
+    private boolean Make_Column_Good_1_And_0s(int ii)
+    {
+        boolean good = false;
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            if (row==ii && matrix[row][ii] == 1)
+                good = true;
+            else if (row!=ii && matrix[row][ii] == 0)
+                good = true;
+            else
+            {
+                good = false;
+                break;
+            }
+        }
+        
+        if (good) //this column is good already
+            return true;
+        
+        //if column all 0s, can not make it good
+        int zero_count=0;
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            if (matrix[row][ii] == 0)
+                zero_count++;
+        }
+        if (zero_count == recv_max_index)
+            return false; //can not make it good
+        
+        
+        //make matrix[ii][ii]==1
+        if (matrix[ii][ii] != 1)
+        {
+            if (matrix[ii][ii] != 0)
+            {
+                 //if 2 then GF_value(8)==1
+                 //if 3 then GF_value(15)==1
+                 //if 4 then GF_value(8)==1
+                 //if 5 then GF_value(15)==1
+                 //if 6 then GF_value(36)==1
+                 //so at some multiple of temp the GF_Value will be 1
+                 int temp = matrix[ii][ii]; //temp!=1 and temp!=0
+                 int temp_ii=1;
+                 while (GF_value(temp) != 1)
+                 {
+                     temp_ii++;
+                     temp = matrix[ii][ii] * temp_ii;
+                 }
+                 Multiply_Row_GF(ii, temp_ii);
+            }
+            else //matrix[ii][ii] == 0
+            {
+                //find another row after this row==ii
+                //whose matrix[row][ii] != 0 and GF_value(matrix[row][ii] + matrix[ii][ii]) != 0 and row <= recv_max_index
+                //add that row here
+                //then do little algorithm above
+                int row = ii+1;
+                int sumgf = GF_value(matrix[row][ii] + matrix[ii][ii]);
+                while (matrix[row][ii] == 0 && sumgf == 0)
+                {
+                    row++;
+                    if (row > recv_max_index)
+                        return false;
+                }
+                Add_RowA_By_RowB_GF(ii, row);
+                if (matrix[ii][ii] != 1)
+                {
+                    //if 2 then GF_value(8)==1
+                    //if 3 then GF_value(15)==1
+                    //if 4 then GF_value(8)==1
+                    //if 5 then GF_value(15)==1
+                    //if 6 then GF_value(36)==1
+                    //so at some multiple of temp the GF_Value will be 1
+                    int temp = matrix[ii][ii]; //temp!=1 and temp!=0
+                    int temp_ii=1;
+                    while (GF_value(temp) != 1)
+                    {
+                        temp_ii++;
+                        temp = matrix[ii][ii] * temp_ii;
+                    }
+                    Multiply_Row_GF(ii, temp_ii);
+                }
+            }
+        }
+        
+        //ok matrix[ii][ii]==1
+        //make other elements in this column 0
+        //but can not simple multiply by GF because it will make that whole row 0
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            if (row != ii)
+            {
+                if (matrix[row][ii] != 0)
+                {
+                    //make it 0
+                    int temp = matrix[row][ii];
+                    int delta = GF - temp;
+                    //multiply good row by delta and add it to this row
+                    MultiplyAndAdd_GF(ii, delta, row);
+                }
+            }
+        }
+        
+        return true;
+    }//Make_Column_Good_1_And_0s
     
 }//class
