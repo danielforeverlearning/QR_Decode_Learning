@@ -211,8 +211,6 @@ public class Example_BarefootBar {
                 t = floor((28-15)/2) = floor(6.5) = 6 errors per block.
                 ***********************************************************************/
                 
-                //Code below only works for maximum-1-byte-error-correction
-                
 		Integer[] correct_block_codewords = 
 			{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134, //data codewords
 			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, //error-correction codewords 
@@ -377,6 +375,26 @@ public class Example_BarefootBar {
 		//Number of Data Codewords in Each of Group1's Blocks = 15
 		//Number of Blocks in Group2                          = 0
 		//Number of Data Codewords in Each of Group2's Blocks = 0
+                
+                /*********************************************************************************
+                 Integer[] correct_block_codewords = 
+			{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134, //data codewords
+			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, //error-correction codewords 
+			  116, 192, 73, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
+                 *************************************************************************************/
+                
+                
+                //location=7 correction=51
+                //location=13 correction=114
+                //location=32 correction=73
+                System.out.println("***** just change 3 bytes *****");
+                //DO NOT USE b[0]
+                int[] received_3byte_errors_codewords = 
+			{ Integer.MAX_VALUE, 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 0, 230, 134,
+			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
+			  116, 192, 0, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
+                Berlekamp_Welch_algorithm barefootbar_algo = new Berlekamp_Welch_algorithm(256, received_3byte_errors_codewords, 3);
+                barefootbar_algo.Manual_Console_Solve();
 		               
 	}//DoExample
 

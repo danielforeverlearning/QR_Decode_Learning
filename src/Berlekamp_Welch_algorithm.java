@@ -94,7 +94,7 @@ public class Berlekamp_Welch_algorithm {
     ArrayList<Integer> F = null;
     ArrayList<Integer> E = null;
     
-    public Berlekamp_Welch_algorithm(int gf_val, int[] temp_b, int temp_e_count)
+    public Berlekamp_Welch_algorithm(int gf_val, int[] temp_b, int temp_e_count) throws  Exception
     {
         GF = gf_val;
         b = temp_b; //do not use b[0]
@@ -106,10 +106,22 @@ public class Berlekamp_Welch_algorithm {
         q_max_index = recv_max_index - e_count - 1;
         q = new int[recv_max_index - e_count];// we will use q[0]
         
-        a = new int[b.length]; //do not use a[0]
-        a[0] = Integer.MAX_VALUE; //do not use a[0] just try to mark it as not used
+        a = new int[b.length]; //DO NOT USE a[0]
+        a[0] = Integer.MAX_VALUE; //DO NOT USE a[0] just try to mark it as not used
         for (int ii=1; ii <= recv_max_index; ii++)
-            a[ii] = ii - 1;
+        {
+            if (GF==7)
+                 a[ii] = ii - 1;
+            else if (GF==256)
+            {
+                //use tables because Math.pow may get too big calculating E(ai) and F(ai) if you get that far
+                //after trying to get identity-matrix
+                Tools tool = new Tools();
+                a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1];
+            }
+            else
+                throw new Exception("Berlekamp_Welch_algorithm: a[ii]: only GF(7) and GF(256) supported because Math.pow may get too big and did not use long or BigInteger");
+        }
         
         //answer_matrix is rows==b.length x columns=1 represented by an array 
         //where answer_matrix[0] is not used so we will not be confused
@@ -135,17 +147,36 @@ public class Berlekamp_Welch_algorithm {
         //         b[5]  b[5]a[5]  -1  -a[5]  -a[5]^2  -a[5]^3  -a[5]^4
         //         b[6]  b[6]a[6]  -1  -a[6]  -a[6]^2  -a[6]^3  -a[6]^4
         //         b[7]  b[7]a[7]  -1  -a[7]  -a[7]^2  -a[7]^3  -a[7]^4
-        for (int row=1; row <= recv_max_index; row++)
+        if (GF==7)
         {
-            matrix[row][1] = GF_value(b[row]);
-            matrix[row][2] = GF_value(b[row] * a[row]);
-            matrix[row][3] = GF_value(-1);
-            matrix[row][4] = GF_value(-1 * a[row]);
-            matrix[row][5] = GF_value(-1 * GF_pow(a[row],2));
-            matrix[row][6] = GF_value(-1 * GF_pow(a[row],3));
-            matrix[row][recv_max_index] = GF_value(-1 * GF_pow(a[row],4));
+            for (int row=1; row <= recv_max_index; row++)
+            {
+                matrix[row][1] = b[row];
+                matrix[row][2] = GF_value(b[row] * a[row]);
+                matrix[row][3] = GF_value(-1);
+                matrix[row][4] = GF_value(-1 * a[row]);
+                matrix[row][5] = GF_value(-1 * GF_pow(a[row],2));
+                matrix[row][6] = GF_value(-1 * GF_pow(a[row],3));
+                matrix[row][recv_max_index] = GF_value(-1 * GF_pow(a[row],4));
+            }
         }
-        
+        else if (GF==256)
+        {
+            for (int row=1; row <= recv_max_index; row++)
+            {
+                matrix[row][1] = b[row];
+                matrix[row][2] = GF_value(b[row] * a[row]);
+                matrix[row][3] = GF_value(-1);
+                matrix[row][4] = GF_value(-1 * a[row]);
+                matrix[row][5] = GF_value(-1 * GF_pow(a[row],2));
+                matrix[row][6] = GF_value(-1 * GF_pow(a[row],3));
+                matrix[row][7] = GF_value(-1 * GF_pow(a[row],4));
+                for (int col=8; col <= recv_max_index; col++)
+                    matrix[row][col] = GF_value(-1 * GF_pow(a[row],col-3));
+            }
+        }
+        else
+            throw new Exception("Berlekamp_Welch_algorithm: making-matrix: only GF(7) and GF(256) supported because Math.pow may get too big and did not use long or BigInteger");
     }//constructor
     
     
@@ -171,12 +202,20 @@ public class Berlekamp_Welch_algorithm {
         System.out.println();
         for (int row=1; row <= recv_max_index; row++)
         {
+            System.out.print(" |");
             for (int col=1; col <= recv_max_index; col++)
             {
-                System.out.print(matrix[row][col] + "  ");
-                if (col == recv_max_index)
-                    System.out.print("     " + answer_matrix[row]);
+                String tempstr = Integer.toString(matrix[row][col]);
+                if (tempstr.length() == 3)
+                    tempstr = "  " + tempstr;
+                else if (tempstr.length() == 2)
+                    tempstr = "   " + tempstr;
+                else if (tempstr.length() == 1)
+                    tempstr = "    " + tempstr;
+                System.out.print(tempstr);
             }
+            
+            System.out.printf("|   |%3d|", answer_matrix[row]);
             System.out.println();
         }
     }//Debug_Print
