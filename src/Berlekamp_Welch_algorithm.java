@@ -106,21 +106,15 @@ public class Berlekamp_Welch_algorithm {
         q_max_index = recv_max_index - e_count - 1;
         q = new int[recv_max_index - e_count];// we will use q[0]
         
+        Tools tool = new Tools();
         a = new int[b.length]; //DO NOT USE a[0]
         a[0] = Integer.MAX_VALUE; //DO NOT USE a[0] just try to mark it as not used
         for (int ii=1; ii <= recv_max_index; ii++)
         {
-            if (GF==7)
-                 a[ii] = ii - 1;
-            else if (GF==256)
-            {
-                //use tables because Math.pow may get too big calculating E(ai) and F(ai) if you get that far
-                //after trying to get identity-matrix
-                Tools tool = new Tools();
-                a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1];
-            }
+            if (GF != 256)
+                a[ii] = ii - 1;
             else
-                throw new Exception("Berlekamp_Welch_algorithm: a[ii]: only GF(7) and GF(256) supported because Math.pow may get too big and did not use long or BigInteger");
+                a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1];
         }
         
         //answer_matrix is rows==b.length x columns=1 represented by an array 
@@ -128,7 +122,20 @@ public class Berlekamp_Welch_algorithm {
         answer_matrix = new int[b.length];
         //it holds values -b[1]a[1]^2 .....-b[recv_max_index]a[recv_max_index]^2
         for (int ii=1; ii <= recv_max_index; ii++)
-            answer_matrix[ii] = GF_value(-1 * b[ii] * a[ii] * a[ii]);
+        {
+            if (GF != 256)
+                answer_matrix[ii] = GF_value(-1 * b[ii] * a[ii] * a[ii]);
+            else
+            {
+                //GF(256)
+                //(2^x)^y == 2^(x*y)
+                int a_row_as_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[ii]];
+                int temp_exp = a_row_as_alpha_exp * 2;
+                if (temp_exp >= 256)
+                    temp_exp %= 255;
+                answer_matrix[ii] = GF_value(-1 * b[ii] * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
+            }
+        }
         
         
         matrix = new int[b.length][b.length];
@@ -147,7 +154,7 @@ public class Berlekamp_Welch_algorithm {
         //         b[5]  b[5]a[5]  -1  -a[5]  -a[5]^2  -a[5]^3  -a[5]^4
         //         b[6]  b[6]a[6]  -1  -a[6]  -a[6]^2  -a[6]^3  -a[6]^4
         //         b[7]  b[7]a[7]  -1  -a[7]  -a[7]^2  -a[7]^3  -a[7]^4
-        if (GF==7)
+        if (GF != 256)
         {
             for (int row=1; row <= recv_max_index; row++)
             {
@@ -157,27 +164,59 @@ public class Berlekamp_Welch_algorithm {
                 matrix[row][4] = GF_value(-1 * a[row]);
                 matrix[row][5] = GF_value(-1 * GF_pow(a[row],2));
                 matrix[row][6] = GF_value(-1 * GF_pow(a[row],3));
-                matrix[row][recv_max_index] = GF_value(-1 * GF_pow(a[row],4));
-            }
-        }
-        else if (GF==256)
-        {
-            for (int row=1; row <= recv_max_index; row++)
-            {
-                matrix[row][1] = b[row];
-                matrix[row][2] = GF_value(b[row] * a[row]);
-                matrix[row][3] = GF_value(-1);
-                matrix[row][4] = GF_value(-1 * a[row]);
-                matrix[row][5] = GF_value(-1 * GF_pow(a[row],2));
-                matrix[row][6] = GF_value(-1 * GF_pow(a[row],3));
-                matrix[row][7] = GF_value(-1 * GF_pow(a[row],4));
-                for (int col=8; col <= recv_max_index; col++)
+                for (int col=7; col <= recv_max_index; col++)
                     matrix[row][col] = GF_value(-1 * GF_pow(a[row],col-3));
             }
         }
-        else
-            throw new Exception("Berlekamp_Welch_algorithm: making-matrix: only GF(7) and GF(256) supported because Math.pow may get too big and did not use long or BigInteger");
+        else //GF(256)
+        {
+            for (int row=1; row <= recv_max_index; row++)
+            {
+                matrix[row][1] = b[row];
+                
+                int b_row = b[row];
+                int a_row = a[row];
+                matrix[row][2] = GF_value(b_row * a_row);
+                
+                matrix[row][3] = GF_value(-1);
+                matrix[row][4] = GF_value(-1 * a[row]);
+                
+                //(2^x)^y == 2^(x*y)
+                int a_row_as_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a_row];
+                int temp_exp = a_row_as_alpha_exp * 2;
+                if (temp_exp >= 256)
+                    temp_exp %= 255;
+                matrix[row][5] = GF_value(-1 * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
+                
+                temp_exp = a_row_as_alpha_exp * 3;
+                if (temp_exp >= 256)
+                    temp_exp %= 255;
+                matrix[row][6] = GF_value(-1 * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
+                
+                for (int col=7; col <= recv_max_index; col++)
+                {
+                    temp_exp = a_row_as_alpha_exp * (col - 3);
+                    if (temp_exp >= 256)
+                        temp_exp %= 255;
+                    matrix[row][col] = GF_value(-1 * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
+                }
+            }
+        }//GF(256)
     }//constructor
+    
+    
+    private int GF_pow(int num, int exponent) throws Exception
+    {
+        if (GF != 256)
+        {
+            int temp = 1;
+            for (int ii=1; ii <= exponent; ii++)
+                temp = GF_value(temp * num);
+            return temp;
+        }
+        else
+            throw new Exception("GF_pow: using tables for GF(256");
+    }//GF_pow
     
     
     private int GF_value(int temp_decimal)
@@ -187,15 +226,6 @@ public class Berlekamp_Welch_algorithm {
             answer += GF;
         return answer;
     }//GF_value
-    
-    private int GF_pow(int num, int exponent)
-    {
-        int temp = 1;
-        for (int ii=1; ii <= exponent; ii++)
-            temp = GF_value(temp * num);
-        
-        return temp;
-    }//GF_pow
     
     public void Debug_Print()
     {
@@ -326,14 +356,46 @@ public class Berlekamp_Welch_algorithm {
     }//Check_Identity_Matrix
     
     
+    public int DoesThereExistRowBelowDiagWhoseColumnValueIs1(int diag)
+    {
+        for (int row=diag+1; row <= recv_max_index; row++)
+        {
+            if (matrix[row][diag] == 1)
+                return row;
+        }
+        return Integer.MAX_VALUE;
+    }//DoesThereExistRowBelowDiagWhoseColumnValueIs1
+    
+    
     public boolean Robot_Solve()
     {   
         int ii=1;
+        Debug_Print();
         while (true)
-        {
-            Debug_Print();
-            
-            boolean good = Make_Column_Good_1_And_0s(ii);
+        {   
+            boolean good = false;
+            if (GF==7)
+                good = GF7_Make_Column_Good_1_And_0s(ii);
+            else if (GF==256)
+            {
+                try
+                {
+                    good = GF256_Make_Column_Good_1_And_0s(ii);
+                    Debug_Print();
+                    int dummy=1;
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                    return false;
+                }
+                
+            }
+            else
+            {
+                System.out.println("Robot_Solve: only GF(7) or GF(256) supported for now");
+                return false;
+            }
             if (!good)
                 return false;
             
@@ -346,7 +408,125 @@ public class Berlekamp_Welch_algorithm {
         return tempbool;
     }//Robot_Solve
     
-    private boolean Make_Column_Good_1_And_0s(int ii)
+    
+    private boolean GF256_Make_Column_Good_1_And_0s(int ii) throws Exception
+    {
+        boolean good = false;
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            if (row==ii && matrix[row][ii] == 1)
+                good = true;
+            else if (row!=ii && matrix[row][ii] == 0)
+                good = true;
+            else
+            {
+                good = false;
+                break;
+            }
+        }
+        
+        if (good) //this column is good already
+            return true;
+        
+        //if column all 0s, can not make it good
+        int zero_count=0;
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            if (matrix[row][ii] == 0)
+                zero_count++;
+        }
+        if (zero_count == recv_max_index)
+            return false; //can not make it good
+        
+        
+        //make matrix[ii][ii]==1
+        if (matrix[ii][ii] != 1)
+        {
+            
+            //find another row where row!=ii whose col-value==1 and col==ii
+            int row_to_use = DoesThereExistRowBelowDiagWhoseColumnValueIs1(ii);
+            if (row_to_use != Integer.MAX_VALUE) // found a good row to use
+            {
+                int delta = -1 * (matrix[ii][ii] - 1);
+                MultiplyAndAdd_GF(row_to_use, delta, ii);
+            }
+            else //DoesThereExistRowBelowDiagWhoseColumnValueIs1==false
+            {
+                if ((matrix[ii][ii] % 2) != 0) //odd
+                {
+                    //at some multiple of temp the GF_Value will be 1
+                    int temp = matrix[ii][ii];
+                    int temp_ii=1;
+                    while (GF_value(temp) != 1)
+                    {
+                        temp_ii += 2;
+                        temp = matrix[ii][ii] * temp_ii;
+                    }
+                    Multiply_Row_GF(ii, temp_ii);
+                    
+                }//odd
+                else //0 or even
+                {
+                    //find another row after this row==ii
+                    //whose matrix[row][ii] != 0 and is odd and row <= recv_max_index
+                    //add that row here
+                    //then do little algorithm above
+                    int row = ii+1;
+                    while ((matrix[row][ii] % 2) != 1)
+                    {
+                        row++;
+                        if (row > recv_max_index)
+                        {
+                            //ok when you get here you can not make it 1 but you can make it 2
+                            int temp = matrix[ii][ii];
+                            int temp_ii=1;
+                            while (GF_value(temp) != 2)
+                            {
+                                temp_ii++;
+                                temp = matrix[ii][ii] * temp_ii;
+                            }
+                            Multiply_Row_GF(ii, temp_ii);
+                            Debug_Print();
+                            int dummy=3;
+                        }
+                    }
+                    Add_RowA_By_RowB_GF(ii, row);
+                    //at some multiple of temp the GF_Value will be 1
+                    int temp = matrix[ii][ii];
+                    int temp_ii=1;
+                    while (GF_value(temp) != 1)
+                    {
+                        temp_ii += 2;
+                        temp = matrix[ii][ii] * temp_ii;
+                    }
+                    Multiply_Row_GF(ii, temp_ii);
+                }//0 or even
+            }//DoesThereExistRowBelowDiagWhoseColumnValueIs1==false
+        }////make matrix[ii][ii]==1
+        
+        //ok matrix[ii][ii]==1
+        //make other elements in this column 0
+        //but can not simple multiply by GF because it will make that whole row 0
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            if (row != ii)
+            {
+                if (matrix[row][ii] != 0)
+                {
+                    //make it 0
+                    int temp = matrix[row][ii];
+                    int delta = GF - temp;
+                    //multiply good row by delta and add it to this row
+                    MultiplyAndAdd_GF(ii, delta, row);
+                }
+            }
+        }
+        
+        return true;
+    }//GF256_Make_Column_Good_1_And_0s
+    
+    
+    private boolean GF7_Make_Column_Good_1_And_0s(int ii)
     {
         boolean good = false;
         for (int row=1; row <= recv_max_index; row++)
@@ -450,7 +630,7 @@ public class Berlekamp_Welch_algorithm {
         }
         
         return true;
-    }//Make_Column_Good_1_And_0s
+    }//GF7_Make_Column_Good_1_And_0s
     
     public void Fill_QuestionMatrix_With_AnswerMatrix()
     {
