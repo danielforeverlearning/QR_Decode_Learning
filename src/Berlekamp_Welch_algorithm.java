@@ -112,9 +112,9 @@ public class Berlekamp_Welch_algorithm {
         for (int ii=1; ii <= recv_max_index; ii++)
         {
             if (GF != 256)
-                a[ii] = ii - 1;
-            else
-                a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1];
+                a[ii] = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
+            else //GF(256)
+                a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1]; //1,2,4,8,16,32,64,128,29,58 ..... alpha^(ii-1) , alpha==2
         }
         
         //answer_matrix is rows==b.length x columns=1 represented by an array 
@@ -126,15 +126,20 @@ public class Berlekamp_Welch_algorithm {
             if (GF != 256)
                 answer_matrix[ii] = GF_value(-1 * b[ii] * a[ii] * a[ii]);
             else
-            {
-                //GF(256)
-                //(2^x)^y == 2^(x*y)
-                int a_row_as_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[ii]];
-                int temp_exp = a_row_as_alpha_exp * 2;
-                if (temp_exp >= 256)
-                    temp_exp %= 255;
-                answer_matrix[ii] = GF_value(-1 * b[ii] * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
-            }
+            { //GF(256)
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[ii]];
+                //alpha^(alpha_exp) * alpha^(alpha_exp) ==
+                //alpha^(alpha_exp + alpha_exp)
+                alpha_exp += alpha_exp;
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[ii]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                int negnum = num * -1;
+                int gfval = GF_value(negnum);
+                answer_matrix[ii] = gfval;
+            } //GF(256)
         }
         
         
@@ -154,69 +159,82 @@ public class Berlekamp_Welch_algorithm {
         //         b[5]  b[5]a[5]  -1  -a[5]  -a[5]^2  -a[5]^3  -a[5]^4
         //         b[6]  b[6]a[6]  -1  -a[6]  -a[6]^2  -a[6]^3  -a[6]^4
         //         b[7]  b[7]a[7]  -1  -a[7]  -a[7]^2  -a[7]^3  -a[7]^4
-        if (GF != 256)
+        for (int row=1; row <= recv_max_index; row++)
         {
-            for (int row=1; row <= recv_max_index; row++)
+            if (GF != 256)
             {
                 matrix[row][1] = b[row];
                 matrix[row][2] = GF_value(b[row] * a[row]);
                 matrix[row][3] = GF_value(-1);
                 matrix[row][4] = GF_value(-1 * a[row]);
-                matrix[row][5] = GF_value(-1 * GF_pow(a[row],2));
-                matrix[row][6] = GF_value(-1 * GF_pow(a[row],3));
+                matrix[row][5] = GF_value(-1 * NotGF256_pow(a[row],2));
+                matrix[row][6] = GF_value(-1 * NotGF256_pow(a[row],3));
                 for (int col=7; col <= recv_max_index; col++)
-                    matrix[row][col] = GF_value(-1 * GF_pow(a[row],col-3));
+                    matrix[row][col] = GF_value(-1 * NotGF256_pow(a[row],col-3));
             }
-        }
-        else //GF(256)
-        {
-            for (int row=1; row <= recv_max_index; row++)
+            else //GF(256)
             {
                 matrix[row][1] = b[row];
                 
-                int b_row = b[row];
-                int a_row = a[row];
-                matrix[row][2] = GF_value(b_row * a_row);
+                if (b[row] == 0)
+                    matrix[row][2] = 0;
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                    int total_exp = alpha_exp + b_as_alpha_to_something_exp;
+                    if (total_exp >= 256)
+                        total_exp %= 255;
+                    int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    matrix[row][2] = gf256val;
+                }
                 
                 matrix[row][3] = GF_value(-1);
+                
                 matrix[row][4] = GF_value(-1 * a[row]);
                 
-                //(2^x)^y == 2^(x*y)
-                int a_row_as_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a_row];
-                int temp_exp = a_row_as_alpha_exp * 2;
-                if (temp_exp >= 256)
-                    temp_exp %= 255;
-                matrix[row][5] = GF_value(-1 * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                int neg_temp = -1 * temp;
+                int gf256val = GF_value(neg_temp);
+                matrix[row][5] = gf256val;
                 
-                temp_exp = a_row_as_alpha_exp * 3;
-                if (temp_exp >= 256)
-                    temp_exp %= 255;
-                matrix[row][6] = GF_value(-1 * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
+                
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                neg_temp = -1 * temp;
+                gf256val = GF_value(neg_temp);
+                matrix[row][6] = gf256val;
+                
                 
                 for (int col=7; col <= recv_max_index; col++)
                 {
-                    temp_exp = a_row_as_alpha_exp * (col - 3);
-                    if (temp_exp >= 256)
-                        temp_exp %= 255;
-                    matrix[row][col] = GF_value(-1 * tool.Table_Exponent_Of_Alpha_To_Integer()[temp_exp]);
+                    total_exp = alpha_exp * (col - 3);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    neg_temp = -1 * temp;
+                    gf256val = GF_value(neg_temp);
+                    matrix[row][col] = gf256val;
                 }
-            }
-        }//GF(256)
+                
+            }//GF(256)
+        }
     }//constructor
     
     
-    private int GF_pow(int num, int exponent) throws Exception
+    private int NotGF256_pow(int num, int exponent) throws Exception
     {
-        if (GF != 256)
-        {
-            int temp = 1;
-            for (int ii=1; ii <= exponent; ii++)
-                temp = GF_value(temp * num);
-            return temp;
-        }
-        else
-            throw new Exception("GF_pow: using tables for GF(256");
-    }//GF_pow
+        int temp = 1;
+        for (int ii=1; ii <= exponent; ii++)
+            temp = GF_value(temp * num);
+        return temp;
+    }//NotGF256_pow
     
     
     private int GF_value(int temp_decimal)
@@ -251,59 +269,74 @@ public class Berlekamp_Welch_algorithm {
     }//Debug_Print
     
     
-    public void MultiplyAndAdd_GF(int row_mult, int mult_val, int row_add)
+    public void NotGF256_MultiplyAndAdd(int row_mult, int mult_val, int row_add) throws Exception
     {
-        for (int col=1; col <= recv_max_index; col++)
+        if (GF != 256)
         {
-            int temp = matrix[row_mult][col];
+            for (int col=1; col <= recv_max_index; col++)
+            {
+                int temp = matrix[row_mult][col];
+                temp *= mult_val;
+                temp += matrix[row_add][col];
+                temp = GF_value(temp);
+                matrix[row_add][col] = temp;
+            }
+
+            int temp = answer_matrix[row_mult];
             temp *= mult_val;
-            temp += matrix[row_add][col];
+            temp += answer_matrix[row_add];
             temp = GF_value(temp);
-            matrix[row_add][col] = temp;
+            answer_matrix[row_add] = temp;
         }
-        
-        int temp = answer_matrix[row_mult];
-        temp *= mult_val;
-        temp += answer_matrix[row_add];
-        temp = GF_value(temp);
-        answer_matrix[row_add] = temp;
-    }//MultiplyAndAdd_GF
+        else //GF(256)
+            throw new Exception("NotGF256_MultiplyAndAdd not used for GF(256)!!!!!");
+    }//NotGF256_MultiplyAndAdd
     
     
-    public void Multiply_Row_GF(int row, int val)
+    public void NotGF256_Multiply_Row(int row, int val) throws Exception
     {
-        for (int col=1; col <= recv_max_index; col++)
+        if (GF != 256)
         {
-            int temp = matrix[row][col];
+            for (int col=1; col <= recv_max_index; col++)
+            {
+                int temp = matrix[row][col];
+                temp *= val;
+                temp = GF_value(temp);
+                matrix[row][col] = temp;
+            }
+
+            int temp = answer_matrix[row];
             temp *= val;
             temp = GF_value(temp);
-            matrix[row][col] = temp;
+            answer_matrix[row] = temp;
         }
-        
-        int temp = answer_matrix[row];
-        temp *= val;
-        temp = GF_value(temp);
-        answer_matrix[row] = temp;
-    }//Multiply_Row_GF
+        else //GF(256)
+            throw new Exception("NotGF256_Multiply_Row not used for GF(256)!!!!!");
+    }//NotGF256_Multiply_Row
     
     
-    public void Add_RowA_By_RowB_GF(int RowA, int RowB)
+    public void NotGF256_Add_RowA_By_RowB(int RowA, int RowB) throws Exception
     {
-        for (int col=1; col <= recv_max_index; col++)
+        if (GF != 256)
         {
-            int Aval = matrix[RowA][col];
-            int Bval = matrix[RowB][col];
+            for (int col=1; col <= recv_max_index; col++)
+            {
+                int Aval = matrix[RowA][col];
+                int Bval = matrix[RowB][col];
+                int temp = Aval + Bval;
+                temp = GF_value(temp);
+                matrix[RowA][col] = temp;
+            }
+
+            int Aval = answer_matrix[RowA];
+            int Bval = answer_matrix[RowB];
             int temp = Aval + Bval;
             temp = GF_value(temp);
-            matrix[RowA][col] = temp;
+            answer_matrix[RowA] = temp;
         }
-        
-        int Aval = answer_matrix[RowA];
-        int Bval = answer_matrix[RowB];
-        int temp = Aval + Bval;
-        temp = GF_value(temp);
-        answer_matrix[RowA] = temp;
-    }//Add_RowA_By_RowB_GF
+        else
+            throw new Exception("NotGF256_Add_RowA_By_RowB not used for GF(256)!!!!!");
+    }//NotGF256_Add_RowA_By_RowB
     
     
     public void Manual_Console_Solve()
@@ -324,20 +357,27 @@ public class Berlekamp_Welch_algorithm {
             
             str = scanner.nextLine();
             
-            String[] temp = str.split(",");
-            if (temp[0].equals("m"))
-                Multiply_Row_GF(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
-            else if (temp[0].equals("a"))
-                Add_RowA_By_RowB_GF(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
-            else if (temp[0].equals("ma"))
-                MultiplyAndAdd_GF(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]), Integer.parseInt(temp[3]));
-            else if (temp[0].equals("x") == false)
+            try
             {
-                System.out.println("BAD STRING ENTERED!!!!!");
-                System.out.println();
+                String[] temp = str.split(",");
+                if (temp[0].equals("m"))
+                    NotGF256_Multiply_Row(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+                else if (temp[0].equals("a"))
+                    NotGF256_Add_RowA_By_RowB(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]));
+                else if (temp[0].equals("ma"))
+                    NotGF256_MultiplyAndAdd(Integer.parseInt(temp[1]), Integer.parseInt(temp[2]), Integer.parseInt(temp[3]));
+                else if (temp[0].equals("x") == false)
+                {
+                    System.out.println("BAD STRING ENTERED!!!!!");
+                    System.out.println();
+                }
             }
-        }
-        
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+                return;
+            }
+        }//while
     }//Manual_Console_Solve
     
     private boolean Check_Identity_Matrix()
@@ -353,19 +393,7 @@ public class Berlekamp_Welch_algorithm {
             }
         }
         return true;
-    }//Check_Identity_Matrix
-    
-    
-    public int DoesThereExistRowBelowDiagWhoseColumnValueIs1(int diag)
-    {
-        for (int row=diag+1; row <= recv_max_index; row++)
-        {
-            if (matrix[row][diag] == 1)
-                return row;
-        }
-        return Integer.MAX_VALUE;
-    }//DoesThereExistRowBelowDiagWhoseColumnValueIs1
-    
+    }//Check_Identity_Matrix    
     
     public boolean Robot_Solve()
     {   
@@ -411,6 +439,7 @@ public class Berlekamp_Welch_algorithm {
     
     private boolean GF256_Make_Column_Good_1_And_0s(int ii) throws Exception
     {
+        Tools tool = new Tools();
         boolean good = false;
         for (int row=1; row <= recv_max_index; row++)
         {
@@ -442,67 +471,18 @@ public class Berlekamp_Welch_algorithm {
         //make matrix[ii][ii]==1
         if (matrix[ii][ii] != 1)
         {
-            
-            //find another row where row!=ii whose col-value==1 and col==ii
-            int row_to_use = DoesThereExistRowBelowDiagWhoseColumnValueIs1(ii);
-            if (row_to_use != Integer.MAX_VALUE) // found a good row to use
+            if (matrix[ii][ii] == 0)
             {
-                int delta = -1 * (matrix[ii][ii] - 1);
-                MultiplyAndAdd_GF(row_to_use, delta, ii);
+                 int non_zero_val_row = this.FindRowBelowDiagWhoseColCellIsNonZero(ii);
+                 if (non_zero_val_row != -1)
+                    GF256_Change_ZeroStartDiag_To_Positive_From_NonZeroRow(ii, non_zero_val_row);
+                 else
+                     return false;
             }
-            else //DoesThereExistRowBelowDiagWhoseColumnValueIs1==false
-            {
-                if ((matrix[ii][ii] % 2) != 0) //odd
-                {
-                    //at some multiple of temp the GF_Value will be 1
-                    int temp = matrix[ii][ii];
-                    int temp_ii=1;
-                    while (GF_value(temp) != 1)
-                    {
-                        temp_ii += 2;
-                        temp = matrix[ii][ii] * temp_ii;
-                    }
-                    Multiply_Row_GF(ii, temp_ii);
-                    
-                }//odd
-                else //0 or even
-                {
-                    //find another row after this row==ii
-                    //whose matrix[row][ii] != 0 and is odd and row <= recv_max_index
-                    //add that row here
-                    //then do little algorithm above
-                    int row = ii+1;
-                    while ((matrix[row][ii] % 2) != 1)
-                    {
-                        row++;
-                        if (row > recv_max_index)
-                        {
-                            //ok when you get here you can not make it 1 but you can make it 2
-                            int temp = matrix[ii][ii];
-                            int temp_ii=1;
-                            while (GF_value(temp) != 2)
-                            {
-                                temp_ii++;
-                                temp = matrix[ii][ii] * temp_ii;
-                            }
-                            Multiply_Row_GF(ii, temp_ii);
-                            Debug_Print();
-                            int dummy=3;
-                        }
-                    }
-                    Add_RowA_By_RowB_GF(ii, row);
-                    //at some multiple of temp the GF_Value will be 1
-                    int temp = matrix[ii][ii];
-                    int temp_ii=1;
-                    while (GF_value(temp) != 1)
-                    {
-                        temp_ii += 2;
-                        temp = matrix[ii][ii] * temp_ii;
-                    }
-                    Multiply_Row_GF(ii, temp_ii);
-                }//0 or even
-            }//DoesThereExistRowBelowDiagWhoseColumnValueIs1==false
-        }////make matrix[ii][ii]==1
+            
+            if (matrix[ii][ii] != 1)
+                 GF256_Change_Diag_Row_Start_With_1_It_Is_Positive_Already(ii);
+        }//make matrix[ii][ii]==1
         
         //ok matrix[ii][ii]==1
         //make other elements in this column 0
@@ -513,11 +493,8 @@ public class Berlekamp_Welch_algorithm {
             {
                 if (matrix[row][ii] != 0)
                 {
-                    //make it 0
-                    int temp = matrix[row][ii];
-                    int delta = GF - temp;
-                    //multiply good row by delta and add it to this row
-                    MultiplyAndAdd_GF(ii, delta, row);
+                    //make it start with 0 in column which is not ii, ii is diagnol column
+                    GF256_Change_Row_DiagColEquals_0(ii, row);
                 }
             }
         }
@@ -574,7 +551,15 @@ public class Berlekamp_Welch_algorithm {
                      temp_ii++;
                      temp = matrix[ii][ii] * temp_ii;
                  }
-                 Multiply_Row_GF(ii, temp_ii);
+                 try
+                 {
+                     NotGF256_Multiply_Row(ii, temp_ii);
+                 }
+                 catch (Exception ex)
+                 {
+                     ex.printStackTrace();
+                     return false;
+                 }
             }
             else //matrix[ii][ii] == 0
             {
@@ -590,8 +575,16 @@ public class Berlekamp_Welch_algorithm {
                     if (row > recv_max_index)
                         return false;
                 }
-                Add_RowA_By_RowB_GF(ii, row);
-                if (matrix[ii][ii] != 1)
+                try
+                {
+                     NotGF256_Add_RowA_By_RowB(ii, row);
+                }
+                catch (Exception ex)
+                {
+                     ex.printStackTrace();
+                     return false;
+                }
+                if (matrix[ii][ii] != 1) //massage to 1
                 {
                     //if 2 then GF_value(8)==1
                     //if 3 then GF_value(15)==1
@@ -606,10 +599,18 @@ public class Berlekamp_Welch_algorithm {
                         temp_ii++;
                         temp = matrix[ii][ii] * temp_ii;
                     }
-                    Multiply_Row_GF(ii, temp_ii);
-                }
-            }
-        }
+                    try
+                    {
+                        NotGF256_Multiply_Row(ii, temp_ii);
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.printStackTrace();
+                        return false;
+                    }
+                }//massage to 1
+            }//matrix[ii][ii] == 0
+        }//make matrix[ii][ii]==1
         
         //ok matrix[ii][ii]==1
         //make other elements in this column 0
@@ -624,7 +625,15 @@ public class Berlekamp_Welch_algorithm {
                     int temp = matrix[row][ii];
                     int delta = GF - temp;
                     //multiply good row by delta and add it to this row
-                    MultiplyAndAdd_GF(ii, delta, row);
+                    try
+                    {
+                        NotGF256_MultiplyAndAdd(ii, delta, row);
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.printStackTrace();
+                        return false;
+                    }
                 }
             }
         }
@@ -826,4 +835,116 @@ public class Berlekamp_Welch_algorithm {
         return locandcorrect;
     }//Find_Error_Locations_And_Corrections
     
+    
+    private int FindRowBelowDiagWhoseColCellIsNonZero(int diag)
+    {
+        for (int row=diag+1; row <= recv_max_index; row++)
+        {
+            if (matrix[row][diag] != 0)
+                return row;
+        }
+        return -1;
+    }//FindRowBelowDiagWhoseColCellIsNonZero
+    
+    private void GF256_Change_ZeroStartDiag_To_Positive_From_NonZeroRow(int diag, int nonzerorow)
+    {
+        for (int col=diag; col <= recv_max_index; col++)
+        {
+            int nonzerorowval = matrix[nonzerorow][col];
+            int temp = nonzerorowval + matrix[diag][col];
+            int gfval = GF_value(temp);
+            matrix[diag][col] = gfval;
+        }
+    }//GF256_Change_ZeroStartDiag_To_Positive_From_NonZeroRow
+    
+    
+    private void GF256_Change_Diag_Row_Start_With_1_It_Is_Positive_Already(int diag)
+    {
+        //diag cell to change to 1
+        Tools tool = new Tools();
+        int num_there_now = matrix[diag][diag]; //it is not 1 and it is not 0
+        int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[num_there_now];
+        //what alpha^temp_exp can you multiply with so that GF(256) value is 1 ??
+        //alpha^temp_exp * alpha^alpha_exp ==
+        //alpha^(temp_exp + alpha_exp)
+        //so that means
+        //temp_exp + alpha_exp == 255 because alpha^255==1 in GF(256) where alpha==1
+        //temp_exp = 255 - alpha_exp
+        int temp_exp = 255 - alpha_exp;
+        
+        int should_be_255 = temp_exp + alpha_exp;
+        int should_be_1_already_in_GF256 = tool.Table_Exponent_Of_Alpha_To_Integer()[should_be_255];
+        matrix[diag][diag] = should_be_1_already_in_GF256;
+                
+        //other cells on row change due to multiplication by alpha^alpha_exp
+        //be careful if cell is 0 because can not get alpha_exp it remains 0
+        for (int col=diag+1; col <= recv_max_index; col++)
+        {
+            if (matrix[diag][col] != 0)
+            {
+                //you can get alpha_exp because matrix[diag][col] != 0
+                num_there_now = matrix[diag][col];
+                alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[num_there_now];
+                int total_exp = temp_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int already_in_GF256_num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[diag][col] = already_in_GF256_num;
+            }
+            //else its already 0, anything times 0 is still 0 even in GF(256) world
+        }
+    }//GF256_Change_Diag_Row_Start_With_1_It_Is_Positive_Already
+    
+    private void GF256_Change_Row_DiagColEquals_0(int diag, int row_to_change) throws Exception
+    {
+        Tools tool = new Tools();
+        if (matrix[diag][diag] != 1)
+            throw new Exception("GF256_Change_Row_DiagColEquals_0: matrix[diag][diag] must already be 1!!!!!");
+        
+        //in GF(256)
+        //1 == alpha^0 where alpha==2
+        //1 == alpha^255 where alpha==2
+        //we want to make matrix[row][diag]==0
+        
+        //additive-inverse in GF(256) is itself so
+        //we first find what we are multiplying the diag-row with
+        int mult_num = matrix[row_to_change][diag];
+        int mult_num_alpha_exp = Integer.MAX_VALUE; //initialize to something bogus if mult_num happens to be 0
+        if (mult_num != 0)
+            mult_num_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[mult_num];
+        else //mult_num==0, rest of row remains unchanged
+            return;
+        //go thru columns starting with column==diag, it should change to 0 but the other cells may or may not change to 0
+        for (int col=diag; col <= recv_max_index; col++)
+        {
+            if (col==diag)
+            {
+                int check_zero = mult_num ^ matrix[row_to_change][col]; //^ in coding is XOR not pow
+                if (check_zero != 0)
+                    throw new Exception("GF256_Change_Row_DiagColEquals_0: check_zero not 0!!!!!");
+            }
+            else //col != diag
+            {
+                int diagrownum = matrix[diag][col];
+                int num        = matrix[row_to_change][col];
+                if (diagrownum==0) //we will be XORing num with 0 so it is itself unchanged
+                {
+                    //do nothing
+                }
+                else
+                {
+                    int diagrownum_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[diagrownum];
+                    //alpha^mult_num_alpha_exp * alpha^diagrownum_alpha_exp ==
+                    //alpha^(mult_num_alpha_exp + diagrownum_alpha_exp) ==
+                    //alpha^total_exp
+                    int total_exp = mult_num_alpha_exp + diagrownum_alpha_exp;
+                    if (total_exp >= 256)
+                        total_exp %= 255;
+                    int already_in_GF256_new_num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    int num_afterXOR_which_is_GF256addandsubtract = num ^ already_in_GF256_new_num;
+                    matrix[row_to_change][col] = num_afterXOR_which_is_GF256addandsubtract;
+                }
+            }//col!=diag
+        }//for cols
+    }//GF256_Change_Row_DiagColEquals_0(ii, row_to_change);
 }//class
