@@ -127,18 +127,25 @@ public class Berlekamp_Welch_algorithm {
                 answer_matrix[ii] = GF_value(-1 * b[ii] * a[ii] * a[ii]);
             else
             { //GF(256)
-                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[ii]];
-                //alpha^(alpha_exp) * alpha^(alpha_exp) ==
-                //alpha^(alpha_exp + alpha_exp)
-                alpha_exp += alpha_exp;
-                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[ii]];
-                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
-                if (total_exp >= 256)
-                    total_exp %= 255;
-                int num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
-                int negnum = num * -1;
-                int gfval = GF_value(negnum);
-                answer_matrix[ii] = gfval;
+                //no such thing as 2^x==0
+                if (a[ii]==0 || b[ii]==0)
+                    answer_matrix[ii]=0;
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[ii]];
+                    //alpha^(alpha_exp) * alpha^(alpha_exp) ==
+                    //alpha^(alpha_exp + alpha_exp)
+                    alpha_exp += alpha_exp;
+                    int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[ii]];
+                    int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                    if (total_exp >= 256)
+                        total_exp %= 255;
+                    
+                    int num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    int negnum = num * -1;
+                    int gfval = GF_value(negnum);
+                    answer_matrix[ii] = gfval;
+                }
             } //GF(256)
         }
         
@@ -878,21 +885,25 @@ public class Berlekamp_Welch_algorithm {
                 
         //other cells on row change due to multiplication by alpha^alpha_exp
         //be careful if cell is 0 because can not get alpha_exp it remains 0
-        for (int col=diag+1; col <= recv_max_index; col++)
+        for (int col=1; col <= recv_max_index; col++)
         {
-            if (matrix[diag][col] != 0)
+            if (col != diag)
             {
-                //you can get alpha_exp because matrix[diag][col] != 0
-                num_there_now = matrix[diag][col];
-                alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[num_there_now];
-                int total_exp = temp_exp + alpha_exp;
-                if (total_exp >= 256)
-                    total_exp %= 255;
-                int already_in_GF256_num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
-                matrix[diag][col] = already_in_GF256_num;
+                if (matrix[diag][col] != 0)
+                {
+                    //you can get alpha_exp because matrix[diag][col] != 0
+                    num_there_now = matrix[diag][col];
+                    alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[num_there_now];
+                    int total_exp = temp_exp + alpha_exp;
+                    if (total_exp >= 256)
+                        total_exp %= 255;
+                    int already_in_GF256_num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    matrix[diag][col] = already_in_GF256_num;
+                }
+                //else its already 0, anything times 0 is still 0 even in GF(256) world
             }
-            //else its already 0, anything times 0 is still 0 even in GF(256) world
         }
+        Debug_Print();
     }//GF256_Change_Diag_Row_Start_With_1_It_Is_Positive_Already
     
     private void GF256_Change_Row_DiagColEquals_0(int diag, int row_to_change) throws Exception
@@ -900,7 +911,8 @@ public class Berlekamp_Welch_algorithm {
         Tools tool = new Tools();
         if (matrix[diag][diag] != 1)
             throw new Exception("GF256_Change_Row_DiagColEquals_0: matrix[diag][diag] must already be 1!!!!!");
-        
+        if (matrix[row_to_change][diag] == 0)
+            throw new Exception("GF256_Change_Row_DiagColEquals_0: matrix[row_to_change][diag] already is 0!!!!!");
         //in GF(256)
         //1 == alpha^0 where alpha==2
         //1 == alpha^255 where alpha==2
@@ -908,20 +920,21 @@ public class Berlekamp_Welch_algorithm {
         
         //additive-inverse in GF(256) is itself so
         //we first find what we are multiplying the diag-row with
-        int mult_num = matrix[row_to_change][diag];
-        int mult_num_alpha_exp = Integer.MAX_VALUE; //initialize to something bogus if mult_num happens to be 0
-        if (mult_num != 0)
-            mult_num_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[mult_num];
-        else //mult_num==0, rest of row remains unchanged
-            return;
+        int mult_num = matrix[row_to_change][diag]; //guaranteed to be non-zero
+        int mult_num_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[mult_num];
+
         //go thru columns starting with column==diag, it should change to 0 but the other cells may or may not change to 0
         for (int col=diag; col <= recv_max_index; col++)
         {
             if (col==diag)
             {
-                int check_zero = mult_num ^ matrix[row_to_change][col]; //^ in coding is XOR not pow
+                int diag_exp_shouldbe0 = tool.Table_Integer_To_Exponent_Of_Alpha()[matrix[diag][diag]];
+                int total_exp = mult_num_alpha_exp + diag_exp_shouldbe0;
+                int check_num = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                int check_zero = check_num ^ matrix[row_to_change][col]; //^ in coding is XOR not pow
                 if (check_zero != 0)
                     throw new Exception("GF256_Change_Row_DiagColEquals_0: check_zero not 0!!!!!");
+                matrix[row_to_change][col]=check_zero;
             }
             else //col != diag
             {
@@ -946,5 +959,6 @@ public class Berlekamp_Welch_algorithm {
                 }
             }//col!=diag
         }//for cols
+        Debug_Print();
     }//GF256_Change_Row_DiagColEquals_0(ii, row_to_change);
 }//class
