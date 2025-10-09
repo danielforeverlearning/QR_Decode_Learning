@@ -774,8 +774,11 @@ public class Berlekamp_Welch_algorithm {
         }
     }//GF_Polynomial_Long_Division_To_Find_F_Function
     
-    public ArrayList<String> Find_Error_Locations_And_Corrections() throws Exception
+    public ArrayList<String> NotGF256_Find_Error_Locations_And_Corrections() throws Exception
     {   
+        if (GF==256)
+            throw new Exception("NotGF256_Find_Error_Locations_And_Corrections: GF(256) is used but this function is for non-GF(256)");
+        
         //error location found if E(ai)==0 and i==location of error in received-bytes
         //and correction is F(ai)
         ArrayList<String> locandcorrect = new ArrayList<String>();
@@ -789,22 +792,8 @@ public class Berlekamp_Welch_algorithm {
                 int coeff = E.get(eterm);
                 int x_exp = E.size() - eterm - 1;
                 int x = a[ii];
-                if (GF == 7)
-                {
-                     int temp = coeff * (int)Math.pow(x, x_exp);
-                     sum += temp;
-                }
-                else if (GF == 256)
-                {
-                    //make sure a(i) = 2^0, 2^1, 2^2, 2^3 ..... 2^(i-1)
-                    //so you can use tables
-                    //that means x==2
-                    throw new Exception("Find_Error_Locations_And_Corrections: did not finish code for GF(256)");
-                }
-                else
-                {
-                    throw new Exception("Find_Error_Locations_And_Corrections: did not finish code for unknown GF because Math.pow may get too big");
-                }
+                int temp = coeff * (int)Math.pow(x, x_exp);
+                sum += temp;
             }
             int E_val = GF_value(sum);
             if (E_val==0) //found error location == ii
@@ -816,22 +805,8 @@ public class Berlekamp_Welch_algorithm {
                     int coeff = F.get(f_term);
                     int x_exp = F.size() - f_term - 1;
                     int x = a[ii];
-                    if (GF == 7)
-                    {
-                          int temp = coeff * (int)Math.pow(x, x_exp);
-                          sum += temp;
-                    }
-                    else if (GF == 256)
-                    {
-                          //make sure a(i) = 2^0, 2^1, 2^2, 2^3 ..... 2^(i-1)
-                          //so you can use tables
-                          //that means x==2
-                          throw new Exception("Find_Error_Locations_And_Corrections: codearea2: did not finish code for GF(256)");
-                    }
-                    else
-                    {
-                          throw new Exception("Find_Error_Locations_And_Corrections: codearea2: did not finish code for unknown GF because Math.pow may get too big");
-                    }
+                    int temp = coeff * (int)Math.pow(x, x_exp);
+                    sum += temp;
                 }
                 int correction = GF_value(sum);
                 locandcorrect.add(ii + "," + correction);
@@ -840,7 +815,7 @@ public class Berlekamp_Welch_algorithm {
         }//ai loop
         
         return locandcorrect;
-    }//Find_Error_Locations_And_Corrections
+    }//NotGF256_Find_Error_Locations_And_Corrections
     
     
     private int FindRowBelowDiagWhoseColCellIsNonZero(int diag)
@@ -961,4 +936,76 @@ public class Berlekamp_Welch_algorithm {
         }//for cols
         Debug_Print();
     }//GF256_Change_Row_DiagColEquals_0(ii, row_to_change);
+    
+    
+    public ArrayList<Integer> GF256_Find_Error_Locations() throws Exception
+    {
+        if (GF != 256)
+            throw new Exception("GF256_Find_Error_Locations: Only for GF(256)");
+        
+        Tools tool = new Tools();
+        
+        //error location found if E(ai)==0 and i==location of error in received-bytes
+        //and correction is F(ai)
+        ArrayList<Integer> loc = new ArrayList<Integer>();
+        
+        for (int ii=1; ii <= recv_max_index; ii++)
+        {
+            //calculate E(ai)
+            int sum=0;
+            for (int eterm=0; eterm < E.size(); eterm++)
+            {
+                int coeff = E.get(eterm);
+                int x_exp = E.size() - eterm - 1;
+                int x = a[ii];
+                //a(i) = 2^0, 2^1, 2^2, 2^3 ..... 2^(i-1)
+                //so you can use tables
+                //that means x is a power-of-2 in GF(256)
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[x];
+                int coeff_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[coeff];
+                int total_exp = (alpha_exp * x_exp) + coeff_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                sum += temp;
+            }
+            int E_val = GF_value(sum);
+            if (E_val==0) //found error location == ii
+                loc.add(ii);
+        }//ai loop
+        
+        return loc;
+    }//GF256_Find_Error_Locations
+    
+    private void later()
+    {
+        /*****
+                //find correction
+                sum = 0;
+                for (int f_term=0; f_term < F.size(); f_term++)
+                {
+                    int coeff = F.get(f_term);
+                    int x_exp = F.size() - f_term - 1;
+                    int x = a[ii];
+                    if (GF == 7)
+                    {
+                          int temp = coeff * (int)Math.pow(x, x_exp);
+                          sum += temp;
+                    }
+                    else if (GF == 256)
+                    {
+                          //make sure a(i) = 2^0, 2^1, 2^2, 2^3 ..... 2^(i-1)
+                          //so you can use tables
+                          //that means x==2
+                          throw new Exception("Find_Error_Locations_And_Corrections: codearea2: did not finish code for GF(256)");
+                    }
+                    else
+                    {
+                          throw new Exception("Find_Error_Locations_And_Corrections: codearea2: did not finish code for unknown GF because Math.pow may get too big");
+                    }
+                }
+                int correction = GF_value(sum);
+                locandcorrect.add(ii + "," + correction);
+        *****/
+    }
 }//class

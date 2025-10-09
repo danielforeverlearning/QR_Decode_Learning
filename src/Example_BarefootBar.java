@@ -351,7 +351,7 @@ public class Example_BarefootBar {
                     algo.Fill_QuestionMatrix_With_AnswerMatrix();
                     algo.Debug_Print_Q_And_E_Functions();
                     algo.GF_Polynomial_Long_Division_To_Find_F_Function();
-                    ArrayList<String> locandcorrect = algo.Find_Error_Locations_And_Corrections();
+                    ArrayList<String> locandcorrect = algo.NotGF256_Find_Error_Locations_And_Corrections();
                     
                     System.out.println();
                     System.out.println();
@@ -396,7 +396,27 @@ public class Example_BarefootBar {
                 Berlekamp_Welch_algorithm barefootbar_algo = new Berlekamp_Welch_algorithm(256, received_3byte_errors_codewords, 3);
                 //barefootbar_algo.Manual_Console_Solve();
                 identity_matrix = barefootbar_algo.Robot_Solve();
-		               
+		if (identity_matrix)
+                {
+                    System.out.println("identity_matrix == true");
+                    barefootbar_algo.Fill_QuestionMatrix_With_AnswerMatrix();
+                    barefootbar_algo.Debug_Print_Q_And_E_Functions();
+                    barefootbar_algo.GF_Polynomial_Long_Division_To_Find_F_Function();
+                    ArrayList<Integer> error_loc = barefootbar_algo.GF256_Find_Error_Locations();
+                    System.out.println();
+                    System.out.println("error_loc.size = " + error_loc.size());
+                    for (int ii=0; ii < error_loc.size(); ii++)
+                        System.out.println(error_loc.get(ii));
+                    //ArrayList<String> locandcorrect = _And_Corrections();
+                    
+                    //System.out.println();
+                    //System.out.println();
+                    //System.out.println("***** locandcorrect *****");
+                    //for (int ii=0; ii < locandcorrect.size(); ii++)
+                    //    System.out.println(locandcorrect.get(ii));
+                }
+                else
+                    System.out.println("identity_matrix == false");
 	}//DoExample
 
 }//class
