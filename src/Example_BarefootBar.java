@@ -394,8 +394,8 @@ public class Example_BarefootBar {
 			{ Integer.MAX_VALUE, 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 0, 230, 134,
 			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
 			  116, 192, 0, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
-                Original_Berlekamp_Welch_algorithm barefootbar_algo = new Original_Berlekamp_Welch_algorithm(256, received_3byte_errors_codewords, 3);
-                //identity_matrix = barefootbar_algo.Robot_Solve();
+                BigInteger_Berlekamp_Welch_algorithm barefootbar_algo = new BigInteger_Berlekamp_Welch_algorithm(256, received_3byte_errors_codewords, 3);
+                identity_matrix = barefootbar_algo.Robot_Solve();
 		/*****
                 if (identity_matrix)
                 {

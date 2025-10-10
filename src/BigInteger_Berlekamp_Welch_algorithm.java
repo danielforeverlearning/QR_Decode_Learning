@@ -75,6 +75,26 @@ public class BigInteger_Berlekamp_Welch_algorithm {
     //for (int col=1; col <= recv_max_index; col++)
     //so do not use matrix[0][anything] or matrix[anything][0]
     
+    private Integer[] GF256_Multiplicative_Inverse_1odd_2even = {
+     -2147483648, 1, 1, 171, -2147483648, 205, 43, 183, -2147483648, 57, 77, 163, -2147483648, 197, 55, 239, 
+     -2147483648, 241, 57, 27, -2147483648, 61, 35, 167, -2147483648, 41, 69, 19, -2147483648, 53, 111, 
+     223, -2147483648, 225, 113, 139, -2147483648, 173, 27, 151, -2147483648, 25, 61, 131, -2147483648, 165, 
+     39, 207, -2147483648, 209, 41, 251, -2147483648, 29, 19, 135, -2147483648, 9, 53, 243, -2147483648, 
+     21, 95, 191, -2147483648, 193, 97, 107, -2147483648, 141, 11, 119, -2147483648, 249, 45, 99, 
+     -2147483648, 133, 23, 175, -2147483648, 177, 25, 219, -2147483648, 253, 3, 103, -2147483648, 233, 37, 
+     211, -2147483648, 245, 79, 159, -2147483648, 161, 81, 75, -2147483648, 109, 123, 87, -2147483648, 217, 
+     29, 67, -2147483648, 101, 7, 143, -2147483648, 145, 9, 187, -2147483648, 221, 115, 71, -2147483648, 
+     201, 21, 179, -2147483648, 213, 63, 127, -2147483648, 129, 65, 43, -2147483648, 77, 107, 55, 
+     -2147483648, 185, 13, 35, -2147483648, 69, 119, 111, -2147483648, 113, 121, 155, -2147483648, 189, 99, 
+     39, -2147483648, 169, 5, 147, -2147483648, 181, 47, 95, -2147483648, 97, 49, 11, -2147483648, 45, 
+     91, 23, -2147483648, 153, 125, 3, -2147483648, 37, 103, 79, -2147483648, 81, 105, 123, -2147483648, 
+     157, 83, 7, -2147483648, 137, 117, 115, -2147483648, 149, 31, 63, -2147483648, 65, 33, 235, 
+     -2147483648, 13, 75, 247, -2147483648, 121, 109, 227, -2147483648, 5, 87, 47, -2147483648, 49, 89, 
+     91, -2147483648, 125, 67, 231, -2147483648, 105, 101, 83, -2147483648, 117, 15, 31, -2147483648, 33, 
+     17, 203, -2147483648, 237, 59, 215, -2147483648, 89, 93, 195, -2147483648, 229, 71, 15, -2147483648, 
+     17, 73, 59, -2147483648, 93, 51, 199, -2147483648, 73, 85, 51, -2147483648, 85, 127, 255
+    };
+    
     int GF;
 
     int[] b = null;          //DO NOT USE b[0]
@@ -326,6 +346,7 @@ public class BigInteger_Berlekamp_Welch_algorithm {
         return true;
     }//Check_Identity_Matrix    
     
+    
     public boolean Robot_Solve() throws Exception
     {   
         int ii=1;
@@ -333,12 +354,10 @@ public class BigInteger_Berlekamp_Welch_algorithm {
         while (true)
         {   
             boolean good = false;
-            if (GF == 7)
-                good = GF7_Make_Column_Good_1_And_0s(ii);
-            else if (GF == 256)
+            if (GF == 256)
                 good = GF256_Make_Column_Good_1_And_0s(ii);
             else
-                throw new Exception("Robot_Solve: only GF(7) or GF(256) supported for now.");
+                throw new Exception("Robot_Solve: only GF(256) supported for now.");
             if (!good)
                 return false;
             
@@ -542,136 +561,29 @@ public class BigInteger_Berlekamp_Welch_algorithm {
         return -1;
     }//FindRowBelowDiagWhoseColCellIs_1
     
-    
-    /*****
-    private boolean GF7_Make_Column_Good_1_And_0s(int ii)
+    private int FindRowBelowDiagWhoseColCellIs_Odd(int diag)
     {
-        boolean good = false;
-        for (int row=1; row <= recv_max_index; row++)
+        for (int row=diag+1; row <= recv_max_index; row++)
         {
-            if (row==ii && matrix[row][ii] == 1)
-                good = true;
-            else if (row!=ii && matrix[row][ii] == 0)
-                good = true;
-            else
-            {
-                good = false;
-                break;
-            }
+            if (matrix[row][diag].remainder(BigInteger.valueOf(2)).compareTo(BigInteger.ONE) == 0)
+                return row;
         }
-        
-        if (good) //this column is good already
-            return true;
-        
-        //if column all 0s, can not make it good
-        int zero_count=0;
-        for (int row=1; row <= recv_max_index; row++)
-        {
-            if (matrix[row][ii] == 0)
-                zero_count++;
-        }
-        if (zero_count == recv_max_index)
-            return false; //can not make it good
-        
-        
-        //make matrix[ii][ii]==1
-        if (matrix[ii][ii] != 1)
-        {
-            if (matrix[ii][ii] != 0)
-            {
-                 //if 2 then GF_value(8)==1
-                 //if 3 then GF_value(15)==1
-                 //if 4 then GF_value(8)==1
-                 //if 5 then GF_value(15)==1
-                 //if 6 then GF_value(36)==1
-                 //so at some multiple of temp the GF_Value will be 1
-                 int temp = matrix[ii][ii]; //temp!=1 and temp!=0
-                 int mult = this.GF7_MultiplicativeInverse_1[temp];
-                 try
-                 {
-                     Multiply_Row(ii, mult);
-                 }
-                 catch (Exception ex)
-                 {
-                     ex.printStackTrace();
-                     return false;
-                 }
-            }
-            else //matrix[ii][ii] == 0
-            {
-                //find another row after this row==ii
-                //whose matrix[row][ii] != 0 and row <= recv_max_index
-                //add that row here
-                //then do little algorithm above
-                int row = ii;
-                while (matrix[row][ii] == 0 && row <= recv_max_index)
-                    row++;
-                if (row > recv_max_index)
-                        return false;
-                try
-                {
-                     Add_RowA_By_RowB(ii, row);
-                }
-                catch (Exception ex)
-                {
-                     ex.printStackTrace();
-                     return false;
-                }
-                if (matrix[ii][ii] != 1) //massage to 1
-                {
-                    //if 2 then GF_value(8)==1
-                    //if 3 then GF_value(15)==1
-                    //if 4 then GF_value(8)==1
-                    //if 5 then GF_value(15)==1
-                    //if 6 then GF_value(36)==1
-                    //so at some multiple of temp the GF_Value will be 1
-                    int temp = matrix[ii][ii]; //temp!=1 and temp!=0
-                    int mult = this.GF7_MultiplicativeInverse_1[temp];
-                    try
-                    {
-                        Multiply_Row(ii, mult);
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.printStackTrace();
-                        return false;
-                    }
-                }//massage to 1
-            }//matrix[ii][ii] == 0
-        }//make matrix[ii][ii]==1
-        
-        //ok matrix[ii][ii]==1
-        //make other elements in this column 0
-        //but can not simple multiply by GF because it will make that whole row 0
-        for (int row=1; row <= recv_max_index; row++)
-        {
-            if (row != ii)
-            {
-                if (matrix[row][ii] != 0)
-                {
-                    //make it 0
-                    int temp = matrix[row][ii];
-                    int delta = GF - temp;
-                    //multiply good row by delta and add it to this row
-                    try
-                    {
-                        MultiplyAndAdd(ii, delta, row);
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.printStackTrace();
-                        return false;
-                    }
-                }
-            }
-        }
-        
-        return true;
-    }//GF7_Make_Column_Good_1_And_0s
-    *****/
+        return -1;
+    }//FindRowBelowDiagWhoseColCellIs_Odd
     
     
-    private boolean GF256_Make_Column_Good_1_And_0s(int ii)
+    private int FindRowAboveDiagWhoseColCellIs_Odd(int diag)
+    {
+        for (int row=diag-1; row >= 1; row--)
+        {
+            if (matrix[row][diag].remainder(BigInteger.valueOf(2)).compareTo(BigInteger.ONE) == 0)
+                return row;
+        }
+        return -1;
+    }//FindRowAboveDiagWhoseColCellIs_Odd
+    
+    
+    private boolean GF256_Make_Column_Good_1_And_0s(int ii) throws Exception
     {
         boolean good = false;
         for (int row=1; row <= recv_max_index; row++)
@@ -702,95 +614,193 @@ public class BigInteger_Berlekamp_Welch_algorithm {
         
         
         //make matrix[ii][ii]==1
-        if (matrix[ii][ii].compareTo(BigInteger.ONE)==0)
+        if (matrix[ii][ii].compareTo(BigInteger.ONE) != 0)
         {
             int row_exists = FindRowBelowDiagWhoseColCellIs_1(ii);
             if (row_exists != -1)
-                this.Add_RowA_By_RowB(ii, row_exists);
-            else if (matrix[ii][ii] != 0)
             {
-                BigInteger temp = matrix[ii][ii];
-                    int d
-                this.MultiplyAndAdd(ii, matrix[ii][ii].negate().add(BigInteger.ONE), row_exists);
+                BigInteger mult = matrix[ii][ii].negate().add(BigInteger.ONE);
+                this.MultiplyAndAdd(row_exists, mult, ii);
+            }
+            else if (matrix[ii][ii].compareTo(BigInteger.ZERO) != 0) //non-zero
+            {
+                if (matrix[ii][ii].remainder(BigInteger.valueOf(2)).compareTo(BigInteger.ONE) == 0) //odd
+                {
+                    
+                    Integer temp = matrix[ii][ii].intValue();
+                    temp = this.GF256_Multiplicative_Inverse_1odd_2even[temp];
+                    this.Multiply_Row(ii, BigInteger.valueOf(temp));
+                }
+                else //even
+                {
+                    row_exists = FindRowBelowDiagWhoseColCellIs_Odd(ii);
+                    if (row_exists != -1)
+                    {
+                        this.Add_RowA_By_RowB(ii, row_exists);
+                        Integer temp = matrix[ii][ii].intValue();
+                        temp = this.GF256_Multiplicative_Inverse_1odd_2even[temp];
+                        this.Multiply_Row(ii, BigInteger.valueOf(temp));
+                    }
+                    else
+                    {
+                        //ok tried above did not work
+                        //everything is even on diag and below
+                        //i think all we can do is get it to 2
+                        //and later we can get .5 in the variables of equations
+                        int temp = matrix[ii][ii].intValue();
+                        int mult_for_2 = this.GF256_Multiplicative_Inverse_1odd_2even[temp];
+                        if (mult_for_2 == Integer.MIN_VALUE)
+                        {
+                            row_exists = FindRowBelowDiagWhoseColCellIs_GoodMultInv2(ii);
+                            if (row_exists != -1)
+                            {
+                                this.Add_RowA_By_RowB(ii, row_exists);
+                                int mult = this.GF256_Multiplicative_Inverse_1odd_2even[matrix[ii][ii].intValue()];
+                                this.Multiply_Row(ii, BigInteger.valueOf(mult));
+                                Debug_Print();
+                            }
+                            else
+                                return false;
+                        }
+                        else
+                            this.Multiply_Row(ii, BigInteger.valueOf(mult_for_2));
+                    }
+                }//even
             }
             else //matrix[ii][ii] == 0
             {
-                //find another row after this row==ii
-                //whose matrix[row][ii] != 0 and GF_value(matrix[row][ii] + matrix[ii][ii]) != 0 and row <= recv_max_index
-                //add that row here
-                //then do little algorithm above
-                int row = ii+1;
-                int sumgf = GF_value(matrix[row][ii] + matrix[ii][ii]);
-                while (matrix[row][ii] == 0 && sumgf == 0)
+                row_exists = FindRowBelowDiagWhoseColCellIs_Odd(ii);
+                if (row_exists != -1)
                 {
-                    row++;
-                    if (row > recv_max_index)
-                        return false;
+                    this.Add_RowA_By_RowB(ii, row_exists);
+                    Integer temp = matrix[ii][ii].intValue();
+                    temp = this.GF256_Multiplicative_Inverse_1odd_2even[temp];
+                    this.Multiply_Row(ii, BigInteger.valueOf(temp));
                 }
-                try
-                {
-                     Add_RowA_By_RowB(ii, row);
-                }
-                catch (Exception ex)
-                {
-                     ex.printStackTrace();
-                     return false;
-                }
-                if (matrix[ii][ii] != 1) //massage to 1
-                {
-                    //if 2 then GF_value(8)==1
-                    //if 3 then GF_value(15)==1
-                    //if 4 then GF_value(8)==1
-                    //if 5 then GF_value(15)==1
-                    //if 6 then GF_value(36)==1
-                    //so at some multiple of temp the GF_Value will be 1
-                    int temp = matrix[ii][ii]; //temp!=1 and temp!=0
-                    int temp_ii=1;
-                    while (GF_value(temp) != 1)
-                    {
-                        temp_ii++;
-                        temp = matrix[ii][ii] * temp_ii;
-                    }
-                    try
-                    {
-                        Multiply_Row(ii, temp_ii);
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.printStackTrace();
-                        return false;
-                    }
-                }//massage to 1
+                else
+                    throw new Exception("again what do we do now ?");
             }//matrix[ii][ii] == 0
         }//make matrix[ii][ii]==1
         
-        //ok matrix[ii][ii]==1
-        //make other elements in this column 0
-        //but can not simple multiply by GF because it will make that whole row 0
-        for (int row=1; row <= recv_max_index; row++)
-        {
-            if (row != ii)
-            {
-                if (matrix[row][ii] != 0)
-                {
-                    //make it 0
-                    int temp = matrix[row][ii];
-                    int delta = GF - temp;
-                    //multiply good row by delta and add it to this row
-                    try
-                    {
-                        MultiplyAndAdd(ii, delta, row);
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.printStackTrace();
-                        return false;
-                    }
-                }
-            }
-        }
         
+        MakeRowsDiagColumn0IfAbleForNow(ii);
+        Debug_Print();
         return true;
     }//GF256_Make_Column_Good_1_And_0s
     
+    
+    public void GF256_Build_MultiplicativeInverse_1odd_2even_Table()
+    {
+        ArrayList<Integer> table = new ArrayList<Integer>();
+        table.add(Integer.MIN_VALUE); //0 , 0 times anything is 0
+        table.add(1);                 //1, what we want matrix-cell to be
+        table.add(1);                 //2, when everything on and below diag is even
+        table.add(171);               //3, 171*3==513, 513 mod 256==1
+        
+        
+        Double temp2=(double)0;
+        int ii=0;
+        for (int num=4; num <= 255; num++)
+        {
+            if ((num % 2)==0)
+            {
+                //can only multiply to get it to 2
+                for (ii=1; ii <= 65536; ii++)
+                {
+                    int temp = (ii * 256) + 2;
+                    temp2 = Double.valueOf(temp) / num;
+                    Double delta = temp2 - (double)temp2.intValue();
+                    if (delta == 0)
+                        break;
+                }
+                if (ii==65537)
+                    table.add(Integer.MIN_VALUE);
+                else
+                    table.add(temp2.intValue());
+            }
+            else
+            {
+                for (ii=1; ii <= 255; ii++)
+                {
+                    int temp = (ii * 256) + 1;
+                    temp2 = Double.valueOf(temp) / num;
+                    Double delta = temp2 - (double)temp2.intValue();
+                    if (delta == 0)
+                        break;
+                }
+                if (ii==256)
+                    table.add(Integer.MIN_VALUE);
+                else
+                    table.add(temp2.intValue());
+            }
+        }
+        
+        System.out.println();
+        for (ii=0; ii < table.size(); ii++)
+        {
+            System.out.print(table.get(ii) + ", ");
+            if ((ii%15)==0)
+                System.out.println();
+        }
+            
+    }//GF256_Build_MultiplicativeInverse_1odd_2even_Table
+    
+    
+    
+    private void MakeRowsDiagColumn0IfAbleForNow(int diag)
+    {
+        //ok matrix[ii][ii]==1 or 2
+        //make other elements in this column 0
+        //but can not simple multiply by GF because it will make that whole row 0
+        BigInteger bigint = matrix[diag][diag];
+        if (bigint.compareTo(BigInteger.ONE) == 0)
+        {
+            for (int row=1; row <= recv_max_index; row++)
+            {
+                if (row != diag)
+                {
+                    if (matrix[row][diag].compareTo(BigInteger.ZERO) != 0)
+                    {
+                        //make it 0
+                        Integer temp = matrix[row][diag].intValue();
+                        Integer delta = GF - temp;
+                        //multiply good row by delta and add it to this row
+                        MultiplyAndAdd(diag, BigInteger.valueOf(delta), row);
+                    }
+                    //else already 0
+                }
+            }
+        }
+        else if (bigint.compareTo(BigInteger.valueOf(2)) == 0)
+        {
+            for (int row=diag+1; row <= recv_max_index; row++)
+            {
+                
+                if (matrix[row][diag].compareTo(BigInteger.ZERO) != 0)
+                {
+                    //make it 0
+                    Integer temp = matrix[row][diag].intValue();
+                    Integer delta_should_be_even = GF - temp;
+                    Integer mult = delta_should_be_even / 2;
+                    //multiply good row by delta and add it to this row
+                    MultiplyAndAdd(diag, BigInteger.valueOf(mult), row);
+                }
+                //else already 0
+            }
+        }
+        
+        Debug_Print();
+    }//MakeRowsDiagColumn0IfAbleForNow
+    
+    private int FindRowBelowDiagWhoseColCellIs_GoodMultInv2(int diag)
+    {
+        for (int row=diag+1; row <= recv_max_index; row++)
+        {
+            BigInteger temp = matrix[diag][diag].add(matrix[row][diag]);
+            BigInteger gfval = GF_value(temp);
+            if (this.GF256_Multiplicative_Inverse_1odd_2even[gfval.intValue()] != Integer.MIN_VALUE)
+                return row;
+        }
+        return -1;
+    }//FindRowBelowDiagWhoseColCellIs_GoodMultInv2
 }//class
