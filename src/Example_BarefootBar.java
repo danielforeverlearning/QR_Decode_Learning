@@ -379,14 +379,16 @@ public class Example_BarefootBar {
                 { Integer.MIN_VALUE, 67, 166, 135, 71, 71, 7, 51, 162, 242, 122, 119, 119, 114, 230, 134, //data codewords
 	          1,   237, 236, 157, 222, 147, 103, 21,  108, 39, 188, 98,  145, 180, //error-correction codewords 
 	          116, 192, 73,  140, 225, 5,   42,  103, 242, 71, 137, 132, 201, 134 };
-                TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself barefootbar_algo = new TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(256, recv_2byte_errors_codewords, 2);
+                //TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself barefootbar_algo = new TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(256, recv_2byte_errors_codewords, 2);
+                Original_Berlekamp_Welch_algorithm barefootbar_algo = new Original_Berlekamp_Welch_algorithm(256, recv_2byte_errors_codewords, 2);
+                
                 identity_matrix = barefootbar_algo.Robot_Solve();
                 System.out.println("identity_matrix == " + identity_matrix);
                 if (identity_matrix)
                 {
-                    //barefootbar_algo.Fill_QuestionMatrix_With_AnswerMatrix();
-                    //barefootbar_algo.Debug_Print_Q_And_E_Functions();
-                    //barefootbar_algo.GF_Polynomial_Long_Division_To_Find_F_Function();
+                    barefootbar_algo.Fill_QuestionMatrix_With_AnswerMatrix();
+                    barefootbar_algo.Debug_Print_Q_And_E_Functions();
+                    barefootbar_algo.GF_Polynomial_Long_Division_To_Find_F_Function();
                     //ArrayList<Integer> error_loc = barefootbar_algo.GF256_Find_Error_Locations();
                     //System.out.println();
                     //System.out.println("error_loc.size = " + error_loc.size());

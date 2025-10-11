@@ -91,8 +91,9 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
     int[] q = null;
     
     //F is calculated after identity-matrix solved if solvable
-    ArrayList<Integer> F = null;
     ArrayList<Integer> E = null;
+    ArrayList<Integer> F = null;
+    ArrayList<Integer> F_Remainder = null;
     
     public TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(int gf_val, int[] temp_b, int temp_e_count) throws  Exception
     {
@@ -506,9 +507,11 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
                 //whose matrix[row][ii] != 0 and row <= recv_max_index
                 int row = ii;
                 while (matrix[row][ii] == 0 && row <= recv_max_index)
+                {
                     row++;
-                if (row > recv_max_index)
-                    return false;
+                    if (row > recv_max_index)
+                        return false;
+                }
                 
                 try
                 {
@@ -602,7 +605,7 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         System.out.println();
     }//Debug_Print_Q_And_E_Functions
     
-    /*****
+    
     public void GF_Polynomial_Long_Division_To_Find_F_Function()
     {
         //q uses q[0], q[0] is coefficient for x^0
@@ -626,8 +629,12 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         //                    1x^2  2x  4
         //                    --------------------
         //                          
-        F = new ArrayList<Integer>();
-        E = new ArrayList<Integer>();
+        E           = new ArrayList<Integer>();
+        F           = new ArrayList<Integer>();
+        F_Remainder = new ArrayList<Integer>();
+        
+        Tools tool = new Tools();
+        
         ArrayList<Integer> dividend = new ArrayList<Integer>();
         
         for (int qii=q_max_index; qii >= 0; qii--) //q uses q[0], q[0] is coefficient for x^0
@@ -645,7 +652,8 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         
         while (dividend.size() >= E_term_length)
         {
-            int mult=0;
+            int mult = 0;
+            int mult_alphaexp = 0;
             for (int ii=0; ii < E.size(); ii++)
             {
                 if (ii==0)
@@ -656,17 +664,27 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
                 }
                 else
                 {
-                    int temp_dividend = dividend.get(ii);
-                    int temp_E = E.get(ii);
-                    int temp = mult * temp_E;
-                    temp = temp_dividend - temp;
-                    temp = GF_value(temp);
-                    dividend.set(ii, temp);
-                }
-            }
+                    if (mult != 0)
+                    {
+                        mult_alphaexp = tool.Table_Integer_To_Exponent_Of_Alpha()[mult];
+                        int temp_dividend = dividend.get(ii);
+                    
+                        int temp_E = E.get(ii);
+                        int temp_E_alphaexp = tool.Table_Integer_To_Exponent_Of_Alpha()[temp_E];
+                        int total_alphaexp = temp_E_alphaexp + mult_alphaexp;
+                        if (total_alphaexp >= 256)
+                            total_alphaexp %= 255;
+                    
+                        int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_alphaexp];
+                        int xornum  = temp_dividend ^ temp;
+                        dividend.set(ii, xornum);
+                    }
+                    //else dividend[ii] remains same
+                }       
+            }//for E
             
             dividend.remove(0);
-        }
+        }//while
         
         System.out.println();
         System.out.print("F(ai) = ");
@@ -680,61 +698,14 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         System.out.print("Remainder = ");
         for (int ii=0; ii < dividend.size(); ii++)
         {
+            F_Remainder.add(dividend.get(ii));
             System.out.print(dividend.get(ii) + "x^" + (dividend.size() - ii - 1));
             if (ii != (dividend.size() - 1))
                 System.out.print(" + ");
         }
     }//GF_Polynomial_Long_Division_To_Find_F_Function
-    *****/
     
     
-    /*****
-    public ArrayList<String> NotGF256_Find_Error_Locations_And_Corrections() throws Exception
-    {   
-        if (GF==256)
-            throw new Exception("NotGF256_Find_Error_Locations_And_Corrections: GF(256) is used but this function is for non-GF(256)");
-        
-        //error location found if E(ai)==0 and i==location of error in received-bytes
-        //and correction is F(ai)
-        ArrayList<String> locandcorrect = new ArrayList<String>();
-        
-        for (int ii=1; ii <= recv_max_index; ii++)
-        {
-            //calculate E(ai)
-            int sum=0;
-            for (int eterm=0; eterm < E.size(); eterm++)
-            {
-                int coeff = E.get(eterm);
-                int x_exp = E.size() - eterm - 1;
-                int x = a[ii];
-                int temp = coeff * (int)Math.pow(x, x_exp);
-                sum += temp;
-            }
-            int E_val = GF_value(sum);
-            if (E_val==0) //found error location == ii
-            {
-                //find correction
-                sum = 0;
-                for (int f_term=0; f_term < F.size(); f_term++)
-                {
-                    int coeff = F.get(f_term);
-                    int x_exp = F.size() - f_term - 1;
-                    int x = a[ii];
-                    int temp = coeff * (int)Math.pow(x, x_exp);
-                    sum += temp;
-                }
-                int correction = GF_value(sum);
-                locandcorrect.add(ii + "," + correction);
-                
-            }////found error location == ii
-        }//ai loop
-        
-        return locandcorrect;
-    }//NotGF256_Find_Error_Locations_And_Corrections
-    *****/
-    
-    
-    /*****
     public ArrayList<Integer> GF256_Find_Error_Locations() throws Exception
     {
         if (GF != 256)
@@ -753,35 +724,37 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
             for (int eterm=0; eterm < E.size(); eterm++)
             {
                 int coeff = E.get(eterm);
+                
                 int x_exp = E.size() - eterm - 1;
                 int x = a[ii];
+                
                 //a(i) = 2^0, 2^1, 2^2, 2^3 ..... 2^(i-1)
                 //so you can use tables
                 //that means x is a power-of-2 in GF(256)
-                if (x!=0)
+                if (x!=0 && coeff!=0)
                 {
-                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[x];
-                    int coeff_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[coeff];
-                    int total_exp = (alpha_exp * x_exp) + coeff_exp;
+                    int x_as_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[x];
+                    int coeff_as_alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[coeff];
+                    int total_exp = (x_as_alpha_exp * x_exp) + coeff_as_alpha_exp;
                     if (total_exp >= 256)
                         total_exp %= 255;
                     int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
-                    sum += temp;
+                    //because additive-inverse in GF(256) is itself so XOR is addition/subtraction in GF(256)
+                    sum ^= temp;
                 }
             }
-            int E_val = GF_value(sum);
-            if (E_val==0) //found error location == ii
+            
+            if (sum==0) //found error location == ii
                 loc.add(ii);
         }//ai loop
         
         return loc;
     }//GF256_Find_Error_Locations
-    *****/
     
     
+    /*****
     private void later()
     {
-        /*****
                 //find correction
                 sum = 0;
                 for (int f_term=0; f_term < F.size(); f_term++)
@@ -808,6 +781,8 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
                 }
                 int correction = GF_value(sum);
                 locandcorrect.add(ii + "," + correction);
-        *****/
     }
+    *****/
+    
+    
 }//class
