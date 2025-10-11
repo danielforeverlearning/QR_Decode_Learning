@@ -112,8 +112,8 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         a[0] = Integer.MAX_VALUE; //DO NOT USE a[0] just try to mark it as not used
         for (int ii=1; ii <= recv_max_index; ii++)
         {
-            //a[ii]   = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
-            a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1]; //1,2,4,8,16,32,64,128,29,58 ..... alpha^(ii-1) , alpha==2
+            a[ii]   = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
+            //a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1]; //1,2,4,8,16,32,64,128,29,58 ..... alpha^(ii-1) , alpha==2
         }
         
         //answer_matrix is rows==b.length x columns=1 represented by an array 
