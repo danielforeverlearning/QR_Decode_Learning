@@ -365,7 +365,7 @@ public class Example_BarefootBar {
                 //****************************************************************
                 //shoot you need to look at equation.
                 //you wrote matrix for 2errors not 3 errors they are different
-                //try 2 errors first before 3 errors
+                //try 1 or 2 errors first before 3 errors
                 //
                 //Integer[] correct_block_codewords = 
 		//	{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134, //data codewords
@@ -374,13 +374,12 @@ public class Example_BarefootBar {
                 //****************************************************************
                 //DO NOT USE b[0]
                 //location==7 correction==51
-                //location==13 correction==114
-                int[] recv_2byte_errors_codewords = 
-		{ Integer.MIN_VALUE, 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 0, 230, 134,
-			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, 
+                int[] recv_1byte_error_codewords = 
+		{ Integer.MIN_VALUE, 67, 166, 135, 71, 71, 7, 50, 162, 242, 247, 119, 119, 114, 230, 134, //data codewords
+			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, //error-correction codewords 
 			  116, 192, 73, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
-                //TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself barefootbar_algo = new TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(256, recv_2byte_errors_codewords, 2);
-                Original_Berlekamp_Welch_algorithm barefootbar_algo = new Original_Berlekamp_Welch_algorithm(256, recv_2byte_errors_codewords, 2);
+                TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself barefootbar_algo = new TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(256, recv_1byte_error_codewords, 6, true);
+                //Original_Berlekamp_Welch_algorithm barefootbar_algo = new Original_Berlekamp_Welch_algorithm(256, recv_2byte_errors_codewords, 2);
                 
                 identity_matrix = barefootbar_algo.Robot_Solve();
                 System.out.println("identity_matrix == " + identity_matrix);
