@@ -97,9 +97,8 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
     
     boolean Switch_aii;
     
-    public TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(int gf_val, int[] temp_b, int temp_e_count, boolean switchaii) throws Exception
+    public TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(int gf_val, int[] temp_b, int temp_e_count) throws Exception
     {
-        Switch_aii = switchaii;
         GF = gf_val;
         b = temp_b; //do not use b[0]
         recv_max_index = b.length - 1;
@@ -115,10 +114,7 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         a[0] = Integer.MAX_VALUE; //DO NOT USE a[0] just try to mark it as not used
         for (int ii=1; ii <= recv_max_index; ii++)
         {
-            if (switchaii)
-                a[ii] = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
-            else
-                a[ii] = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1]; //1,2,4,8,16,32,64,128,29,58 ..... alpha^(ii-1) , alpha==2
+            a[ii] = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
         }
         
         //answer_matrix is rows==b.length x columns=1 represented by an array 
@@ -136,9 +132,8 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
                 int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[ii]];
                 //alpha^(alpha_exp) * alpha^(alpha_exp) ==
                 //alpha^(alpha_exp + alpha_exp)
-                alpha_exp += alpha_exp;
                 int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[ii]];
-                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                int total_exp = b_as_alpha_to_something_exp + (alpha_exp * e_count);
                 if (total_exp >= 256)
                     total_exp %= 255;
 
@@ -582,7 +577,7 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
             }
 
 
-            for (int col=10; col <= recv_max_index; col++)
+            for (int col=8; col <= recv_max_index; col++)
             {
                 if (a[row] == 0)
                 {
