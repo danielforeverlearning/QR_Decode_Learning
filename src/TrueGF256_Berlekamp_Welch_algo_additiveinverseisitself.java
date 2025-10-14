@@ -114,23 +114,18 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         Tools tool = new Tools();
         a = new int[b.length]; //DO NOT USE a[0]
         a[0] = Integer.MAX_VALUE; //DO NOT USE a[0] just try to mark it as not used
-        System.out.println();
-        System.out.print("a[ii] = ");
         for (int ii=1; ii <= recv_max_index; ii++)
         {
             if (Switch_aii)
             {
                 int num = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1];
                 a[ii] = num;
-                System.out.print("2^" + (ii-1) + ", ");
             }
             else
             {
                 a[ii] = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
-                System.out.print(a[ii] + ", ");
             }
         }
-        System.out.println();
         
         //answer_matrix is rows==b.length x columns=1 represented by an array 
         //where answer_matrix[0] is not used so we will not be confused
@@ -178,6 +173,22 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         
         switch (e_count)
         {
+            case 14: Fill_Matrix_14();
+                     break;
+            case 13: Fill_Matrix_13();
+                     break;
+            case 12: Fill_Matrix_12();
+                     break;
+            case 11: Fill_Matrix_11();
+                     break;
+            case 10: Fill_Matrix_10();
+                     break;
+            case 9: Fill_Matrix_9();
+                    break;
+            case 8: Fill_Matrix_8();
+                    break;
+            case 7: Fill_Matrix_7();
+                    break;
             case 6: Fill_Matrix_6();
                     break;
             case 5: Fill_Matrix_5();
@@ -193,6 +204,1274 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
             default: throw new Exception("constructor: unsupported e_count");
         }
     }//constructor
+    
+    
+    private void Fill_Matrix_14()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            //e7
+            //e8
+            //e9
+            //e10
+            //e11
+            //e12
+            //e13
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+                matrix[row][8] = 0; //e7
+                matrix[row][9] = 0; //e8
+                matrix[row][10] = 0; //e9
+                matrix[row][11] = 0; //e10
+                matrix[row][12] = 0; //e11
+                matrix[row][13] = 0; //e12
+                matrix[row][14] = 0; //e13
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+                
+                //e7
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 7);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][8] = gf256val;
+                
+                //e8
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 8);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][9] = gf256val;
+                
+                //e9
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 9);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][10] = gf256val;
+                
+                //e10
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 10);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][11] = gf256val;
+                
+                //e11
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 11);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][12] = gf256val;
+                
+                //e12
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 12);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][13] = gf256val;
+                
+                //e13
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 13);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][14] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][15] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][16] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][17] = 0;
+                matrix[row][18] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][17] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][18] = temp;
+            }
+
+
+            for (int col=19; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 15);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_14
+    
+    
+    private void Fill_Matrix_13()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            //e7
+            //e8
+            //e9
+            //e10
+            //e11
+            //e12
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+                matrix[row][8] = 0; //e7
+                matrix[row][9] = 0; //e8
+                matrix[row][10] = 0; //e9
+                matrix[row][11] = 0; //e10
+                matrix[row][12] = 0; //e11
+                matrix[row][13] = 0; //e12
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+                
+                //e7
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 7);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][8] = gf256val;
+                
+                //e8
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 8);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][9] = gf256val;
+                
+                //e9
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 9);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][10] = gf256val;
+                
+                //e10
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 10);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][11] = gf256val;
+                
+                //e11
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 11);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][12] = gf256val;
+                
+                //e12
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 12);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][13] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][14] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][15] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][16] = 0;
+                matrix[row][17] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][16] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][17] = temp;
+            }
+
+
+            for (int col=18; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 14);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_13
+    
+    
+    private void Fill_Matrix_12()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            //e7
+            //e8
+            //e9
+            //e10
+            //e11
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+                matrix[row][8] = 0; //e7
+                matrix[row][9] = 0; //e8
+                matrix[row][10] = 0; //e9
+                matrix[row][11] = 0; //e10
+                matrix[row][12] = 0; //e11
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+                
+                //e7
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 7);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][8] = gf256val;
+                
+                //e8
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 8);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][9] = gf256val;
+                
+                //e9
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 9);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][10] = gf256val;
+                
+                //e10
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 10);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][11] = gf256val;
+                
+                //e11
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 11);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][12] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][13] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][14] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][15] = 0;
+                matrix[row][16] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][15] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][16] = temp;
+            }
+
+
+            for (int col=17; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 13);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_12
+    
+    
+    private void Fill_Matrix_11()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            //e7
+            //e8
+            //e9
+            //e10
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+                matrix[row][8] = 0; //e7
+                matrix[row][9] = 0; //e8
+                matrix[row][10] = 0; //e9
+                matrix[row][11] = 0; //e10
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+                
+                //e7
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 7);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][8] = gf256val;
+                
+                //e8
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 8);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][9] = gf256val;
+                
+                //e9
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 9);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][10] = gf256val;
+                
+                //e10
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 10);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][11] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][12] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][13] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][14] = 0;
+                matrix[row][15] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][14] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][15] = temp;
+            }
+
+
+            for (int col=16; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 12);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_11
+    
+    
+    private void Fill_Matrix_10()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            //e7
+            //e8
+            //e9
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+                matrix[row][8] = 0; //e7
+                matrix[row][9] = 0; //e8
+                matrix[row][10] = 0; //e9
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+                
+                //e7
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 7);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][8] = gf256val;
+                
+                //e8
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 8);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][9] = gf256val;
+                
+                //e9
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 9);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][10] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][11] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][12] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][13] = 0;
+                matrix[row][14] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][13] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][14] = temp;
+            }
+
+
+            for (int col=15; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 11);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_10
+    
+    
+    private void Fill_Matrix_9()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            //e7
+            //e8
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+                matrix[row][8] = 0; //e7
+                matrix[row][9] = 0; //e8
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+                
+                //e7
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 7);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][8] = gf256val;
+                
+                //e8
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 8);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][9] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][10] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][11] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][12] = 0;
+                matrix[row][13] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][12] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][13] = temp;
+            }
+
+
+            for (int col=14; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 10);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_9
+    
+    
+    private void Fill_Matrix_8()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            //e7
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+                matrix[row][8] = 0; //e7
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+                
+                //e7
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 7);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][8] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][9] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][10] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][11] = 0;
+                matrix[row][12] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][11] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][12] = temp;
+            }
+
+
+            for (int col=13; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 9);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_8
+    
+    
+    private void Fill_Matrix_7()
+    {
+        Tools tool = new Tools();
+        for (int row=1; row <= recv_max_index; row++)
+        {
+            //GF(256)
+            
+            //e0
+            matrix[row][1] = b[row];
+
+            //e1
+            //e2
+            //e3
+            //e4
+            //e5
+            //e6
+            if (b[row]==0 || a[row]==0)
+            {
+                matrix[row][2] = 0; //e1
+                matrix[row][3] = 0; //e2
+                matrix[row][4] = 0; //e3
+                matrix[row][5] = 0; //e4
+                matrix[row][6] = 0; //e5
+                matrix[row][7] = 0; //e6
+            }   
+            else
+            {
+                //e1
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int b_as_alpha_to_something_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[b[row]];
+                int total_exp = b_as_alpha_to_something_exp + alpha_exp;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][2] = gf256val;
+                
+                //e2
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 2);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][3] = gf256val;
+                
+                //e3
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 3);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][4] = gf256val;
+                
+                //e4
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 4);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][5] = gf256val;
+                
+                //e5
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 5);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][6] = gf256val;
+                
+                //e6
+                total_exp = b_as_alpha_to_something_exp + (alpha_exp * 6);
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                gf256val = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                matrix[row][7] = gf256val;
+            }
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q0
+            matrix[row][8] = 1;
+
+            //in true GF(256) additive inverse is itself which is why XOR for addition works
+            //q1
+            matrix[row][9] = a[row];
+
+            //q2 and q3
+            if (a[row]==0)
+            {
+                matrix[row][10] = 0;
+                matrix[row][11] = 0;
+            }
+            else
+            {
+                int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                int total_exp = alpha_exp * 2;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][10] = temp;
+
+
+                total_exp = alpha_exp * 3;
+                if (total_exp >= 256)
+                    total_exp %= 255;
+                temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                //in true GF(256) additive inverse is itself which is why XOR for addition works
+                matrix[row][11] = temp;
+            }
+
+
+            for (int col=12; col <= recv_max_index; col++)
+            {
+                if (a[row] == 0)
+                {
+                    matrix[row][col] = 0;
+                }
+                else
+                {
+                    int alpha_exp = tool.Table_Integer_To_Exponent_Of_Alpha()[a[row]];
+                    int total_exp = alpha_exp * (col - 8);
+                    if (total_exp >= 256)
+                         total_exp %= 255;
+                    int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+                    //in true GF(256) additive inverse is itself which is why XOR for addition works
+                    matrix[row][col] = temp;
+                }
+            }
+        }//for row
+    }//Fill_Matrix_7
     
     
     private void Fill_Matrix_6()
@@ -1228,6 +2507,22 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
                 System.out.print(" + ");
         }
     }//GF_Polynomial_Long_Division_To_Find_F_Function
+    
+    public boolean Check_Remainder_All_0()
+    {
+        System.out.println();
+        System.out.print("a[ii] = ");
+        for (int ii=1; ii < this.a.length; ii++) //DO NOT USE a[0]
+            System.out.print(a[ii] + " "); //DO NOT USE a[0]
+        System.out.println();
+        
+        for (int ii=0; ii < F_Remainder.size(); ii++)
+        {
+            if (F_Remainder.get(ii) != 0)
+                return false;
+        }
+        return true;
+    }//Check_Remainder_All_0
     
     
     public ArrayList<Integer> GF256_Find_Error_Locations() throws Exception
