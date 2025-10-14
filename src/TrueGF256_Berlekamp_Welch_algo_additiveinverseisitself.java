@@ -97,8 +97,10 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
     
     boolean Switch_aii;
     
-    public TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(int gf_val, int[] temp_b, int temp_e_count) throws Exception
+    
+    public TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself(int gf_val, int[] temp_b, int temp_e_count, boolean switch_aii) throws Exception
     {
+        Switch_aii = switch_aii;
         GF = gf_val;
         b = temp_b; //do not use b[0]
         recv_max_index = b.length - 1;
@@ -112,10 +114,23 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         Tools tool = new Tools();
         a = new int[b.length]; //DO NOT USE a[0]
         a[0] = Integer.MAX_VALUE; //DO NOT USE a[0] just try to mark it as not used
+        System.out.println();
+        System.out.print("a[ii] = ");
         for (int ii=1; ii <= recv_max_index; ii++)
         {
-            a[ii] = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
+            if (Switch_aii)
+            {
+                int num = tool.Table_Exponent_Of_Alpha_To_Integer()[ii-1];
+                a[ii] = num;
+                System.out.print("2^" + (ii-1) + ", ");
+            }
+            else
+            {
+                a[ii] = ii-1; //0,1,2,3,4,5,6,7,8 ..... ii-1
+                System.out.print(a[ii] + ", ");
+            }
         }
+        System.out.println();
         
         //answer_matrix is rows==b.length x columns=1 represented by an array 
         //where answer_matrix[0] is not used so we will not be confused
@@ -871,7 +886,7 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
         String str = "";
         while (str.equals("x") == false)
         {
-            Debug_Print();
+            //Debug_Print();
             
             System.out.println();
             System.out.println("Enter m,x,y: Multiply row-x by y (GF7)");
@@ -923,7 +938,7 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
     public boolean Robot_Solve()
     {   
         int ii=1;
-        Debug_Print();
+        //Debug_Print();
         while (true)
         {   
             boolean good = false;
@@ -932,8 +947,7 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
                 try
                 {
                     good = GF256_Make_Column_Good_1_And_0s(ii);
-                    Debug_Print();
-                    int dummy=1;
+                    //Debug_Print();
                 }
                 catch (Exception ex)
                 {
@@ -1088,10 +1102,7 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
     
     public void Debug_Print_Q_And_E_Functions()
     {
-        if (Switch_aii)
-            System.out.println("ai = a[ii] = 0,1,2,3,4,5,6,7,8,9 ..... ii-1");
-        else
-            System.out.println("ai = a[ii] = 1,2,4,8,16,32,64,128,29,58 ..... 2^(ii-1)");
+        
         System.out.print("Q(ai) = ");
         for (int qii=q_max_index; qii >= 0; qii--) //q uses q[0], q[0] is coefficient for x^0
         {
@@ -1178,17 +1189,19 @@ public class TrueGF256_Berlekamp_Welch_algo_additiveinverseisitself {
                     if (mult != 0)
                     {
                         mult_alphaexp = tool.Table_Integer_To_Exponent_Of_Alpha()[mult];
-                        int temp_dividend = dividend.get(ii);
-                    
+                        int temp_dividend = dividend.get(ii);                    
                         int temp_E = E.get(ii);
-                        int temp_E_alphaexp = tool.Table_Integer_To_Exponent_Of_Alpha()[temp_E];
-                        int total_alphaexp = temp_E_alphaexp + mult_alphaexp;
-                        if (total_alphaexp >= 256)
-                            total_alphaexp %= 255;
-                    
-                        int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_alphaexp];
-                        int xornum  = temp_dividend ^ temp;
-                        dividend.set(ii, xornum);
+                        if (temp_E != 0)
+                        {
+                            int temp_E_alphaexp = tool.Table_Integer_To_Exponent_Of_Alpha()[temp_E];
+                            int total_alphaexp = temp_E_alphaexp + mult_alphaexp;
+                            if (total_alphaexp >= 256)
+                                total_alphaexp %= 255;
+
+                            int temp = tool.Table_Exponent_Of_Alpha_To_Integer()[total_alphaexp];
+                            int xornum  = temp_dividend ^ temp;
+                            dividend.set(ii, xornum);
+                        }
                     }
                     //else dividend[ii] remains same
                 }       
