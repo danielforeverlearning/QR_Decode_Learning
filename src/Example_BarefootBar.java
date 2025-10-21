@@ -407,7 +407,23 @@ public class Example_BarefootBar {
                     //for (int ii=0; ii < locandcorrect.size(); ii++)
                     //    System.out.println(locandcorrect.get(ii));
                     }
+                    else
+                        System.out.println("Remainder not all 0, can not proceed.");
                 }
+                
+                
+                //Ok i think i figured it out i think .....
+                //Berlekamp-Welch and Modified-Berlekamp-Welch
+                //algorithms work on systematic-encoding where
+                //you use a different polynomial u(x) called the  "message-polynomial" and you use ai=0,1,2,3,4,5 .....i-1
+                //as inputs to x in the message-polynomial to get 
+                //the first k bytes which are the message-bytes followed by the error-correction-bytes which
+                //you put after the message-bytes.
+                //BUT QR-codes first use polynomial-long-division on a polynomial by
+                //a generator-polynomial and the error-correction-bytes which you
+                //put after the message-bytes are the remainder-bytes from the polynomial-long-division.
+                //These message-bytes and error-correction-bytes are NOT u(x)
+                //from Berlekamp-Welch and Modified-Berlekamp-Welch algorithms.
 
                  
                 //****************************************************************************
